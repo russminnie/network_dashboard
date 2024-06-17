@@ -11,9 +11,16 @@
 - `requirements.txt`: Contains the Python libraries required for the project.
 
 ## Description
+This project is a network dashboard which displays information about income and outgoing traffic from the MultiTech Conduit gateways and their respective IOT devices.
 
 ## Requirements
+- Python 3.10.12
+- Flask 3.0.3
 
 ## Setup
+1. Clone the repository.
+2. Install the required Python libraries using `pip install -r requirements.txt`.
 
 ## Usage
+1. Run the Flask server using `python server.py`.
+2. Open the dashboard in your browser by navigating to `localhost:5000`.
