@@ -13,26 +13,6 @@
 
 ## Description
 
-This project is a network dashboard which displays information about income and outgoing traffic from the MultiTech
-Conduit gateways and their respective IOT devices.
-
-## Requirements
-
-- Python 3.10.12
-- Flask 3.0.3
-
-## Setup
-
-1. Clone the repository.
-2. Install the required Python libraries using `pip install -r requirements.txt`.
-
-## Usage
-
-1. Run the Flask server using `python server.py`.
-2. Open the dashboard in your browser by navigating to `localhost:5000`.
-
-# About
-
 This application uses flask and flask extentions to create a simple websever and API in python. For more information
 about these libraries used in the app see the docs below
 
@@ -46,43 +26,20 @@ about these libraries used in the app see the docs below
 Flask has many more extensions to extend your web
 applications. [Popular flask extensions](https://www.fullstackpython.com/flask-extensions-plug-ins-related-libraries.html)
 
+## Requirements
+
+- Python 3.10.12
+- Flask 3.0.3
+
 # How to Run Application On conduit
 
-install all required libraries libraries using pip
-for Example:
+1. Clone the repository.
+2. Install the required Python libraries using `pip install -r requirements.txt`.
 
-```
-  $ pip install flask
-  $ pip install flask-restful
-  $ pip install flask-sqlalchemy
-```
+## Usage
 
-before running the 'apiapp.py' script create the database using the following steps:
-
-- open python
-
-```
-$ python3
-```
-
-- in python run the following lines. this will import the db from the app and create the db tables from the models
-
-```
-$ from apiapp import db
-$ db.create_all()
-```
-
-- exit python
-
-```
-exit()
-```
-
-next run the apiapp
-
-```
-$ python3 apiapp.py
-```
+1. Run the Flask server using `python3 server.py`.
+2. Open the dashboard in your browser by navigating to `localhost:5000`.
 
 # API Documentation
 
