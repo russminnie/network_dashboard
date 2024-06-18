@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
 from werkzeug.security import generate_password_hash, check_password_hash
 from data import *
-import os, json, io. sqlite3
+import os, json, io.sqlite3
 from os import environ as env
 from dotenv import load_dotenv
 from datetime import datetime
@@ -18,45 +18,23 @@ app = Flask(__name__, static_url_path='/static')
 db = SQLAlchemy(app)
 api = Api(app)
 
+
 # Create the application instance
 @app.route('/')
 def home():
     return render_template('home.html')
 
-# Configure sqlite database in the current directory
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.dirname(app.root_path) + '/LoraMessage.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config["JSON_SORT_KEYS"] = False
-
-#connect and return database
-def get_db():
-    db = getattr(g,'_database' , None)
-    if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
-    return db
-
-#closes connection when aplication exits
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-
-#define the table models in database
-class Users(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50))
-    password = db.Column(db.String(50))
 
 class LoraMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     deviceName = db.Column(db.String(50))
-    deveui =db.Column(db.String(23))
+    deveui = db.Column(db.String(23))
     appeui = db.Column(db.String(23))
     data = db.Column(db.String(50))
     size = db.Column(db.Integer)
     timestamp = db.Column(db.Integer)
     sqn = db.Column(db.Integer)
+
 
 #### next set of classes use flask restful to define endpoints and request methods
 class UserList(Resource):
@@ -76,29 +54,31 @@ class UserList(Resource):
 
     ## create new user##
     def post(self):
-        #initialize request parser, set parameter arguments
+        # initialize request parser, set parameter arguments
         parser = reqparse.RequestParser()
         parser.add_argument('username', required=True)
         parser.add_argument('password', required=True)
-        #save arguments into object
+        # save arguments into object
         args = parser.parse_args()
         password = args['password']
         username = args['username']
-        #hash the password
+        # hash the password
         hash_password = generate_password_hash(password, method='sha256')
 
-        new_user = Users(username=username, password = hash_password)
+        new_user = Users(username=username, password=hash_password)
         db.session.add(new_user)
         db.session.commit()
 
         return ({'message': 'User Created', 'data': args}, 201)
+
+
 class User(Resource):
     def get(self, identifier):
         # get user if exists
-        user = Users.query.filter_by(username = identifier).first()
-        #handle if user doesn't exist
+        user = Users.query.filter_by(username=identifier).first()
+        # handle if user doesn't exist
         if not user:
-            return jsonify({'message':'No user found'})
+            return jsonify({'message': 'No user found'})
         user_data = {}
         user_data['username'] = user.username
         user_data['password'] = user.password
@@ -106,18 +86,19 @@ class User(Resource):
         return jsonify({'user': user_data})
 
     def delete(self, identifier):
-        user = Users.query.filter_by(username = identifier).first()
+        user = Users.query.filter_by(username=identifier).first()
         if not user:
-                # return on failure
-                return jsonify({'message': 'No user found'})
+            # return on failure
+            return jsonify({'message': 'No user found'})
         db.session.delete(user)
         db.session.commit()
-                #return on success
+        # return on success
         return jsonify({'message': 'The user has been deleted'})
+
 
 class LoraMessageList(Resource):
     def get(self):
-        LoraMessageList  = LoraMessage.query.all()
+        LoraMessageList = LoraMessage.query.all()
         output = []
         for LoraMessage in LoraMessageList:
             LoraMessage_data = {}
@@ -128,7 +109,6 @@ class LoraMessageList(Resource):
             LoraMessage_data["size"] = LoraMessage.size
             LoraMessage_data["timestamp"] = LoraMessage.timestamp
             LoraMessage_data["sqn"] = LoraMessage.sqn
-
 
             output.append(LoraMessage_data)
 
@@ -142,10 +122,10 @@ class LoraMessageList(Resource):
         parser.add_argument('data', required=True)
         parser.add_argument('size', required=True)
         parser.add_argument('timestamp', required=True)
-        parser.add_argument('sqn', required = True)
+        parser.add_argument('sqn', required=True)
 
         args = parser.parse_args()
-        deviceName= args['deviceName']
+        deviceName = args['deviceName']
         deveui = args['deveui']
         appeui = args['appeui']
         data = args['data']
@@ -153,8 +133,8 @@ class LoraMessageList(Resource):
         timestamp = args['timestamp']
         sqn = args['sqn']
 
-        new_LoraMessage = LoraMessage(deviceName=deviceName, deveui=deveui, appeui= appeui, data= data,
-        size = size, timestamp = timestamp, sqn = sqn)
+        new_LoraMessage = LoraMessage(deviceName=deviceName, deveui=deveui, appeui=appeui, data=data,
+                                      size=size, timestamp=timestamp, sqn=sqn)
         db.session.add(new_LoraMessage)
         db.session.commit()
         ##return message
@@ -163,7 +143,7 @@ class LoraMessageList(Resource):
 
 class LoraMessage(Resource):
     def get(self, identifier):
-        LoraMessage = LoraMessage.query.filter_by(deveui= identifier).first()
+        LoraMessage = LoraMessage.query.filter_by(deveui=identifier).first()
 
         if not LoraMessage:
             return jsonify({'message': 'Device not found'})
@@ -177,6 +157,7 @@ class LoraMessage(Resource):
         LoraMessage_data["sqn"] = LoraMessage.sqn
 
         return jsonify({'LoraMessage': LoraMessage_data})
+
 
 # add api routes and endpoints
 api.add_resource(LoraMessageList, '/LoraMessage')
