@@ -1,45 +1,41 @@
 # MultiTech Network Dashboard
 
-[![My Skills](https://skillicons.dev/icons?i=python,flask,js,mysql,html,css,github)](https://skillicons.dev)
-
-## Project Files
-
-- `server.py`: The main file that runs the Flask server and serves the dashboard.
-- `templates/`: Contains the HTML files for the dashboard. Dynamically generated using Jinja2.
-- `static/`: Contains the CSS JavaScript and image files for the dashboard.
-- `data.py`: Contains the data processing functions.
-- `schema.sql`: Contains the SQL schema for the database.
-- `requirements.txt`: Contains the Python libraries required for the project.
+[![My Skills](https://skillicons.dev/icons?i=python,flask,js,html,css,github)](https://skillicons.dev)
 
 ## Description
 
 This application uses flask and flask extentions to create a simple websever and API in python. For more information
 about these libraries used in the app see the docs below
 
-- *Flask* is lightwieght web appliction framework for python.
-  [Flask Documentation](https://flask.palletsprojects.com/en/1.1.x/)
-- *Flask-Restful* is an extension for Flask that adds support for quickly building REST APIs.
-  [Flask-restful Documentation](https://flask-restful.readthedocs.io/en/latest/index.html)
-- *Flask-sqlalchemy* is a flask extension that adds support for sqlalchemy(database toolkit) for flask
-  [Flask-sqlalchemy Documentation](https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
+## How to Run Application On conduit
 
-Flask has many more extensions to extend your web
-applications. [Popular flask extensions](https://www.fullstackpython.com/flask-extensions-plug-ins-related-libraries.html)
+### Project Files
 
-## Requirements
+- `server.py`: The main file that runs the Flask server and serves the dashboard.
+- `templates/`: Contains the HTML files for the dashboard. Dynamically generated using Jinja2.
+- `static/`: Contains the CSS JavaScript and image files for the dashboard. ase.
+- `requirements.txt`: Contains the Python libraries required for the project.
+- `README.md`: The file you are currently reading.
+- other files you can ignore for now.
 
-- Python 3.10.12
-- Flask 3.0.3
+### Requirements
 
-# How to Run Application On conduit
+- Python 3
+- Pip
 
-1. Clone the repository.
-2. Install the required Python libraries using `pip install -r requirements.txt`.
+### Installation
 
-## Usage
+```bash
+pip install -r requirements.txt
+```
 
-1. Run the Flask server using `python3 server.py`.
-2. Open the dashboard in your browser by navigating to `localhost:5000`.
+### Running the Application
+
+```bash
+python3 server.py
+```
+
+Or press the run button in your IDE of choice.
 
 # API Documentation
 
