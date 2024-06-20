@@ -3,21 +3,87 @@
 # Inspiration from Russel Ndip
 # Authors Benjamin Lindeen, Austin Jacobson
 
-from flask import Flask, jsonify, render_template, redirect, url_for
+from flask import Flask, jsonify, request, render_template, redirect, url_for
 from flask_restful import Resource, Api, reqparse
 from werkzeug.security import generate_password_hash
 
+# Create the application instance
 app = Flask(__name__)
-api = Api(app)
+api = Api(app)  # create the API instance and bind to app
 
 # In-memory storage
 users = []
 lora_messages = []
 
 
+# Create a URL route in our application for "/"
 @app.route('/')
 def index():
-    return render_template('home.html')
+    return render_template('index.html')
+
+
+@app.route('/users')
+def list_users():
+    return render_template('users.html', users=users)
+
+
+@app.route('/users/add', methods=['GET', 'POST'])
+def add_user():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        for user in users:
+            if user['username'] == username:
+                return {'message': 'User already exists'}, 400
+
+        hashed_password = generate_password_hash(password, method='sha256')
+        users.append({'username': username, 'password': hashed_password})
+        return redirect(url_for('list_users'))
+    return render_template('add_user.html')
+
+
+@app.route('/users/delete/<string:username>', methods=['POST'])
+def delete_user(username):
+    global users
+    users = [user for user in users if user['username'] != username]
+    return redirect(url_for('list_users'))
+
+
+@app.route('/lora_messages')
+def list_lora_messages():
+    return render_template('lora_messages.html', lora_messages=lora_messages)
+
+
+@app.route('/lora_messages/add', methods=['GET', 'POST'])
+def add_lora_message():
+    if request.method == 'POST':
+        deviceName = request.form['deviceName']
+        deveui = request.form['deveui']
+        appeui = request.form['appeui']
+        data = request.form['data']
+        size = request.form['size']
+        timestamp = request.form['timestamp']
+        sqn = request.form['sqn']
+
+        lora_messages.append({
+            'deviceName': deviceName,
+            'deveui': deveui,
+            'appeui': appeui,
+            'data': data,
+            'size': size,
+            'timestamp': timestamp,
+            'sqn': sqn
+        })
+        return redirect(url_for('list_lora_messages'))
+    return render_template('add_lora_message.html')
+
+
+@app.route('/lora_messages/<string:deveui>')
+def view_lora_message(deveui):
+    for message in lora_messages:
+        if message['deveui'] == deveui:
+            return render_template('view_lora_message.html', message=message)
+    return {'message': 'Device not found'}, 404
 
 
 #### UserList Resource
@@ -84,10 +150,10 @@ class LoraMessage(Resource):
 
 
 # add api routes and endpoints
-api.add_resource(UserList, '/users')
-api.add_resource(User, '/users/<string:identifier>')
-api.add_resource(LoraMessageList, '/LoraMessage')
-api.add_resource(LoraMessage, '/LoraMessage/<string:identifier>')
+api.add_resource(UserList, '/api/users')
+api.add_resource(User, '/api/users/<string:identifier>')
+api.add_resource(LoraMessageList, '/api/LoraMessage')
+api.add_resource(LoraMessage, '/api/LoraMessage/<string:identifier>')
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(debug=True, port=5000)
