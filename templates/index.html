@@ -1,15 +1,9 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Home</title>
-</head>
-<body>
-<h1>Home</h1>
-<a href="{{ url_for('list_users') }}">Manage Users</a><br>
-<a href="{{ url_for('list_lora_messages') }}">Manage LoRa Messages</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+    <h1>MultiTech</h1>
+    <a href="{{ url_for('list_users') }}">Manage Users</a><br>
+    <a href="{{ url_for('list_lora_messages') }}">Manage LoRa Messages</a>
+{% endblock %}
