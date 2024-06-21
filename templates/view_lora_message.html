@@ -1,20 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>LoRa Message Details</title>
-</head>
-<body>
-<h1>LoRa Message Details</h1>
-<ul>
-    <li>Device Name: {{ message.deviceName }}</li>
-    <li>Device EUI: {{ message.deveui }}</li>
-    <li>App EUI: {{ message.appeui }}</li>
-    <li>Data: {{ message.data }}</li>
-    <li>Size: {{ message.size }}</li>
-    <li>Timestamp: {{ message.timestamp }}</li>
-    <li>Sequence Number: {{ message.sqn }}</li>
-</ul>
-<a href="{{ url_for('list_lora_messages') }}">Back to LoRa Messages</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}LoRa Message Details{% endblock %}
+
+{% block content %}
+    <h1>LoRa Message Details</h1>
+    <ul>
+        <li>Device Name: {{ message.deviceName }}</li>
+        <li>Device EUI: {{ message.deveui }}</li>
+        <li>App EUI: {{ message.appeui }}</li>
+        <li>Data: {{ message.data }}</li>
+        <li>Size: {{ message.size }}</li>
+        <li>Timestamp: {{ message.timestamp }}</li>
+        <li>Sequence Number: {{ message.sqn }}</li>
+    </ul>
+    <a href="{{ url_for('list_lora_messages') }}">Back to LoRa Messages</a>
+{% endblock %}
