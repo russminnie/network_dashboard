@@ -13,6 +13,7 @@ about these libraries used in the app see the docs below
 
 - `server.py`: The main file that runs the Flask server and serves the dashboard.
 - `templates/`: Contains the HTML files for the dashboard. Dynamically generated using Jinja2.
+- `base.html`: The base HTML file that all other HTML files extend.
 - `static/`: Contains the CSS JavaScript and image files for the dashboard. ase.
 - `requirements.txt`: Contains the Python libraries required for the project.
 - `README.md`: The file you are currently reading.
