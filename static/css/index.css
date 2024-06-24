@@ -86,3 +86,20 @@ a.button {
 a.button:hover {
     background-color: #e0e0e0;
 }
+
+nav {
+    margin-bottom: 20px;
+}
+
+nav a {
+    background-color: #005bb5;
+    color: white;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    background-color: #0072ce;
+}
