@@ -4,11 +4,10 @@
 
 {% block content %}
     <h1>LoRa Messages</h1>
-    <a href="{{ url_for('add_lora_message') }}">Add LoRa Message</a>
+    <a class="button" href="{{ url_for('add_lora_message') }}">Add LoRa Message</a>
     <ul>
         {% for message in lora_messages %}
-            <li><a href="{{ url_for('view_lora_message', deveui=message.deveui) }}">{{ message.deviceName }}</a></li>
+        <li><a href="{{ url_for('view_lora_message', deveui=message.deveui) }}">{{ message.deviceName }}</a></li>
         {% endfor %}
     </ul>
-    <a href="{{ url_for('index') }}">Back to Home</a>
 {% endblock %}
