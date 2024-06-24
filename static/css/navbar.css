@@ -1,0 +1,35 @@
+nav {
+    height: 100vh;
+    margin: 1em 75vw 1em 1em;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background-color: #ffffff;
+    overflow-x: hidden;
+    transition: 0.5s;
+    border-radius: 2em;
+    padding: 1em;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    display: block;
+    margin: 0 auto;
+    padding: 1em;
+    width: 80%;
+}
+
+nav a, p {
+    padding: 1em;
+    font-size: 1.5vw;
+    color: #000000;
+    display: block;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+nav a:hover {
+    background-color: #0072ce;
+    border-radius: 1em;
+}
