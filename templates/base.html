@@ -6,9 +6,14 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/index.css') }}">
 </head>
 <body>
-    <div class="container">
-        {% include 'navbar.html' %}
-        {% block content %}{% endblock %}
-    </div>
+<div class="wrapper">
+    {% include 'navbar.html' %}
+    <main>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+</div>
 </body>
 </html>

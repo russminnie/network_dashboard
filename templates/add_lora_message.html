@@ -5,13 +5,20 @@
 {% block content %}
     <h1>Add LoRa Message</h1>
     <form action="{{ url_for('add_lora_message') }}" method="post">
-        Device Name: <input type="text" name="deviceName"><br>
-        Device EUI: <input type="text" name="deveui"><br>
-        App EUI: <input type="text" name="appeui"><br>
-        Data: <input type="text" name="data"><br>
-        Size: <input type="number" name="size"><br>
-        Timestamp: <input type="text" name="timestamp"><br>
-        Sequence Number: <input type="number" name="sqn"><br>
+        Device Name <br>
+        <input type="text" name="deviceName"><br>
+        Device EUI <br>
+        <input type="text" name="deveui"><br>
+        App EU <br>
+        <input type="text" name="appeui"><br>
+        Data <br>
+        <input type="text" name="data"><br>
+        Size <br>
+        <input type="number" name="size"><br>
+        Timestamp <br>
+        <input type="text" name="timestamp"><br>
+        Sequence Number <br>
+        <input type="number" name="sqn"><br>
         <button type="submit">Add LoRa Message</button>
     </form>
 {% endblock %}

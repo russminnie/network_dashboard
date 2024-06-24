@@ -1,5 +1,8 @@
+<link href='https://fonts.googleapis.com/css?family=Lexend' rel='stylesheet'>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/navbar.css') }}">
 <nav>
+    <img src="../static/img/MultiTech_Logo_Color_3000px_RGB.png" class="logo">
     <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('list_users') }}">Manage Users</a>
-    <a href="{{ url_for('list_lora_messages') }}">Manage LoRa Messages</a>
+    <a href="{{ url_for('list_users') }}">Users</a>
+    <a href="{{ url_for('list_lora_messages') }}">LoRa Messages</a>
 </nav>
