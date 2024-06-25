@@ -16,11 +16,14 @@ nav {
 .logo {
     display: block;
     margin: 0 auto;
-    padding: 1em;
     width: 80%;
+    padding: 1em;
+    font-size: 1.5vw;
+    color: #000000;
+    transition: 0.3s;
 }
 
-nav a, p {
+nav a {
     padding: 1em;
     font-size: 1.5vw;
     color: #000000;
