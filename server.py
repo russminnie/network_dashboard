@@ -7,16 +7,13 @@ from flask import Flask, jsonify, request, render_template, redirect, url_for
 from flask_restful import Resource, Api, reqparse
 from werkzeug.security import generate_password_hash
 
-# Create the application instance
 app = Flask(__name__)
-api = Api(app)  # create the API instance and bind to app
+api = Api(app)
 
-# In-memory storage
 users = []
 lora_messages = []
 
 
-# Create a URL route in our application for "/"
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -86,7 +83,6 @@ def view_lora_message(deveui):
     return {'message': 'Device not found'}, 404
 
 
-#### UserList Resource
 class UserList(Resource):
     def get(self):
         return jsonify({'users': users})
@@ -106,7 +102,6 @@ class UserList(Resource):
         return {'message': 'User Created', 'data': args}, 201
 
 
-#### User Resource
 class User(Resource):
     def get(self, identifier):
         for user in users:
@@ -120,7 +115,6 @@ class User(Resource):
         return {'message': 'The user has been deleted'}
 
 
-#### LoraMessageList Resource
 class LoraMessageList(Resource):
     def get(self):
         return jsonify({'LoraMessages': lora_messages})
@@ -140,7 +134,6 @@ class LoraMessageList(Resource):
         return {'message': 'Lora Message Added', 'data': args}, 201
 
 
-#### LoraMessage Resource
 class LoraMessage(Resource):
     def get(self, identifier):
         for message in lora_messages:
@@ -149,7 +142,6 @@ class LoraMessage(Resource):
         return {'message': 'Device not found'}, 404
 
 
-# add api routes and endpoints
 api.add_resource(UserList, '/api/users')
 api.add_resource(User, '/api/users/<string:identifier>')
 api.add_resource(LoraMessageList, '/api/LoraMessage')
