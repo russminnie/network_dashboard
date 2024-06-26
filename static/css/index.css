@@ -24,7 +24,7 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1, a {
+h1, a, ul, li {
     color: white;
 }
 
@@ -36,6 +36,14 @@ a {
 form {
     color: #ffffff;
     margin: 2em 0;
+}
+
+.form-section {
+    margin-bottom: 1.5em;
+}
+
+form.inline {
+    display: inline;
 }
 
 input[type="text"], input[type="password"], input[type="number"], input[type="datetime-local"] {
@@ -56,9 +64,6 @@ li {
     margin: 1em 0em;
 }
 
-form.inline {
-    display: inline;
-}
 
 button, a.button {
     display: inline-block;
@@ -76,4 +81,20 @@ button, a.button {
 
 button:hover, a.button:hover {
     background-color: #e0e0e0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    width: 50vw;
+    border: 1px solid black;
+    padding: 1em;
+    text-align: left;
+}
+
+th {
+    background-color: #ffffff;
 }
