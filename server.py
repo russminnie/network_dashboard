@@ -8,9 +8,8 @@ from flask_restful import Api
 from werkzeug.security import generate_password_hash
 import paho.mqtt.client as mqtt
 from static.data.tooltips import *
-from static.data.message_type_map import *
-from py.messages_lora import *
-from py.messages_mqtt import *
+from static.py.messages_lora import *
+from static.py.messages_mqtt import *
 
 app = Flask(__name__)
 api = Api(app)
