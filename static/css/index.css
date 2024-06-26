@@ -7,13 +7,12 @@ body {
 
 .wrapper {
     display: flex;
-    height: 100vh;
 }
 
 main {
-    height: 100vh;
+    height: 100%;
     width: 75vw;
-    margin: 1em 1em 0 25vw;
+    margin: 1em 1em 1em 30vw;
     transition: 0.5s;
     display: flex;
     justify-content: left;
@@ -24,7 +23,7 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-h1, a, ul, li, label{
+h1, a, ul, li, label {
     color: white;
 }
 
@@ -64,7 +63,6 @@ li {
     margin: 1em 0em;
 }
 
-
 button, a.button {
     display: inline-block;
     margin: 1em 0em;
@@ -90,9 +88,12 @@ table {
 
 th, td {
     width: 50vw;
-    border: 1px solid black;
     padding: 1em;
     text-align: left;
+    font-size: 1vw;
+    color: #000000;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 th {
