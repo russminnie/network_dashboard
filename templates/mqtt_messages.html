@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}MQTT Messages{% endblock %}
+
+{% block content %}
+    <script src="./static/js/mqtt_messages.js"></script>
+    <h1>MQTT Messages</h1>
+
+    <!-- Form for connecting to MQTT broker -->
+    <form id="connectForm" onsubmit="connectToBroker(event)">
+        <div class="form-group">
+            <label for="broker">MQTT Broker IP:</label>
+            <input type="text" id="broker" name="broker" required>
+        </div>
+        <div class="form-group">
+            <label for="port">Port:</label>
+            <input type="number" id="port" name="port" value="1883" required>
+        </div>
+        <div class="form-group">
+            <label for="topic">Topic:</label>
+            <input type="text" id="topic" name="topic" required>
+        </div>
+        <button type="submit">Connect</button>
+    </form>
+
+    <!-- Filter messages dropdown -->
+    <label for="filter">Filter:</label>
+    <select id="filter" onchange="fetchMessages(this.value)">
+        <option value="">All</option>
+        <option value="Water sensor event">Water Sensor Event</option>
+        <option value="Reset Message">Reset</option>
+        <option value="Supervisory Message">Supervisory</option>
+        <!-- Add more filter options as needed -->
+    </select>
+    <br><br>
+    <!-- Table to display MQTT messages -->
+    <table>
+        <thead>
+        <tr>
+            <th>Topic</th>
+            <th>Content</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="messageTableBody">
+        <!-- Rows will be populated by JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Modal structure -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <pre id="modal-content"></pre>
+        </div>
+    </div>
+{% endblock %}

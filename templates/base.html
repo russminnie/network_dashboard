@@ -5,10 +5,11 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/index.css') }}">
 </head>
-<body>
+<body onload="fetchMessages()">
+<div class="background"></div>
 <div class="wrapper">
-    {% include 'navbar.html' %}
     <main>
+        {% include 'navbar.html' %}
         <div class="container">
             {% block content %}
             {% endblock %}
