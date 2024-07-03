@@ -1,11 +1,11 @@
+import paho.mqtt.client as mqtt
 import base64
 import json
-
 import paho.mqtt.publish as publish
 from static.data.config import *
 
 message_buffer = []
-mqtt_client = None
+mqtt_client = mqtt.Client()
 broker_ip = None
 
 def decode_sensor_data(data):

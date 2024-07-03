@@ -1,10 +1,15 @@
 from flask import Flask, jsonify, request, render_template
 from paho.mqtt import client as mqtt
 
-from static.py.mqtt_utils import *
+from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink
+
 
 app = Flask(__name__)
 
+
+# Configure MQTT client
+mqtt_client.on_connect = on_connect
+mqtt_client.on_message = on_message
 
 @app.route('/')
 def index():
@@ -40,6 +45,22 @@ def connect():
 
     return jsonify({"message": "Connected to MQTT broker"})
 
+
+@app.route('/messages', methods=['GET'])
+def get_messages():
+    filter_type = request.args.get('filter', '')
+    filtered_messages = []
+    for m in message_buffer:
+        if not filter_type or (
+                m['type'] == 'json' and
+                'data_decoded' in m['data'] and
+                m['data']['data_decoded'].get('message_type') == filter_type):
+            filtered_messages.append({
+                'topic': m['topic'],
+                'type': m['type'],
+                'data': m['data']
+            })
+    return jsonify(messages=filtered_messages)
 
 @app.route('/send_downlink', methods=['POST'])
 def send_downlink_route():
