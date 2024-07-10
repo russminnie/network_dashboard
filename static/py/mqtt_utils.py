@@ -48,12 +48,12 @@ def decode_sensor_data(data):
         return f"Error decoding Base64 or interpreting the payload: {e}"
 
 
-def on_connect(client, userdata, rc):
+def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe(userdata['topic'])
 
 
-def on_message(msg):
+def on_message(client, userdata, msg):
     global message_buffer
     topic = msg.topic
     message = msg.payload.decode()
