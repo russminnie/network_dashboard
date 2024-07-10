@@ -3,7 +3,7 @@
 {% block title %}Downlink{% endblock %}
 
 {% block content %}
-    <script src="./static/js/downlink.js"></script>
+    <script src="{{ url_for('static', filename='js/downlinks.js') }}"></script>
     <h1>Configure Downlink</h1>
     <!-- Form for connecting to MQTT broker -->
     <form id="connectForm" onsubmit="connectToBroker(event)">
