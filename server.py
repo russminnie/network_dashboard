@@ -5,9 +5,11 @@ from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_bu
 
 app = Flask(__name__)
 
+
 # Declare mqtt_client and broker_ip as global at the module level
 mqtt_client = None
 broker_ip = None
+
 
 @app.route('/')
 def index():
@@ -57,6 +59,20 @@ def get_messages():
                 'data': m['data']
             })
     return jsonify(messages=filtered_messages)
+
+
+@app.route('/dump_messages', methods=['GET'])
+def dump_messages():
+    try:
+        # Convert message buffer to JSON string
+        messages_json = jsonify(messages=message_buffer).get_data(as_text=True)
+        # Create a response with the JSON data, setting appropriate headers for file download
+        response = app.response_class(messages_json, mimetype='application/json')
+        response.headers['Content-Disposition'] = 'attachment; filename=message_buffer.json'
+        return response
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+
 
 @app.route('/send_downlink', methods=['POST'])
 def send_downlink_route():
