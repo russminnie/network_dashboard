@@ -5,7 +5,6 @@ from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_bu
 
 app = Flask(__name__)
 
-
 # Declare mqtt_client and broker_ip as global at the module level
 mqtt_client = None
 broker_ip = None
@@ -15,13 +14,16 @@ broker_ip = None
 def index():
     return render_template('index.html')
 
+
 @app.route('/mqtt_messages')
 def mqtt_messages():
     return render_template('mqtt_messages.html')
 
+
 @app.route('/downlink')
 def downlink():
     return render_template('downlinks.html')
+
 
 @app.route('/connect', methods=['POST'])
 def connect():
@@ -43,6 +45,7 @@ def connect():
     mqtt_client.loop_start()
 
     return jsonify({"message": "Connected to MQTT broker"})
+
 
 @app.route('/messages', methods=['GET'])
 def get_messages():
@@ -83,6 +86,7 @@ def send_downlink_route():
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)  # Debug log
     return jsonify(response), status_code
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
