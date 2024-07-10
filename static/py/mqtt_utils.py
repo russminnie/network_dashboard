@@ -6,7 +6,6 @@ from static.data.config import *
 
 message_buffer = []
 mqtt_client = mqtt.Client()
-broker_ip = None
 
 def decode_sensor_data(data):
     padding = '=' * ((4 - len(data) % 4) % 4)
@@ -36,7 +35,6 @@ def decode_sensor_data(data):
             decoded_message.update({
                 'device_error_code': payload[0],
                 'current_sensor_state': payload[1],
-                'battery_level': payload[2],
                 'battery_voltage': battery_voltage
             })
         elif message_type == 0x02:
@@ -82,8 +80,11 @@ def on_message(client, userdata, msg):
     if len(message_buffer) > 150:
         message_buffer.pop(0)
 
-def send_downlink(data):
-    global broker_ip
+def send_downlink(data, broker_ip):
+    print(f"Using broker_ip in send_downlink: {broker_ip}")  # Debug log
+
+    if not broker_ip:
+        return {"error": "Invalid host."}, 500
 
     topic = data['topic']
     enable_water_present = int(data['enableWaterPresent'])
@@ -91,7 +92,7 @@ def send_downlink(data):
     threshold = int(data['threshold'])
     restoral = int(data['restoral'])
 
-    enable_events = (enable_water_not_present << 1) | enable_water_present
+    enable_events = ((not enable_water_present) << 1) | (not enable_water_not_present)
 
     downlink_message = [
         0x08,  # Water sensor event
@@ -105,8 +106,11 @@ def send_downlink(data):
 
     payload = json.dumps({'data': downlink_message_base64})
 
+    print("Sending downlink message:", payload)  # Debug log
+
     try:
         publish.single(topic, payload, hostname=broker_ip)
         return {"message": "Downlink message sent successfully"}, 200
     except Exception as e:
+        print(f"Error sending downlink: {e}")  # Debug log
         return {"error": str(e)}, 500

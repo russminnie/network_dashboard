@@ -13,18 +13,18 @@ function connectToBroker(event) {
         },
         body: JSON.stringify({broker, port, topic})
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert(data.message);
-                brokerIp = broker; // Store broker IP for downlink usage
-            } else {
-                alert('Failed to connect to the broker');
-            }
-        })
-        .catch(error => {
-            alert('Error: ' + error);
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            brokerIp = broker; // Store broker IP for downlink usage
+        } else {
+            alert('Failed to connect to the broker');
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
 }
 
 function sendDownlink(event) {
@@ -34,6 +34,8 @@ function sendDownlink(event) {
     const enableWaterNotPresent = document.querySelector('input[name="enable_water_not_present"]:checked').value;
     const threshold = document.getElementById('threshold').value;
     const restoral = document.getElementById('restoral').value;
+
+    console.log("Sending downlink data:", { topic, enableWaterPresent, enableWaterNotPresent, threshold, restoral }); // Debug log
 
     fetch('/send_downlink', {
         method: 'POST',
@@ -48,11 +50,17 @@ function sendDownlink(event) {
             restoral
         })
     })
-        .then(response => response.json())
-        .then(data => {
+    .then(response => response.json())
+    .then(data => {
+        console.log('Response data:', data); // Debug log
+        if (data.message) {
             alert('Downlink sent: ' + data.message);
-        })
-        .catch(error => {
-            alert('Error sending downlink: ' + error);
-        });
+        } else {
+            alert('Error sending downlink: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error sending downlink: ' + error);
+    });
 }
