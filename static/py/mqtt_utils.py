@@ -2,11 +2,12 @@ import paho.mqtt.client as mqtt
 import base64
 import json
 import paho.mqtt.publish as publish
-from static.data.config import *
+from ..data.config import message_type_map, tooltips
 
 message_buffer = []
 mqtt_client = mqtt.Client()
 broker_ip = None
+
 
 def decode_sensor_data(data):
     padding = '=' * ((4 - len(data) % 4) % 4)
@@ -48,11 +49,13 @@ def decode_sensor_data(data):
     except (base64.binascii.Error, IndexError, ValueError) as e:
         return f"Error decoding Base64 or interpreting the payload: {e}"
 
-def on_connect(client, userdata, flags, rc):
+
+def on_connect(client, userdata, rc):
     print("Connected with result code " + str(rc))
     client.subscribe(userdata['topic'])
 
-def on_message(client, userdata, msg):
+
+def on_message(msg):
     global message_buffer
     topic = msg.topic
     message = msg.payload.decode()
@@ -81,6 +84,7 @@ def on_message(client, userdata, msg):
         })
     if len(message_buffer) > 150:
         message_buffer.pop(0)
+
 
 def send_downlink(data):
     global broker_ip
