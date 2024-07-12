@@ -1,5 +1,8 @@
 from flask import Flask, jsonify, request, render_template
 from paho.mqtt import client as mqtt
+import json
+import os
+import sys
 
 from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink
 
@@ -67,10 +70,14 @@ def get_messages():
 @app.route('/dump_messages', methods=['GET'])
 def dump_messages():
     try:
-        # Convert message buffer to JSON string
-        messages_json = jsonify(messages=message_buffer).get_data(as_text=True)
+        # Convert message buffer to JSON
+        messages_json = jsonify(messages=message_buffer).get_json()
+
         # Create a response with the JSON data, setting appropriate headers for file download
-        response = app.response_class(messages_json, mimetype='application/json')
+        response = app.response_class(
+            response=json.dumps(messages_json),
+            mimetype='application/json'
+        )
         response.headers['Content-Disposition'] = 'attachment; filename=message_buffer.json'
         return response
     except Exception as e:
