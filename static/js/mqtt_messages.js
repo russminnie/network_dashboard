@@ -120,11 +120,16 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
+document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);
+
 function dumpMessagesToJSON() {
-    fetch('/dump_messages', {
-        method: 'GET'
-    })
-        .then(response => response.blob())
+    fetch('/dump_messages')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob();
+        })
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -137,8 +142,5 @@ function dumpMessagesToJSON() {
         })
         .catch(error => console.error('Error downloading the file:', error));
 }
-
-// Add event listener to the button
-document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);
 
 setInterval(() => fetchMessages(document.getElementById('filter').value), 5000); // Fetch messages every 5 seconds
