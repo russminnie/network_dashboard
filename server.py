@@ -12,21 +12,17 @@ app = Flask(__name__)
 mqtt_client = None
 broker_ip = None
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/mqtt_messages')
 def mqtt_messages():
     return render_template('mqtt_messages.html')
 
-
 @app.route('/downlink')
 def downlink():
     return render_template('downlinks.html')
-
 
 @app.route('/connect', methods=['POST'])
 def connect():
@@ -49,7 +45,6 @@ def connect():
 
     return jsonify({"message": "Connected to MQTT broker"})
 
-
 @app.route('/messages', methods=['GET'])
 def get_messages():
     filter_type = request.args.get('filter', '')
@@ -65,7 +60,6 @@ def get_messages():
                 'data': m['data']
             })
     return jsonify(messages=filtered_messages)
-
 
 @app.route('/dump_messages', methods=['GET'])
 def dump_messages():
@@ -83,7 +77,6 @@ def dump_messages():
     except Exception as e:
         return jsonify(error=str(e)), 500
 
-
 @app.route('/send_downlink', methods=['POST'])
 def send_downlink_route():
     global broker_ip
@@ -93,7 +86,6 @@ def send_downlink_route():
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)  # Debug log
     return jsonify(response), status_code
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

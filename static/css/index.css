@@ -124,3 +124,71 @@ th {
 .form-group input {
     flex: 1;
 }
+.modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        background-color: #ffffff; /* Change to match your app's background */
+        color: #333333; /* Change to match your app's text color */
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        border-radius: 10px; /* Rounded corners */
+        width: 80%;
+        max-width: 600px; /* Max width for smaller screens */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Add a shadow for depth */
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    pre {
+        background-color: #f8f8f8; /* Light background for the text area */
+        padding: 10px;
+        border-radius: 5px;
+        overflow: auto;
+    }
+
+    button {
+        background-color: #007BFF; /* Bootstrap primary color */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition-duration: 0.4s;
+    }
+
+    button:hover {
+        background-color: white;
+        color: #007BFF;
+        border: 2px solid #007BFF;
+    }
+    </style>
+
+{% endblock %}

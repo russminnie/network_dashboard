@@ -7,7 +7,6 @@ from ..data.config import message_type_map, tooltips
 message_buffer = []
 mqtt_client = mqtt.Client()
 
-
 def decode_sensor_data(data):
     padding = '=' * ((4 - len(data) % 4) % 4)
     base64_data_padded = data + padding
@@ -31,13 +30,18 @@ def decode_sensor_data(data):
             })
         elif message_type == 0x00:
             decoded_message['reset_info'] = payload[:6].hex()
-        elif message_type == 0x01:
-            battery_voltage = payload[2] * 0.1
+        elif message_type == 0x01:  # Supervisory message
+            battery_voltage_hex = format(payload[2], '02x')
+            print(f"Battery voltage hex: {battery_voltage_hex}")  # Debug log
+            battery_voltage = int(battery_voltage_hex, 16) * 0.1  # Convert hex to int then multiply
+            print(f"Battery voltage: {battery_voltage}")  # Debug log
             decoded_message.update({
                 'device_error_code': payload[0],
                 'current_sensor_state': payload[1],
-                'battery_voltage': battery_voltage
+                'battery_voltage': battery_voltage,
+                'battery_voltage_hex': battery_voltage_hex  # Store hex value as a string
             })
+
         elif message_type == 0x02:
             decoded_message['tamper_status'] = 'Tampered' if payload[0] else 'Not tampered'
         elif message_type == 0x03:
@@ -47,11 +51,9 @@ def decode_sensor_data(data):
     except (base64.binascii.Error, IndexError, ValueError) as e:
         return f"Error decoding Base64 or interpreting the payload: {e}"
 
-
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe(userdata['topic'])
-
 
 def on_message(client, userdata, msg):
     global message_buffer
@@ -82,7 +84,6 @@ def on_message(client, userdata, msg):
         })
     if len(message_buffer) > 150:
         message_buffer.pop(0)
-
 
 def send_downlink(data, broker_ip):
     print(f"Using broker_ip in send_downlink: {broker_ip}")  # Debug log

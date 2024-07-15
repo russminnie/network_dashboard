@@ -15,6 +15,7 @@ function connectToBroker(event) {
         .then(data => {
             if (data.message) {
                 alert(data.message);
+                startFetchingMessages(); // Start fetching messages after successful connection
             } else {
                 alert('Failed to connect to the broker');
             }
@@ -46,7 +47,7 @@ function fetchMessages(filter = '') {
                         contentCell.textContent = 'No decoded data';
                     }
                     moreInfoButton.textContent = 'More Info';
-                    moreInfoButton.onclick = () => showModal(index);
+                    moreInfoButton.onclick = () => showModal(message.data);
                     buttonCell.appendChild(moreInfoButton);
                 } else {
                     contentCell.textContent = message.data;
@@ -56,9 +57,6 @@ function fetchMessages(filter = '') {
                 row.appendChild(contentCell);
                 row.appendChild(buttonCell);
                 messageTable.appendChild(row);
-
-                // Store the full message data in a data attribute for later use
-                row.dataset.fullMessage = JSON.stringify(message.data, null, 2);
             });
         });
 }
@@ -107,11 +105,10 @@ function formatContent(data) {
     return content;
 }
 
-function showModal(index) {
+function showModal(data) {
     const modal = document.getElementById('myModal');
-    const modalContent = document.getElementById('modal-content');
-    const messageRow = document.getElementById('messageTableBody').children[index];
-    modalContent.textContent = messageRow.dataset.fullMessage;
+    const modalContent = document.getElementById('modalText');
+    modalContent.textContent = JSON.stringify(data, null, 2);
     modal.style.display = 'block';
 }
 
@@ -120,16 +117,11 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);
-
 function dumpMessagesToJSON() {
-    fetch('/dump_messages')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.blob();
-        })
+    fetch('/dump_messages', {
+        method: 'GET'
+    })
+        .then(response => response.blob())
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -143,4 +135,20 @@ function dumpMessagesToJSON() {
         .catch(error => console.error('Error downloading the file:', error));
 }
 
-setInterval(() => fetchMessages(document.getElementById('filter').value), 5000); // Fetch messages every 5 seconds
+// Add event listener to the button
+document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);
+
+function startFetchingMessages() {
+    setInterval(() => fetchMessages(document.getElementById('filter').value), 5000); // Fetch messages every 5 seconds
+}
+
+// Add event listener for the close button of the modal
+document.querySelector('.close').addEventListener('click', closeModal);
+
+// Add event listener to close the modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('myModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+});
