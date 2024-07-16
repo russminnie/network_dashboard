@@ -118,21 +118,7 @@ function closeModal() {
 }
 
 function dumpMessagesToJSON() {
-    fetch('/dump_messages', {
-        method: 'GET'
-    })
-        .then(response => response.blob())
-        .then(blob => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'message_buffer.json';
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(error => console.error('Error downloading the file:', error));
+    window.location.href = '/dump_messages';
 }
 
 // Add event listener to the button
