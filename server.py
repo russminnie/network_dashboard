@@ -1,8 +1,7 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, send_file, Response
 from paho.mqtt import client as mqtt
+from datetime import datetime
 import json
-import os
-import sys
 
 from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink
 
@@ -12,17 +11,21 @@ app = Flask(__name__)
 mqtt_client = None
 broker_ip = None
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/mqtt_messages')
 def mqtt_messages():
     return render_template('mqtt_messages.html')
 
+
 @app.route('/downlink')
 def downlink():
     return render_template('downlinks.html')
+
 
 @app.route('/connect', methods=['POST'])
 def connect():
@@ -45,6 +48,7 @@ def connect():
 
     return jsonify({"message": "Connected to MQTT broker"})
 
+
 @app.route('/messages', methods=['GET'])
 def get_messages():
     filter_type = request.args.get('filter', '')
@@ -61,21 +65,15 @@ def get_messages():
             })
     return jsonify(messages=filtered_messages)
 
-@app.route('/dump_messages', methods=['GET'])
-def dump_messages():
-    try:
-        # Convert message buffer to JSON
-        messages_json = jsonify(messages=message_buffer).get_json()
 
-        # Create a response with the JSON data, setting appropriate headers for file download
-        response = app.response_class(
-            response=json.dumps(messages_json),
-            mimetype='application/json'
-        )
-        response.headers['Content-Disposition'] = 'attachment; filename=message_buffer.json'
-        return response
-    except Exception as e:
-        return jsonify(error=str(e)), 500
+@app.route('/dump_messages')
+def dump_messages():
+    data_json = json.dumps(message_buffer, indent=4)
+    response = Response(data_json, content_type='application/json; charset=utf-8')
+    filename_json = f'mqttmessages{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.json'
+    response.headers['Content-Disposition'] = 'attachment; filename=' + filename_json
+    return response
+
 
 @app.route('/send_downlink', methods=['POST'])
 def send_downlink_route():
@@ -86,6 +84,7 @@ def send_downlink_route():
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)  # Debug log
     return jsonify(response), status_code
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
