@@ -5,7 +5,7 @@ import json
 
 from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
 # Declare mqtt_client and broker_ip as global at the module level
 mqtt_client = None
