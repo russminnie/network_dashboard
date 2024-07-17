@@ -92,10 +92,12 @@ function formatContent(data) {
             content += `<strong>Temperature:</strong> ${data.temperature}<br>`;
             content += `<strong>Humidity:</strong> ${data.humidity}<br>`;
             break;
-        case 'Supervisory Message':
+case 'Supervisory Message':
             content += `<strong>Device Error Code:</strong> ${data.device_error_code}<br>`;
             content += `<strong>Current Sensor State:</strong> ${data.current_sensor_state}<br>`;
-            content += `<strong>Battery Level:</strong> ${data.battery_level}<br>`;
+            if (data.battery_level !== undefined) {
+                content += `<strong>Battery Level:</strong> ${data.battery_level}<br>`;
+            }
             content += `<strong>Battery Voltage:</strong> ${data.battery_voltage.toFixed(1)}V<br>`;
             break;
         default:

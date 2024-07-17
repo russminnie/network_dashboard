@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import base64
 import json
 import paho.mqtt.publish as publish
-from ..data.config import message_type_map, tooltips
+from static.data.config import message_type_map
 
 message_buffer = []
 mqtt_client = mqtt.Client()
@@ -10,6 +10,7 @@ mqtt_client = mqtt.Client()
 def decode_sensor_data(data):
     padding = '=' * ((4 - len(data) % 4) % 4)
     base64_data_padded = data + padding
+
     try:
         decoded_bytes = base64.b64decode(base64_data_padded)
         protocol_version = decoded_bytes[0] >> 4
@@ -30,22 +31,17 @@ def decode_sensor_data(data):
             })
         elif message_type == 0x00:
             decoded_message['reset_info'] = payload[:6].hex()
-        elif message_type == 0x01:  # Supervisory message
+        elif message_type == 0x01:
             battery_voltage_hex = format(payload[2], '02x')
-            print(f"Battery voltage hex: {battery_voltage_hex}")  # Debug log
-            battery_voltage = int(battery_voltage_hex, 16) * 0.1  # Convert hex to int then multiply
-            print(f"Battery voltage: {battery_voltage}")  # Debug log
+            battery_voltage = int(battery_voltage_hex) * 0.1
             decoded_message.update({
                 'device_error_code': payload[0],
                 'current_sensor_state': payload[1],
-                'battery_voltage': battery_voltage,
-                'battery_voltage_hex': battery_voltage_hex  # Store hex value as a string
+                'battery_voltage_hex': battery_voltage_hex,
+                'battery_voltage': battery_voltage
             })
-
-        elif message_type == 0x02:
-            decoded_message['tamper_status'] = 'Tampered' if payload[0] else 'Not tampered'
-        elif message_type == 0x03:
-            decoded_message['door_status'] = 'Open' if payload[0] else 'Closed'
+        else:
+            decoded_message['payload'] = payload.hex()
 
         return decoded_message
     except (base64.binascii.Error, IndexError, ValueError) as e:

@@ -22,31 +22,82 @@
         <button type="submit">Connect</button>
     </form>
 
-
     <form id="downlinkForm" onsubmit="sendDownlink(event)">
         <h2>Configure Sensor</h2>
         <div class="form-group">
-            <label for="downlinkTopic">Topic:</label>
+            <label for="downlinkTopic">Topic:
+                <button type="button" class="help-button" data-modal="downlinkTopicHelp">?</button>
+            </label>
             <input type="text" id="downlinkTopic" name="topic" required>
         </div>
         <div class="form-group">
-            <label>Enable water present message:</label>
+            <label>Enable water present message:
+                <button type="button" class="help-button" data-modal="enableWaterPresentHelp">?</button>
+            </label>
             <label><input type="radio" name="enable_water_present" value="1" required> Yes</label>
             <label><input type="radio" name="enable_water_present" value="0" required> No</label>
         </div>
         <div class="form-group">
-            <label>Enable water not present message:</label>
+            <label>Enable water not present message:
+                <button type="button" class="help-button" data-modal="enableWaterNotPresentHelp">?</button>
+            </label>
             <label><input type="radio" name="enable_water_not_present" value="1" required> Yes</label>
             <label><input type="radio" name="enable_water_not_present" value="0" required> No</label>
         </div>
         <div class="form-group">
-            <label for="threshold">Threshold of relative resistance between probes:</label>
+            <label for="threshold">Threshold of relative resistance between probes:
+                <button type="button" class="help-button" data-modal="thresholdHelp">?</button>
+            </label>
             <input type="number" id="threshold" name="threshold" min="0" max="255" required>
         </div>
         <div class="form-group">
-            <label for="restoral">Restoral margin in units of relative resistance between probes:</label>
+            <label for="restoral">Restoral margin in units of relative resistance between probes:
+                <button type="button" class="help-button" data-modal="restoralHelp">?</button>
+            </label>
             <input type="number" id="restoral" name="restoral" min="0" max="255" required>
         </div>
         <button type="submit">Submit</button>
     </form>
+
+    <!-- Help Modals -->
+    <div id="downlinkTopicHelp" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeHelpModal('downlinkTopicHelp')">&times;</span>
+        <h2>Help - Downlink Topic</h2>
+        <p>Enter the downlink topic in the following format: lora/Dev-EUI/down</p>
+        <p><strong>Example:</strong> lora/1122334455667788/down</p>
+    </div>
+</div>
+
+    <div id="enableWaterPresentHelp" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHelpModal('enableWaterPresentHelp')">&times;</span>
+            <h2>Help - Enable Water Present</h2>
+            <p>Select 'Yes' to receive alerts when the sensor detects water, or 'No' to disable this alert.</p>
+        </div>
+    </div>
+
+    <div id="enableWaterNotPresentHelp" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHelpModal('enableWaterNotPresentHelp')">&times;</span>
+            <h2>Help - Enable Water Not Present</h2>
+            <p>Select 'Yes' to receive alerts when the sensor no longer detects water, or 'No' to disable this alert.</p>
+        </div>
+    </div>
+
+    <div id="thresholdHelp" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHelpModal('thresholdHelp')">&times;</span>
+            <h2>Help - Threshold</h2>
+            <p>Enter the threshold for the water present alerts. The recommended value for this setting is 80.</p>
+        </div>
+    </div>
+
+    <div id="restoralHelp" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHelpModal('restoralHelp')">&times;</span>
+            <h2>Help - Restoral</h2>
+            <p>Enter the restoral value for the water sensor. The recommended value for this setting is 0</p>
+        </div>
+    </div>
 {% endblock %}
