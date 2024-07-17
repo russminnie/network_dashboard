@@ -11,21 +11,17 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 mqtt_client = None
 broker_ip = None
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/mqtt_messages')
 def mqtt_messages():
     return render_template('mqtt_messages.html')
 
-
 @app.route('/downlink')
 def downlink():
     return render_template('downlinks.html')
-
 
 @app.route('/connect', methods=['POST'])
 def connect():
@@ -48,7 +44,6 @@ def connect():
 
     return jsonify({"message": "Connected to MQTT broker"})
 
-
 @app.route('/messages', methods=['GET'])
 def get_messages():
     filter_type = request.args.get('filter', '')
@@ -56,7 +51,9 @@ def get_messages():
     for m in message_buffer:
         if not filter_type or (
                 m['type'] == 'json' and
+                isinstance(m['data'], dict) and
                 'data_decoded' in m['data'] and
+                isinstance(m['data']['data_decoded'], dict) and
                 m['data']['data_decoded'].get('message_type') == filter_type):
             filtered_messages.append({
                 'topic': m['topic'],
@@ -65,7 +62,6 @@ def get_messages():
             })
     return jsonify(messages=filtered_messages)
 
-
 @app.route('/dump_messages')
 def dump_messages():
     data_json = json.dumps(message_buffer, indent=4)
@@ -73,7 +69,6 @@ def dump_messages():
     filename_json = f'mqttmessages{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.json'
     response.headers['Content-Disposition'] = 'attachment; filename=' + filename_json
     return response
-
 
 @app.route('/send_downlink', methods=['POST'])
 def send_downlink_route():
@@ -84,7 +79,6 @@ def send_downlink_route():
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)  # Debug log
     return jsonify(response), status_code
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
