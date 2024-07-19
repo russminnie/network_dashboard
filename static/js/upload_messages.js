@@ -1,32 +1,5 @@
-function connectToBroker(event) {
-    event.preventDefault();
-    const broker = document.getElementById('broker').value;
-    const port = document.getElementById('port').value;
-    const topic = document.getElementById('topic').value;
-
-    fetch('/connect', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({broker, port, topic})
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert(data.message);
-                startFetchingMessages(); // Start fetching messages after successful connection
-            } else {
-                alert('Failed to connect to the broker');
-            }
-        })
-        .catch(error => {
-            alert('Error: ' + error);
-        });
-}
-
 function fetchMessages(filter = '') {
-    fetch(`/messages?filter=${filter}`)
+    fetch(`/upload?filter=${filter}`)
         .then(response => response.json())
         .then(data => {
             const messageTable = document.getElementById('messageTableBody');
@@ -119,7 +92,6 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-
 function startFetchingMessages() {
     setInterval(() => fetchMessages(document.getElementById('filter').value), 5000); // Fetch messages every 5 seconds
 }
@@ -134,10 +106,3 @@ window.addEventListener('click', (event) => {
         closeModal();
     }
 });
-
-function dumpMessagesToJSON() {
-    window.location.href = '/dump_messages';
-}
-
-// Add event listener to the button
-document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);

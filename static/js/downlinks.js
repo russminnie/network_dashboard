@@ -86,7 +86,7 @@ function closeHelpModal(modalId) {
 }
 
 // Add the existing function to close the modal when clicking outside of it
-window.onclick = function(event) {
+window.onclick = function (event) {
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
         if (event.target == modal) {

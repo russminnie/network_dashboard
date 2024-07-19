@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template, send_file, Response
+from flask import Flask, jsonify, request, render_template, send_file, Response, redirect, url_for
 from paho.mqtt import client as mqtt
 from datetime import datetime
 import json
@@ -11,17 +11,31 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 mqtt_client = None
 broker_ip = None
 
+upload_buffer = []
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html', message='Page not found'), 404
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/mqtt_messages')
 def mqtt_messages():
     return render_template('mqtt_messages.html')
 
+
+@app.route('/upload_messages')
+def upload_messages():
+    return render_template('upload_messages.html')
+
+
 @app.route('/downlink')
 def downlink():
     return render_template('downlinks.html')
+
 
 @app.route('/connect', methods=['POST'])
 def connect():
@@ -44,6 +58,7 @@ def connect():
 
     return jsonify({"message": "Connected to MQTT broker"})
 
+
 @app.route('/messages', methods=['GET'])
 def get_messages():
     filter_type = request.args.get('filter', '')
@@ -62,6 +77,7 @@ def get_messages():
             })
     return jsonify(messages=filtered_messages)
 
+
 @app.route('/dump_messages')
 def dump_messages():
     data_json = json.dumps(message_buffer, indent=4)
@@ -69,6 +85,46 @@ def dump_messages():
     filename_json = f'mqttmessages{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.json'
     response.headers['Content-Disposition'] = 'attachment; filename=' + filename_json
     return response
+
+
+@app.route('/import_messages', methods=['POST'])
+def import_messages():
+    if 'file' not in request.files:
+        return render_template('error.html', message='No file part')
+    file = request.files['file']
+    if file.filename == '':
+        return render_template('error.html', message='No selected file')
+    if file:
+        try:
+            imported_data = json.load(file)
+            if not isinstance(imported_data, list):
+                return render_template('error.html', message='Invalid JSON file')
+
+            global upload_buffer
+            upload_buffer = imported_data
+            return redirect(url_for('upload_messages'))
+        except json.JSONDecodeError:
+            return render_template('error.html', message='Invalid JSON file')
+
+
+@app.route('/upload', methods=['GET'])
+def upload():
+    filter_type = request.args.get('filter', '')
+    filtered_messages = []
+    for m in upload_buffer:
+        if not filter_type or (
+                m['type'] == 'json' and
+                isinstance(m['data'], dict) and
+                'data_decoded' in m['data'] and
+                isinstance(m['data']['data_decoded'], dict) and
+                m['data']['data_decoded'].get('message_type') == filter_type):
+            filtered_messages.append({
+                'topic': m['topic'],
+                'type': m['type'],
+                'data': m['data']
+            })
+    return jsonify(messages=filtered_messages)
+
 
 @app.route('/send_downlink', methods=['POST'])
 def send_downlink_route():
@@ -79,6 +135,7 @@ def send_downlink_route():
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)  # Debug log
     return jsonify(response), status_code
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
