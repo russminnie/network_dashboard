@@ -18,9 +18,17 @@ html, body {
     display: flex;
 }
 
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    height: 100%;
+    width: 100%;
+}
+
 main {
     height: 100%;
-    width: 75vw;
+    width: 80vw;
     margin: 1em 1em 1em 30vw;
     transition: 0.5s;
     display: flex;
@@ -77,19 +85,39 @@ li {
 button, a.button {
     display: inline-block;
     margin: 1em 0em;
-    background-color: white;
-    color: #0072ce;
     text-align: center;
     cursor: pointer;
     padding: 1em 2em;
-    border: 1px solid #ddd;
+    border: none;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 1em;
     transition: 0.3s;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    transition-duration: 0.4s;
 }
 
-button:hover, a.button:hover {
+button:hover, a.button:hover, .help-button:hover {
     background-color: #e0e0e0;
+}
+
+.help-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px; /* Increased size for better visibility */
+    height: 25px;
+    font-size: 16px; /* Increased font size for better visibility */
+    line-height: 25px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    display: inline-flex; /* Centering the text */
+    justify-content: center;
+    align-items: center;
 }
 
 table {
@@ -107,8 +135,13 @@ th, td {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-th {
+th, tr, td {
     background-color: #ffffff;
+    padding: 1em 2em;
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    font-size: 1em;
 }
 
 .form-group {
@@ -138,74 +171,31 @@ th {
 }
 
 .modal-content {
-    background-color: #007BFF;
+    background-color: #0072ce;
     margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
+    padding: .5em;
+    border: none;
     width: 80%;
     color: white;
-    border-radius: 5px;
+    border-radius: .5em;
 }
 
 .close {
     color: #aaa;
     float: right;
-    font-size: 28px;
+    font-size: 1em;
     font-weight: bold;
 }
 
-.close:hover,
-.close:focus {
+.close:hover, .close:focus {
     color: white;
     text-decoration: none;
     cursor: pointer;
 }
 
 pre {
-    background-color: #f8f8f8; /* Light background for the text area */
-    padding: 10px;
-    border-radius: 5px;
+    background-color: #0072ce;
+    padding: .5em;
+    border-radius: .5em;
     overflow: auto;
-}
-
-button {
-    background-color: #007BFF; /* Bootstrap primary color */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition-duration: 0.4s;
-}
-
-button:hover {
-    background-color: white;
-    color: #007BFF;
-    border: 2px solid #007BFF;
-}
-
-.help-button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 25px; /* Increased size for better visibility */
-    height: 25px;
-    font-size: 16px; /* Increased font size for better visibility */
-    line-height: 25px;
-    text-align: center;
-    cursor: pointer;
-    margin-left: 5px;
-    display: inline-flex; /* Centering the text */
-    justify-content: center;
-    align-items: center;
-}
-
-.help-button:hover {
-    background-color: #0056b3;
 }
