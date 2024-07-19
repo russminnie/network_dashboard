@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Upload and View MQTT Messages{% endblock %}
+
+{% block content %}
+    <script src="./static/js/upload_messages.js"></script>
+    <h1>Upload and View MQTT Messages</h1>
+
+    <!-- Form for uploading JSON file -->
+    <form id="uploadForm" method="post" enctype="multipart/form-data" action="/import_messages">
+        <div class="form-group">
+            <label for="file">Upload JSON File:</label>
+            <input type="file" id="file" name="file" required>
+        </div>
+        <button type="submit">Upload</button>
+    </form>
+
+    <br><br>
+
+    <!-- Filter messages dropdown -->
+    <label for="filter">Filter:</label>
+    <select id="filter" onchange="fetchMessages(this.value)">
+        <option value="">All</option>
+        <option value="Water Leak Sensor Event">Water Leak Sensor Event</option>
+        <option value="Reset Message">Reset</option>
+        <option value="Supervisory Message">Supervisory</option>
+        <!-- Add more filter options as needed -->
+    </select>
+    <br><br>
+    <!-- Table to display MQTT messages -->
+    <table>
+        <thead>
+        <tr>
+            <th>Topic</th>
+            <th>Content</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="messageTableBody">
+        <!-- Rows will be populated by JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Modal structure -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <pre id="modalText"></pre>
+        </div>
+    </div>
+{% endblock %}
