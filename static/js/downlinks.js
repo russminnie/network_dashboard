@@ -1,5 +1,54 @@
 let brokerIp = '';
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    const sensorTypeElement = document.getElementById('sensorType');
+    const modeElement = document.getElementById('mode');
+    const thresholdModeConfig = document.getElementById('thresholdModeConfig');
+    const reportOnChangeConfig = document.getElementById('reportOnChangeConfig');
+
+    if (sensorTypeElement) {
+        sensorTypeElement.addEventListener('change', (event) => {
+            const sensorType = event.target.value;
+            const waterSensorConfig = document.getElementById('waterSensorConfig');
+            const tempHumiditySensorConfig = document.getElementById('tempHumiditySensorConfig');
+
+            waterSensorConfig.style.display = sensorType === 'water_sensor' ? 'block' : 'none';
+            tempHumiditySensorConfig.style.display = sensorType === 'temp_humidity_sensor' ? 'block' : 'none';
+
+            const waterSensorInputs = waterSensorConfig.querySelectorAll('input, select');
+            const tempHumiditySensorInputs = tempHumiditySensorConfig.querySelectorAll('input, select');
+
+            waterSensorInputs.forEach(input => input.required = sensorType === 'water_sensor');
+            tempHumiditySensorInputs.forEach(input => input.required = sensorType === 'temp_humidity_sensor');
+        });
+    }
+
+    if (modeElement) {
+        modeElement.addEventListener('change', (event) => {
+            const mode = event.target.value;
+
+            thresholdModeConfig.style.display = mode === '0x00' ? 'block' : 'none';
+            reportOnChangeConfig.style.display = mode === '0x01' ? 'block' : 'none';
+        });
+    }
+
+    document.querySelectorAll('.help-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const modalId = event.target.getAttribute('data-modal');
+            openHelpModal(modalId);
+        });
+    });
+
+    window.onclick = function(event) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+});
+
 function connectToBroker(event) {
     event.preventDefault();
     const broker = document.getElementById('broker').value;
@@ -30,25 +79,62 @@ function connectToBroker(event) {
 function sendDownlink(event) {
     event.preventDefault();
     const topic = document.getElementById('downlinkTopic').value;
-    const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;
-    const enableWaterNotPresent = document.querySelector('input[name="enable_water_not_present"]:checked').value;
-    const threshold = document.getElementById('threshold').value;
-    const restoral = document.getElementById('restoral').value;
+    const sensorType = document.getElementById('sensorType').value;
+    let downlinkData = { topic, sensorType };
 
-    console.log("Sending downlink data:", {topic, enableWaterPresent, enableWaterNotPresent, threshold, restoral}); // Debug log
+    if (sensorType === 'water_sensor') {
+        const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;
+        const enableWaterNotPresent = document.querySelector('input[name="enable_water_not_present"]:checked').value;
+        const threshold = document.getElementById('threshold').value;
+        const restoral = document.getElementById('restoral').value;
+        downlinkData = {
+            ...downlinkData,
+            enableWaterPresent,
+            enableWaterNotPresent,
+            threshold,
+            restoral
+        };
+    } else if (sensorType === 'temp_humidity_sensor') {
+        const mode = document.getElementById('mode').value;
+        if (mode === '0x00') {
+            const reportingInterval = document.getElementById('reportingInterval').value;
+            const restoralMargin = document.getElementById('restoralMargin').value;
+            const lowerTempThreshold = document.getElementById('lowerTempThreshold').value;
+            const upperTempThreshold = document.getElementById('upperTempThreshold').value;
+            const lowerHumidityThreshold = document.getElementById('lowerHumidityThreshold').value;
+            const upperHumidityThreshold = document.getElementById('upperHumidityThreshold').value;
+            downlinkData = {
+                ...downlinkData,
+                reportingInterval,
+                restoralMargin,
+                lowerTempThreshold,
+                upperTempThreshold,
+                lowerHumidityThreshold,
+                upperHumidityThreshold
+            };
+        } else if (mode === '0x01') {
+            const tempIncrease = document.getElementById('tempIncrease').value;
+            const tempDecrease = document.getElementById('tempDecrease').value;
+            const humidityIncrease = document.getElementById('humidityIncrease').value;
+            const humidityDecrease = document.getElementById('humidityDecrease').value;
+            downlinkData = {
+                ...downlinkData,
+                tempIncrease,
+                tempDecrease,
+                humidityIncrease,
+                humidityDecrease
+            };
+        }
+    }
+
+    console.log("Sending downlink data:", downlinkData); // Debug log
 
     fetch('/send_downlink', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            topic,
-            enableWaterPresent,
-            enableWaterNotPresent,
-            threshold,
-            restoral
-        })
+        body: JSON.stringify(downlinkData)
     })
         .then(response => response.json())
         .then(data => {
@@ -65,66 +151,26 @@ function sendDownlink(event) {
         });
 }
 
-// Event listeners for help buttons
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.help-button').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const modalId = event.target.getAttribute('data-modal');
-            openHelpModal(modalId);
-        });
-    });
-});
-
 function openHelpModal(modalId) {
     const helpModal = document.getElementById(modalId);
-    helpModal.style.display = 'block';
+    if (helpModal) {
+        helpModal.style.display = 'block';
+    }
 }
 
 function closeHelpModal(modalId) {
     const helpModal = document.getElementById(modalId);
-    helpModal.style.display = 'none';
+    if (helpModal) {
+        helpModal.style.display = 'none';
+    }
 }
 
 // Add the existing function to close the modal when clicking outside of it
-window.onclick = function (event) {
+window.onclick = function(event) {
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
         if (event.target == modal) {
             modal.style.display = 'none';
         }
     });
-}
-
-function configureSensor(event) {
-    event.preventDefault();
-    const topic = document.getElementById('downlinkTopic').value;
-    const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;
-    const enableWaterNotPresent = document.querySelector('input[name="enable_water_not_present"]:checked').value;
-    const threshold = document.getElementById('threshold').value;
-    const restoral = document.getElementById('restoral').value;
-
-    fetch('/send_downlink', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            topic,
-            enableWaterPresent,
-            enableWaterNotPresent,
-            threshold,
-            restoral
-        })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert('Downlink sent: ' + data.message);
-            } else {
-                alert('Error sending downlink: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            alert('Error: ' + error);
-        });
 }

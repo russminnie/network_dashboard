@@ -11,54 +11,54 @@ function connectToBroker(event) {
         },
         body: JSON.stringify({broker, port, topic})
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                alert(data.message);
-                startFetchingMessages(); // Start fetching messages after successful connection
-            } else {
-                alert('Failed to connect to the broker');
-            }
-        })
-        .catch(error => {
-            alert('Error: ' + error);
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            startFetchingMessages(); // Start fetching messages after successful connection
+        } else {
+            alert('Failed to connect to the broker');
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
 }
 
 function fetchMessages(filter = '') {
     fetch(`/messages?filter=${filter}`)
-        .then(response => response.json())
-        .then(data => {
-            const messageTable = document.getElementById('messageTableBody');
-            messageTable.innerHTML = '';
-            data.messages.forEach((message, index) => {
-                const row = document.createElement('tr');
-                const topicCell = document.createElement('td');
-                const contentCell = document.createElement('td');
-                const buttonCell = document.createElement('td');
-                const moreInfoButton = document.createElement('button');
+    .then(response => response.json())
+    .then(data => {
+        const messageTable = document.getElementById('messageTableBody');
+        messageTable.innerHTML = '';
+        data.messages.forEach((message, index) => {
+            const row = document.createElement('tr');
+            const topicCell = document.createElement('td');
+            const contentCell = document.createElement('td');
+            const buttonCell = document.createElement('td');
+            const moreInfoButton = document.createElement('button');
 
-                topicCell.textContent = message.topic;
+            topicCell.textContent = message.topic;
 
-                if (message.type === 'json') {
-                    if ('data_decoded' in message.data) {
-                        contentCell.innerHTML = formatContent(message.data.data_decoded);
-                    } else {
-                        contentCell.textContent = 'No decoded data';
-                    }
-                    moreInfoButton.textContent = 'More Info';
-                    moreInfoButton.onclick = () => showModal(message.data);
-                    buttonCell.appendChild(moreInfoButton);
+            if (message.type === 'json') {
+                if ('data_decoded' in message.data) {
+                    contentCell.innerHTML = formatContent(message.data.data_decoded);
                 } else {
-                    contentCell.textContent = message.data;
+                    contentCell.textContent = 'No decoded data';
                 }
+                moreInfoButton.textContent = 'More Info';
+                moreInfoButton.onclick = () => showModal(message.data);
+                buttonCell.appendChild(moreInfoButton);
+            } else {
+                contentCell.textContent = message.data;
+            }
 
-                row.appendChild(topicCell);
-                row.appendChild(contentCell);
-                row.appendChild(buttonCell);
-                messageTable.appendChild(row);
-            });
+            row.appendChild(topicCell);
+            row.appendChild(contentCell);
+            row.appendChild(buttonCell);
+            messageTable.appendChild(row);
         });
+    });
 }
 
 function formatContent(data) {
