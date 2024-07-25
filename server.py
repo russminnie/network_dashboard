@@ -132,9 +132,18 @@ def send_downlink_route():
     print(f"Using broker_ip in send_downlink_route: {broker_ip}")  # Debug log
     data = request.json
     print("Received downlink request:", data)  # Debug log
+
+    # Check if required keys are present
+    required_keys = ['topic', 'sensor_type']
+    missing_keys = [key for key in required_keys if key not in data]
+    if missing_keys:
+        print(f"Missing required keys: {missing_keys}")  # Debug log
+        return jsonify({"error": f"Missing required keys: {missing_keys}"}), 400
+
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)  # Debug log
     return jsonify(response), status_code
+
 
 
 if __name__ == '__main__':

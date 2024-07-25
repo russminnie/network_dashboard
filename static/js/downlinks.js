@@ -79,8 +79,11 @@ function connectToBroker(event) {
 function sendDownlink(event) {
     event.preventDefault();
     const topic = document.getElementById('downlinkTopic').value;
-    const sensorType = document.getElementById('sensorType').value;
-    let downlinkData = { topic, sensorType };
+    const sensorTypeElement = document.getElementById('sensorType');
+    const sensorType = sensorTypeElement ? sensorTypeElement.value : null;
+    let downlinkData = { topic, sensor_type: sensorType };
+
+    console.log("Sensor Type:", sensorType); // Debug log
 
     if (sensorType === 'water_sensor') {
         const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;
@@ -105,6 +108,7 @@ function sendDownlink(event) {
             const upperHumidityThreshold = document.getElementById('upperHumidityThreshold').value;
             downlinkData = {
                 ...downlinkData,
+                mode,
                 reportingInterval,
                 restoralMargin,
                 lowerTempThreshold,
@@ -119,6 +123,7 @@ function sendDownlink(event) {
             const humidityDecrease = document.getElementById('humidityDecrease').value;
             downlinkData = {
                 ...downlinkData,
+                mode,
                 tempIncrease,
                 tempDecrease,
                 humidityIncrease,
@@ -127,7 +132,7 @@ function sendDownlink(event) {
         }
     }
 
-    console.log("Sending downlink data:", downlinkData); // Debug log
+    console.log("Sending downlink data:", JSON.stringify(downlinkData, null, 2)); // Debug log
 
     fetch('/send_downlink', {
         method: 'POST',
@@ -150,6 +155,10 @@ function sendDownlink(event) {
             alert('Error sending downlink: ' + error);
         });
 }
+
+
+
+
 
 function openHelpModal(modalId) {
     const helpModal = document.getElementById(modalId);
