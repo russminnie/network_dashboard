@@ -4,7 +4,7 @@
 
 ## Description
 
-This application uses flask and flask extentions to create a simple websever and API in python. For more information
+This application uses flask and flask extensions to create a simple webserver and API in python. For more information
 about these libraries used in the app see the docs below
 
 ## How to Run Application On conduit
@@ -23,6 +23,41 @@ about these libraries used in the app see the docs below
 
 - Python 3
 - Pip
+- Multitech Gateway
+- Web Browser
+- CLI interface
+
+### Configuring Gateway
+
+- Navigate to the MultiTech Gateway dashboard console in your browser:
+    - http://<gateway_ip> (i.e. 192.168.2.1)
+        - login with your account
+        - navigate to the firewall settings
+        - add a new rule for "Input Filter Rules"
+        - name the firewall filter rule and accept the rest of the default settings
+        - ensure that "Output Filter Rules" has Allow Outbound enabled
+- SSH to the gateway in your computers CLI
+    - ssh <username>@gateway_ip
+    - enter your password
+    - navigate to the /etc/mosquitto directory
+    - enter the following command:
+        ```bash
+        sudo nano mosquitto.conf
+        ```
+    - add a "#" in from of the following lines to the file:
+    - "bind_address 127.0.0.1"
+    - save and exit nano
+    - restart the mosquitto service with the following command:
+      ```bash
+      /etc/init.d/mosquitto restart
+      ```
+    - exit the ssh session.
+- Remote PC:
+    - Install the mosquitto software - https://mosquitto.org/download/
+  ```bash
+  mosquitto_sub -t lora/+/+ -v -h 192.168.2.1
+  ```
+    - Then reboot MDot
 
 ### Installation
 
@@ -36,4 +71,3 @@ pip install -r requirements.txt
 python3 server.py
 ```
 
-Or press the run button in your IDE of choice.

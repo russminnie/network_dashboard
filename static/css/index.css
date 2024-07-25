@@ -200,3 +200,7 @@ th, tr, td {
     text-decoration: none;
     cursor: pointer;
 }
+
+.modal_p {
+    color: #000000;
+}
