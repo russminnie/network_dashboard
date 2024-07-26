@@ -39,6 +39,7 @@ function fetchMessages(filter = '') {
         .then(data => {
             const messageTable = document.getElementById('messageTableBody');
             messageTable.innerHTML = '';
+            data.messages.reverse(); // Reverse the order of messages to show newest first
             data.messages.forEach((message, index) => {
                 const row = document.createElement('tr');
                 const topicCell = document.createElement('td');
