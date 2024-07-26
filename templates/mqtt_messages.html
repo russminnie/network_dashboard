@@ -5,8 +5,6 @@
 {% block content %}
     <script src="./static/js/mqtt_messages.js"></script>
     <h1>MQTT Messages</h1>
-
-    <!-- Form for connecting to MQTT broker -->
     <form id="connectForm" onsubmit="connectToBroker(event)">
         <div class="form-group">
             <label for="broker">MQTT Broker IP:</label>
@@ -23,18 +21,14 @@
         <button type="submit">Connect</button>
         <button type="button" id="dumpMessages" onclick="dumpMessagesToJSON()">Dump Messages to JSON</button>
     </form>
-
-    <!-- Filter messages dropdown -->
     <label for="filter">Filter:</label>
     <select id="filter" class="filter-dropdown" onchange="fetchMessages(this.value)">
         <option value="">All</option>
         <option value="Water Leak Sensor Event">Water Leak Sensor Event</option>
         <option value="Reset Message">Reset</option>
         <option value="Supervisory Message">Supervisory</option>
-        <!-- Add more filter options as needed -->
     </select>
     <br><br>
-    <!-- Table to display MQTT messages -->
     <table>
         <thead>
         <tr>
@@ -44,11 +38,8 @@
         </tr>
         </thead>
         <tbody id="messageTableBody">
-        <!-- Rows will be populated by JavaScript -->
         </tbody>
     </table>
-
-    <!-- Modal structure -->
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>

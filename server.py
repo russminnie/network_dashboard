@@ -1,21 +1,32 @@
 from flask import Flask, jsonify, request, render_template, send_file, Response, redirect, url_for
+import json
+import logging
 from paho.mqtt import client as mqtt
 from datetime import datetime
-import json
 
 from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 # Declare mqtt_client and broker_ip as global at the module level
-mqtt_client = None
-broker_ip = None
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-upload_buffer = []
+
+class MQTTHandler:
+    def __init__(self):
+        self.client = None
+        self.broker_ip = None
+        self.upload_buffer = []
+
+
+mqtt_handler = MQTTHandler()
+
 
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('error.html', message='Page not found'), 404
+
 
 @app.route('/')
 def index():
@@ -143,7 +154,6 @@ def send_downlink_route():
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)  # Debug log
     return jsonify(response), status_code
-
 
 
 if __name__ == '__main__':
