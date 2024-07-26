@@ -11,54 +11,62 @@ function connectToBroker(event) {
         },
         body: JSON.stringify({broker, port, topic})
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            alert(data.message);
-            startFetchingMessages(); // Start fetching messages after successful connection
-        } else {
-            alert('Failed to connect to the broker');
-        }
-    })
-    .catch(error => {
-        alert('Error: ' + error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                startFetchingMessages(); // Start fetching messages after successful connection
+            } else {
+                alert('Failed to connect to the broker');
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error);
+        });
 }
 
 function fetchMessages(filter = '') {
-    fetch(`/messages?filter=${filter}`)
-    .then(response => response.json())
-    .then(data => {
-        const messageTable = document.getElementById('messageTableBody');
-        messageTable.innerHTML = '';
-        data.messages.forEach((message, index) => {
-            const row = document.createElement('tr');
-            const topicCell = document.createElement('td');
-            const contentCell = document.createElement('td');
-            const buttonCell = document.createElement('td');
-            const moreInfoButton = document.createElement('button');
+    let currentPath = window.location.pathname;
 
-            topicCell.textContent = message.topic;
+    // Determine the endpoint based on the current path
+    let endpoint = (currentPath === '/mqtt_messages') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
 
-            if (message.type === 'json') {
-                if ('data_decoded' in message.data) {
-                    contentCell.innerHTML = formatContent(message.data.data_decoded);
+    // Construct the URL using the current base URL and the selected endpoint
+    let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
+
+    fetch(currentURL)
+        .then(response => response.json())
+        .then(data => {
+            const messageTable = document.getElementById('messageTableBody');
+            messageTable.innerHTML = '';
+            data.messages.forEach((message, index) => {
+                const row = document.createElement('tr');
+                const topicCell = document.createElement('td');
+                const contentCell = document.createElement('td');
+                const buttonCell = document.createElement('td');
+                const moreInfoButton = document.createElement('button');
+
+                topicCell.textContent = message.topic;
+
+                if (message.type === 'json') {
+                    if ('data_decoded' in message.data) {
+                        contentCell.innerHTML = formatContent(message.data.data_decoded);
+                    } else {
+                        contentCell.textContent = 'No decoded data';
+                    }
+                    moreInfoButton.textContent = 'More Info';
+                    moreInfoButton.onclick = () => showModal(message.data);
+                    buttonCell.appendChild(moreInfoButton);
                 } else {
-                    contentCell.textContent = 'No decoded data';
+                    contentCell.textContent = message.data;
                 }
-                moreInfoButton.textContent = 'More Info';
-                moreInfoButton.onclick = () => showModal(message.data);
-                buttonCell.appendChild(moreInfoButton);
-            } else {
-                contentCell.textContent = message.data;
-            }
 
-            row.appendChild(topicCell);
-            row.appendChild(contentCell);
-            row.appendChild(buttonCell);
-            messageTable.appendChild(row);
+                row.appendChild(topicCell);
+                row.appendChild(contentCell);
+                row.appendChild(buttonCell);
+                messageTable.appendChild(row);
+            });
         });
-    });
 }
 
 function formatContent(data) {

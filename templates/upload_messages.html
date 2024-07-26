@@ -3,7 +3,7 @@
 {% block title %}Upload and View MQTT Messages{% endblock %}
 
 {% block content %}
-    <script src="./static/js/upload_messages.js"></script>
+    <script src="./static/js/mqtt_messages.js"></script>
     <h1>Upload and View MQTT Messages</h1>
 
     <!-- Form for uploading JSON file -->
@@ -19,7 +19,7 @@
 
     <!-- Filter messages dropdown -->
     <label for="filter">Filter:</label>
-    <select id="filter" onchange="fetchMessages(this.value)">
+    <select id="filter" class="filter-dropdown" onchange="fetchMessages(this.value)">
         <option value="">All</option>
         <option value="Water Leak Sensor Event">Water Leak Sensor Event</option>
         <option value="Reset Message">Reset</option>
