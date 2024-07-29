@@ -42,8 +42,6 @@ function fetchMessages(filter = '') {
                 const devEUICell = document.createElement('td');
                 const topicCell = document.createElement('td');
                 const messageTypeCell = document.createElement('td');
-                const errorCodeCell = document.createElement('td');
-                const sensorStateCell = document.createElement('td');
                 const batteryVoltageCell = document.createElement('td');
                 const messageCell = document.createElement('td');
                 const buttonCell = document.createElement('td');
@@ -70,12 +68,6 @@ function fetchMessages(filter = '') {
                         if ('message_type' in message.data.data_decoded) {
                             messageTypeCell.textContent = message.data.data_decoded.message_type;
                         }
-                        if ('device_error_code' in message.data.data_decoded) {
-                            errorCodeCell.textContent = message.data.data_decoded.device_error_code;
-                        }
-                        if ('current_sensor_state' in message.data.data_decoded) {
-                            sensorStateCell.textContent = message.data.data_decoded.current_sensor_state;
-                        }
                         if ('battery_voltage' in message.data.data_decoded) {
                             batteryVoltageCell.textContent = message.data.data_decoded.battery_voltage.toFixed(1) + 'V';
                         }
@@ -91,8 +83,6 @@ function fetchMessages(filter = '') {
                 row.appendChild(topicCell);
                 row.appendChild(messageTypeCell);
                 row.appendChild(messageCell);
-                row.appendChild(errorCodeCell);
-                row.appendChild(sensorStateCell);
                 row.appendChild(batteryVoltageCell);
                 row.appendChild(buttonCell);
                 messageTable.appendChild(row);
@@ -130,6 +120,10 @@ function formatContent(data) {
             content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
             content += `<em>Temperature:</em> <strong>${data.temperature}</strong><br>`;
             content += `<em>Humidity:</em> <strong>${data.humidity}</strong><br>`;
+            break;
+        case 'Supervisory Message':
+            content += `<em>Device Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
+            content += `<em>Current Sensor State:</em> <strong>${data.current_sensor_state}<strong><br>`;
             break;
     }
 
