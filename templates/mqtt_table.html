@@ -1,0 +1,31 @@
+<label for="filter">Filter:</label>
+<select id="filter" class="filter-dropdown" onchange="fetchMessages(this.value)">
+    <option value="">All</option>
+    <option value="Water Leak Sensor Event">Water Leak Sensor Event</option>
+    <option value="Reset Message">Reset</option>
+    <option value="Supervisory Message">Supervisory</option>
+</select>
+<br><br>
+<table>
+    <thead>
+    <tr>
+        <th>Time</th>
+        <th>DevEUI</th>
+        <th>Topic</th>
+        <th>Message Type</th>
+        <th>Message</th>
+        <th>Error Code</th>
+        <th>Sensor State</th>
+        <th>Battery Voltage</th>
+        <th>View All</th>
+    </tr>
+    </thead>
+    <tbody id="messageTableBody">
+    </tbody>
+</table>
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <pre id="modalText"></pre>
+    </div>
+</div>

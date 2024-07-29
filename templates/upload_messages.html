@@ -12,30 +12,5 @@
         </div>
         <button type="submit">Upload</button>
     </form>
-    <br><br>
-    <label for="filter">Filter:</label>
-    <select id="filter" class="filter-dropdown" onchange="fetchMessages(this.value)">
-        <option value="">All</option>
-        <option value="Water Leak Sensor Event">Water Leak Sensor Event</option>
-        <option value="Reset Message">Reset</option>
-        <option value="Supervisory Message">Supervisory</option>
-    </select>
-    <br><br>
-    <table>
-        <thead>
-        <tr>
-            <th>Topic</th>
-            <th>Content</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody id="messageTableBody">
-        </tbody>
-    </table>
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <pre id="modalText"></pre>
-        </div>
-    </div>
+    {% include 'mqtt_table.html' %}
 {% endblock %}
