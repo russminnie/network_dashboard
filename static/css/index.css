@@ -29,7 +29,7 @@ html, body {
 main {
     height: 100%;
     width: 80vw;
-    margin: 1em 1em 1em 25vw;
+    margin: 1em 1em 1em 20vw;
     transition: 0.5s;
     display: flex;
     justify-content: left;

@@ -15,7 +15,7 @@ function connectToBroker(event) {
         .then(data => {
             if (data.message) {
                 alert(data.message);
-                startFetchingMessages(); // Start fetching messages after successful connection
+                startFetchingMessages();
             } else {
                 alert('Failed to connect to the broker');
             }
@@ -27,11 +27,7 @@ function connectToBroker(event) {
 
 function fetchMessages(filter = '') {
     let currentPath = window.location.pathname;
-
-    // Determine the endpoint based on the current path
     let endpoint = (currentPath === '/mqtt_messages') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
-
-    // Construct the URL using the current base URL and the selected endpoint
     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
 
     fetch(currentURL)
@@ -39,31 +35,65 @@ function fetchMessages(filter = '') {
         .then(data => {
             const messageTable = document.getElementById('messageTableBody');
             messageTable.innerHTML = '';
-            data.messages.reverse(); // Reverse the order of messages to show newest first
+            data.messages.reverse();
             data.messages.forEach((message, index) => {
                 const row = document.createElement('tr');
+                const timeCell = document.createElement('td');
+                const devEUICell = document.createElement('td');
                 const topicCell = document.createElement('td');
-                const contentCell = document.createElement('td');
+                const messageTypeCell = document.createElement('td');
+                const errorCodeCell = document.createElement('td');
+                const sensorStateCell = document.createElement('td');
+                const batteryVoltageCell = document.createElement('td');
+                const messageCell = document.createElement('td');
                 const buttonCell = document.createElement('td');
                 const moreInfoButton = document.createElement('button');
 
-                topicCell.textContent = message.topic;
+                const time = message.data.time;
+                const date = new Date(time);
+                const options = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZoneName: 'short'
+                };
+
+                timeCell.textContent = date.toLocaleDateString('en-US', options);
+                devEUICell.textContent = message.data.deveui;
+                topicCell.textContent = message.topic.substring(message.topic.lastIndexOf('/') + 1);
 
                 if (message.type === 'json') {
                     if ('data_decoded' in message.data) {
-                        contentCell.innerHTML = formatContent(message.data.data_decoded);
-                    } else {
-                        contentCell.textContent = 'No decoded data';
+                        if ('message_type' in message.data.data_decoded) {
+                            messageTypeCell.textContent = message.data.data_decoded.message_type;
+                        }
+                        if ('device_error_code' in message.data.data_decoded) {
+                            errorCodeCell.textContent = message.data.data_decoded.device_error_code;
+                        }
+                        if ('current_sensor_state' in message.data.data_decoded) {
+                            sensorStateCell.textContent = message.data.data_decoded.current_sensor_state;
+                        }
+                        if ('battery_voltage' in message.data.data_decoded) {
+                            batteryVoltageCell.textContent = message.data.data_decoded.battery_voltage.toFixed(1) + 'V';
+                        }
+                        messageCell.innerHTML = formatContent(message.data.data_decoded);
                     }
                     moreInfoButton.textContent = 'More Info';
                     moreInfoButton.onclick = () => showModal(message.data);
                     buttonCell.appendChild(moreInfoButton);
-                } else {
-                    contentCell.textContent = message.data;
                 }
 
+                row.appendChild(timeCell);
+                row.appendChild(devEUICell);
                 row.appendChild(topicCell);
-                row.appendChild(contentCell);
+                row.appendChild(messageTypeCell);
+                row.appendChild(messageCell);
+                row.appendChild(errorCodeCell);
+                row.appendChild(sensorStateCell);
+                row.appendChild(batteryVoltageCell);
                 row.appendChild(buttonCell);
                 messageTable.appendChild(row);
             });
@@ -71,46 +101,36 @@ function fetchMessages(filter = '') {
 }
 
 function formatContent(data) {
-    let content = `<strong>Message Type:</strong> ${data.message_type}<br>`;
+    let content = ``;
 
     switch (data.message_type) {
         case 'Water Leak Sensor Event':
-            content += `<strong>Measurement (0-255):</strong> ${data['Measurement (0-255)']}<br>`;
-            content += `<strong>Water Status:</strong> ${data.water_status}<br>`;
+            content += `<em>Measurement (0-255):</em> <strong>${data['Measurement (0-255)']}</strong><br>`;
+            content += `<em>Water Status:</em> <strong>${data.water_status}</strong><br>`;
             break;
         case 'Door/Window Sensor Event':
-            content += `<strong>Open/Close Status:</strong> ${data.open_close_status}<br>`;
+            content += `<em>Open/Close Status:</em> <strong>${data.open_close_status}</strong><br>`;
             break;
         case 'Push Button Sensor Event':
-            content += `<strong>Button ID:</strong> ${data.button_id}<br>`;
-            content += `<strong>Action Performed:</strong> ${data.action_performed}<br>`;
+            content += `<em>Button ID:</em> <strong>${data.button_id}</strong><br>`;
+            content += `<em>Action Performed:</em> <strong>${data.action_performed}</strong><br>`;
             break;
         case 'Dry Contact Sensor Event':
-            content += `<strong>Connection Status:</strong> ${data.connection_status}<br>`;
+            content += `<em>Connection Status:</em> <strong>${data.connection_status}</strong><br>`;
             break;
         case 'Thermistor Temperature Sensor Event':
-            content += `<strong>Event Type:</strong> ${data.event_type}<br>`;
-            content += `<strong>Current Temperature:</strong> ${data.current_temperature}<br>`;
+            content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
+            content += `<em>Current Temperature:</em> <strong>${data.current_temperature}</strong><br>`;
             break;
         case 'Tilt Sensor Event':
-            content += `<strong>Event Type:</strong> ${data.event_type}<br>`;
-            content += `<strong>Angle of Tilt:</strong> ${data.angle_of_tilt}<br>`;
+            content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
+            content += `<em>Angle of Tilt:</em> <strong>${data.angle_of_tilt}</strong><br>`;
             break;
         case 'Air Temperature Sensor Event':
-            content += `<strong>Event Type:</strong> ${data.event_type}<br>`;
-            content += `<strong>Temperature:</strong> ${data.temperature}<br>`;
-            content += `<strong>Humidity:</strong> ${data.humidity}<br>`;
+            content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
+            content += `<em>Temperature:</em> <strong>${data.temperature}</strong><br>`;
+            content += `<em>Humidity:</em> <strong>${data.humidity}</strong><br>`;
             break;
-        case 'Supervisory Message':
-            content += `<strong>Device Error Code:</strong> ${data.device_error_code}<br>`;
-            content += `<strong>Current Sensor State:</strong> ${data.current_sensor_state}<br>`;
-            if (data.battery_level !== undefined) {
-                content += `<strong>Battery Level:</strong> ${data.battery_level}<br>`;
-            }
-            content += `<strong>Battery Voltage:</strong> ${data.battery_voltage.toFixed(1)}V<br>`;
-            break;
-        default:
-            content += 'No specific data available for this message type.';
     }
 
     return content;
@@ -128,15 +148,12 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-
 function startFetchingMessages() {
-    setInterval(() => fetchMessages(document.getElementById('filter').value), 5000); // Fetch messages every 5 seconds
+    setInterval(() => fetchMessages(document.getElementById('filter').value), 5000);
 }
 
-// Add event listener for the close button of the modal
 document.querySelector('.close').addEventListener('click', closeModal);
 
-// Add event listener to close the modal when clicking outside of it
 window.addEventListener('click', (event) => {
     const modal = document.getElementById('myModal');
     if (event.target === modal) {
@@ -148,5 +165,4 @@ function dumpMessagesToJSON() {
     window.location.href = '/dump_messages';
 }
 
-// Add event listener to the button
 document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);

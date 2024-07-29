@@ -8,7 +8,6 @@ from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_bu
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# Declare mqtt_client and broker_ip as global at the module level
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -55,8 +54,7 @@ def connect():
     broker_ip = data['broker']
     port = int(data['port'])
     topic = data['topic']
-
-    print(f"Setting broker_ip to: {broker_ip}")  # Debug log
+    print(f"Setting broker_ip to: {broker_ip}")
 
     if mqtt_client is not None:
         mqtt_client.disconnect()
@@ -140,21 +138,19 @@ def upload():
 @app.route('/send_downlink', methods=['POST'])
 def send_downlink_route():
     global broker_ip
-    print(f"Using broker_ip in send_downlink_route: {broker_ip}")  # Debug log
+    print(f"Using broker_ip in send_downlink_route: {broker_ip}")
     data = request.json
-    print("Received downlink request:", data)  # Debug log
-
-    # Check if required keys are present
+    print("Received downlink request:", data)
     required_keys = ['topic', 'sensor_type']
     missing_keys = [key for key in required_keys if key not in data]
+
     if missing_keys:
-        print(f"Missing required keys: {missing_keys}")  # Debug log
+        print(f"Missing required keys: {missing_keys}")
         return jsonify({"error": f"Missing required keys: {missing_keys}"}), 400
 
     response, status_code = send_downlink(data, broker_ip)
-    print("Send downlink response:", response, "Status code:", status_code)  # Debug log
+    print("Send downlink response:", response, "Status code:", status_code)
     return jsonify(response), status_code
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
