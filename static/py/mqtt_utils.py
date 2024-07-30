@@ -97,8 +97,8 @@ def on_message(client, userdata, msg):
             'topic': topic,
             'data': f"Error processing message: {e}"
         })
-    if len(message_buffer) > 150:
-        message_buffer.pop(0)
+    # if len(message_buffer) > 150:
+    #     message_buffer.pop(0)
 
 def encode_temperature_humidity_downlink(data):
     mode = int(data['mode'])
@@ -123,7 +123,7 @@ def encode_temperature_humidity_downlink(data):
     return base64.b64encode(bytes(downlink_message)).decode('utf-8')
 
 def send_downlink(data, broker_ip):
-    print(f"Using broker_ip in send_downlink: {broker_ip}")  # Debug log
+    print(f"Using broker_ip in send_downlink: {broker_ip}")
 
     if not broker_ip:
         return {"error": "Invalid host."}, 500
@@ -173,7 +173,7 @@ def send_downlink(data, broker_ip):
 
         payload = json.dumps({'data': downlink_message_base64})
 
-        print("Sending downlink message:", payload)  # Debug log
+        print("Sending downlink message:", payload)
 
         publish.single(topic, payload, hostname=broker_ip)
         return {"message": "Downlink message sent successfully"}, 200
@@ -181,5 +181,5 @@ def send_downlink(data, broker_ip):
         print(f"KeyError: {e}")
         return {"error": f"Missing key in downlink data: {e}"}, 400
     except Exception as e:
-        print(f"Error sending downlink: {e}")  # Debug log
+        print(f"Error sending downlink: {e}")
         return {"error": str(e)}, 500
