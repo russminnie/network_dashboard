@@ -23,7 +23,7 @@ mqtt_handler = MQTTHandler()
 
 
 @app.errorhandler(404)
-def page_not_found():
+def page_not_found(e):
     return render_template('error.html', message='Page not found'), 404
 
 
