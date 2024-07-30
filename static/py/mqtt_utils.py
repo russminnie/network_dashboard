@@ -97,8 +97,8 @@ def on_message(client, userdata, msg):
             'topic': topic,
             'data': f"Error processing message: {e}"
         })
-    # if len(message_buffer) > 150:
-    #     message_buffer.pop(0)
+    if len(message_buffer) > 150:
+        message_buffer.pop(0)
 
 def encode_temperature_humidity_downlink(data):
     mode = int(data['mode'])
