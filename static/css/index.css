@@ -42,7 +42,7 @@ main {
     z-index: 0;
 }
 
-h1, a, ul, li, label, p {
+h1, h3, a, ul, li, label, p {
     color: white;
 }
 
@@ -79,8 +79,8 @@ input[type="text"], input[type="password"], input[type="number"], input[type="da
 }
 
 ul {
-    list-style-type: none;
-    padding: 0;
+    list-style-type: disc;
+    padding: 1em;"
 }
 
 li {

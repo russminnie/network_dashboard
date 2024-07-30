@@ -1,15 +1,44 @@
+<script src="./static/js/connect_form.js"></script>
+<h3>Connect to MultiTech Gateway</h3>
 <form id="connectForm" onsubmit="connectToBroker(event)">
     <div class="form-group">
         <label for="broker">MQTT Broker IP:</label>
         <input type="text" id="broker" name="broker" required>
+        <button type="button" class="help-button" data-modal="ipHelp">?</button>
     </div>
     <div class="form-group">
         <label for="port">Port:</label>
         <input type="number" id="port" name="port" value="1883" required>
+        <button type="button" class="help-button" data-modal="portHelp">?</button>
     </div>
     <div class="form-group">
         <label for="topic">Topic:</label>
         <input type="text" id="topic" name="topic" value="lora/+/+" required>
+        <button type="button" class="help-button" data-modal="topicHelp">?</button>
     </div>
     <button type="submit">Connect</button>
 </form>
+<div id="ipHelp" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeHelpModal('ipHelp')">&times;</span>
+        <h2>Help - MQTT Broker IP:</h2>
+        <p class="modal_p">Enter the IP address used the access your MultiTech Gateway</p>
+        <p class="modal_p"><strong>Example:</strong> <em>192.168.2.1</em></p>
+    </div>
+</div>
+<div id="portHelp" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeHelpModal('portHelp')">&times;</span>
+        <h2>Help - Port</h2>
+        <p class="modal_p">Enter the port which your traffic to the MultiTech gateway will route through</p>
+        <p class="modal_p"><strong>Example:</strong> <em>1883</em></p>
+    </div>
+</div>
+<div id="topicHelp" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeHelpModal('topicHelp')">&times;</span>
+        <h2>Help - Topic</h2>
+        <p class="modal_p">A string which filters the messages for a connected client device</p>
+        <p class="modal_p"><strong>Example:</strong> <em>lora/+/+</em></p>
+    </div>
+</div>
