@@ -5,22 +5,17 @@
 {% block content %}
     <script src="{{ url_for('static', filename='js/downlinks.js') }}"></script>
     <h1>Configure Downlink</h1>
-    {%  include 'connect_form.html' %}
+    {% include 'connect_form.html' %}
     <form id="downlinkForm" onsubmit="sendDownlink(event)">
         <h2>Configure Sensor</h2>
         <div class="form-group">
-            <label for="downlinkTopic">Topic:</label>
-            <input type="text" id="downlinkTopic" name="topic" required>
-            <button type="button" class="help-button" data-modal="downlinkTopicHelp">?</button>
-        </div>
-        <div class="form-group">
-            <label for="sensorType">Sensor Type:</label>
-            <select id="sensorType" name="sensor_type" required>
-                <option value="water_sensor">Water Sensor</option>
-                <option value="temp_humidity_sensor">Temperature & Humidity Sensor</option>
+            <label for="sensorSelect">Select Sensor:</label>
+            <select id="sensorSelect" name="sensor_select" required>
+                <!-- Options will be populated by JavaScript -->
             </select>
+            <button type="button" class="help-button" data-modal="sensorSelectHelp">?</button>
         </div>
-        <div id="waterSensorConfig">
+        <div id="waterSensorConfig" style="display: none;">
             <div class="form-group">
                 <label>Enable water present message:</label>
                 <label><input type="radio" name="enable_water_present" value="1"> Yes</label>
@@ -110,130 +105,12 @@
         </div>
         <button type="submit">Submit</button>
     </form>
-    <div id="downlinkTopicHelp" class="modal">
+    <div id="sensorSelectHelp" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('downlinkTopicHelp')">&times;</span>
-            <h2>Help - Downlink Topic</h2>
-            <p class="modal_p">Enter the downlink topic in the following format: lora/Dev-EUI/down</p>
-            <p class="modal_p"><strong>Example:</strong> lora/1122334455667788/down</p>
+            <span class="close" onclick="closeHelpModal('sensorSelectHelp')">&times;</span>
+            <h2>Help - Select Sensor</h2>
+            <p>Select the sensor you want to send a downlink to.</p>
         </div>
     </div>
-    <div id="enableWaterPresentHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('enableWaterPresentHelp')">&times;</span>
-            <h2>Help - Enable Water Present</h2>
-            <p class="modal_p">Select 'Yes' to receive alerts when the sensor detects water, or 'No' to disable this
-                alert.</p>
-        </div>
-    </div>
-    <div id="enableWaterNotPresentHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('enableWaterNotPresentHelp')">&times;</span>
-            <h2>Help - Enable Water Not Present</h2>
-            <p class="modal_p">Select 'Yes' to receive alerts when the sensor no longer detects water, or 'No' to
-                disable this alert.</p>
-        </div>
-    </div>
-    <div id="thresholdHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('thresholdHelp')">&times;</span>
-            <h2>Help - Threshold</h2>
-            <p class="modal_p">Enter the threshold for the water present alerts. The recommended value for this setting
-                is 80.</p>
-        </div>
-    </div>
-    <div id="restoralHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('restoralHelp')">&times;</span>
-            <h2>Help - Restoral</h2>
-            <p class="modal_p">Enter the restoral value for the water sensor. The recommended value for this setting is
-                0</p>
-        </div>
-    </div>
-    <div id="modeHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('modeHelp')">&times;</span>
-            <h2>Help - Reporting Mode</h2>
-            <p class="modal_p">Select the mode of reporting. Threshold Mode allows you to receive alerts whenever the
-                temp goes above/below a certain threshold.</p>
-            <p class="modal_p">Report on Change Mode allows you to receive alerts whenever the sensor detects a certain
-                change in temp or humidity.</p>
-        </div>
-    </div>
-    <div id="reportingIntervalHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('reportingIntervalHelp')">&times;</span>
-            <h2>Help - Reporting Interval</h2>
-            <p class="modal_p">Enter the periodic reporting time interval. Set to 0 to disable periodic reporting.</p>
-            <p class="modal_p">Example: A value of 5 here would make the sensor report the temp and humidity every 5
-                minutes. </p>
-        </div>
-    </div>
-    <div id="restoralMarginHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('restoralMarginHelp')">&times;</span>
-            <h2>Help - Restoral Margin</h2>
-            <p class="modal_p">Enter the restoral margin for threshold mode.</p>
-        </div>
-    </div>
-    <div id="lowerTempThresholdHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('lowerTempThresholdHelp')">&times;</span>
-            <h2>Help - Lower Temperature Threshold</h2>
-            <p class="modal_p">Enter the lower temperature threshold in degrees Celsius.</p>
-        </div>
-    </div>
-    <div id="upperTempThresholdHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('upperTempThresholdHelp')">&times;</span>
-            <h2>Help - Upper Temperature Threshold</h2>
-            <p class="modal_p">Enter the upper temperature threshold in degrees Celsius.</p>
-        </div>
-    </div>
-    <div id="lowerHumidityThresholdHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('lowerHumidityThresholdHelp')">&times;</span>
-            <h2>Help - Lower Humidity Threshold</h2>
-            <p class="modal_p">Enter the lower humidity threshold in percent relative humidity.</p>
-        </div>
-    </div>
-    <div id="upperHumidityThresholdHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('upperHumidityThresholdHelp')">&times;</span>
-            <h2>Help - Upper Humidity Threshold</h2>
-            <p class="modal_p">Enter the upper humidity threshold in percent relative humidity.</p>
-        </div>
-    </div>
-    <div id="tempIncreaseHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('tempIncreaseHelp')">&times;</span>
-            <h2>Help - Temperature Increase Threshold</h2>
-            <p class="modal_p">Enter the threshold for temperature increase. The recommended value for this setting is
-                2.</p>
-        </div>
-    </div>
-    <div id="tempDecreaseHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('tempDecreaseHelp')">&times;</span>
-            <h2>Help - Temperature Decrease Threshold</h2>
-            <p class="modal_p">Enter the threshold for temperature decrease. The recommended value for this setting is
-                2.</p>
-        </div>
-    </div>
-    <div id="humidityIncreaseHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('humidityIncreaseHelp')">&times;</span>
-            <h2>Help - Humidity Increase Threshold</h2>
-            <p class="modal_p">Enter the threshold for humidity increase. The recommended value for this setting is
-                5.</p>
-        </div>
-    </div>
-    <div id="humidityDecreaseHelp" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHelpModal('humidityDecreaseHelp')">&times;</span>
-            <h2>Help - Humidity Decrease Threshold</h2>
-            <p class="modal_p">Enter the threshold for humidity decrease. The recommended value for this setting is
-                5.</p>
-        </div>
-    </div>
+    <!-- Other help modals here... -->
 {% endblock %}

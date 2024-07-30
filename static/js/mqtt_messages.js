@@ -94,29 +94,29 @@ function formatContent(data) {
     let content = ``;
 
     switch (data.message_type) {
-        case 'Water Leak Sensor Event':
+        case 'Water Leak Sensor':
             content += `<em>Measurement (0-255):</em> <strong>${data['Measurement (0-255)']}</strong><br>`;
             content += `<em>Water Status:</em> <strong>${data.water_status}</strong><br>`;
             break;
-        case 'Door/Window Sensor Event':
+        case 'Door/Window Sensor':
             content += `<em>Open/Close Status:</em> <strong>${data.open_close_status}</strong><br>`;
             break;
-        case 'Push Button Sensor Event':
+        case 'Push Button Sensor':
             content += `<em>Button ID:</em> <strong>${data.button_id}</strong><br>`;
             content += `<em>Action Performed:</em> <strong>${data.action_performed}</strong><br>`;
             break;
-        case 'Dry Contact Sensor Event':
+        case 'Dry Contact Sensor':
             content += `<em>Connection Status:</em> <strong>${data.connection_status}</strong><br>`;
             break;
-        case 'Thermistor Temperature Sensor Event':
+        case 'Thermistor Temperature Sensor':
             content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
             content += `<em>Current Temperature:</em> <strong>${data.current_temperature}</strong><br>`;
             break;
-        case 'Tilt Sensor Event':
+        case 'Tilt Sensor':
             content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
             content += `<em>Angle of Tilt:</em> <strong>${data.angle_of_tilt}</strong><br>`;
             break;
-        case 'Air Temperature Sensor Event':
+        case 'Air Temperature Sensor':
             content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
             content += `<em>Temperature:</em> <strong>${data.temperature}</strong><br>`;
             content += `<em>Humidity:</em> <strong>${data.humidity}</strong><br>`;
