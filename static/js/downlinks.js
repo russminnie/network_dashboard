@@ -83,7 +83,7 @@ function sendDownlink(event) {
     const sensorType = sensorTypeElement ? sensorTypeElement.value : null;
     let downlinkData = { topic, sensor_type: sensorType };
 
-    console.log("Sensor Type:", sensorType); // Debug log
+    console.log("Sensor Type:", sensorType);
 
     if (sensorType === 'water_sensor') {
         const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;
@@ -132,7 +132,7 @@ function sendDownlink(event) {
         }
     }
 
-    console.log("Sending downlink data:", JSON.stringify(downlinkData, null, 2)); // Debug log
+    console.log("Sending downlink data:", JSON.stringify(downlinkData, null, 2));
 
     fetch('/send_downlink', {
         method: 'POST',
@@ -143,7 +143,7 @@ function sendDownlink(event) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('Response data:', data); // Debug log
+            console.log('Response data:', data);
             if (data.message) {
                 alert('Downlink sent: ' + data.message);
             } else {
@@ -155,10 +155,6 @@ function sendDownlink(event) {
             alert('Error sending downlink: ' + error);
         });
 }
-
-
-
-
 
 function openHelpModal(modalId) {
     const helpModal = document.getElementById(modalId);
@@ -174,7 +170,6 @@ function closeHelpModal(modalId) {
     }
 }
 
-// Add the existing function to close the modal when clicking outside of it
 window.onclick = function(event) {
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {

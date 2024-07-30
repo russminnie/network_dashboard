@@ -4,12 +4,13 @@
 
 {% block content %}
     <h1 class="outlined-text">MultiTech Network Dashboard</h1>
-    <p class="welcome-text">Welcome to the MultiTech Network Dashboard. This application allows you to:</p>
-    <ul class="welcome-text" style="list-style-type: disc; padding-left: 20px;">
+    <h3 class="welcome-text">Welcome to the MultiTech Network Dashboard. This application allows you to:</h3>
+    <ul class="welcome-text">
         <li>View real-time and historical data from your sensors.</li>
+        <li>Connect to your MultiTech Gateway.</li>
+        <li>Configure your Radiobridge sensors.</li>
         <li>Send and receive MQTT messages.</li>
         <li>Upload and view MQTT messages.</li>
-        <li>Configure your Radiobridge sensors.</li>
     </ul>
-    {%  include 'connect_form.html' %}
+    {% include 'connect_form.html' %}
 {% endblock %}
