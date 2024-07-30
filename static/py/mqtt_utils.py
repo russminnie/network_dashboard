@@ -143,7 +143,7 @@ def encode_temperature_humidity_downlink(data):
     return base64.b64encode(bytes(downlink_message)).decode('utf-8')
 
 def send_downlink(data, broker_ip):
-    print(f"Using broker_ip in send_downlink: {broker_ip}")  # Debug log
+    print(f"Using broker_ip in send_downlink: {broker_ip}")
 
     if not broker_ip:
         return {"error": "Invalid host."}, 500
@@ -197,7 +197,8 @@ def send_downlink(data, broker_ip):
         print(f"Base64 encoded downlink message: {downlink_message_base64}")  # Debug log
 
         payload = json.dumps({'data': downlink_message_base64})
-        print(f"Payload: {payload}")  # Debug log
+
+        print(f"Payload: {payload}")
 
         publish.single(topic, payload, hostname=broker_ip)
         return {"message": "Downlink message sent successfully"}, 200
@@ -205,6 +206,6 @@ def send_downlink(data, broker_ip):
         print(f"KeyError: {e}")
         return {"error": f"Missing key in downlink data: {e}"}, 400
     except Exception as e:
-        print(f"Error sending downlink: {e}")  # Debug log
+        print(f"Error sending downlink: {e}")
         return {"error": str(e)}, 500
 

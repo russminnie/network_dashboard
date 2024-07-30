@@ -95,11 +95,11 @@ function formatContent(data) {
 
     switch (data.message_type) {
         case 'Water Leak Sensor':
-            content += `<em>Measurement (0-255):</em> <strong>${data['Measurement (0-255)']}</strong><br>`;
             content += `<em>Water Status:</em> <strong>${data.water_status}</strong><br>`;
+            content += `<em>Measurement (0-255):</em> <strong>${data['Measurement (0-255)']}</strong><br>`;
             break;
-        case 'Door/Window Sensor':
-            content += `<em>Open/Close Status:</em> <strong>${data.open_close_status}</strong><br>`;
+        case 'Door/Window Sensor Event':
+            content += `<em>Status:</em> <strong>${data.open_close_status}</strong><br>`;
             break;
         case 'Push Button Sensor':
             content += `<em>Button ID:</em> <strong>${data.button_id}</strong><br>`;
@@ -110,7 +110,7 @@ function formatContent(data) {
             break;
         case 'Thermistor Temperature Sensor':
             content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
-            content += `<em>Current Temperature:</em> <strong>${data.current_temperature}</strong><br>`;
+            content += `<em>Temperature:</em> <strong>${data.current_temperature}</strong><br>`;
             break;
         case 'Tilt Sensor':
             content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
@@ -122,8 +122,8 @@ function formatContent(data) {
             content += `<em>Humidity:</em> <strong>${data.humidity}</strong><br>`;
             break;
         case 'Supervisory Message':
-            content += `<em>Device Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
-            content += `<em>Current Sensor State:</em> <strong>${data.current_sensor_state}<strong><br>`;
+            content += `<em>Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
+            content += `<em>Sensor State:</em> <strong>${data.current_sensor_state}<strong><br>`;
             break;
     }
 
