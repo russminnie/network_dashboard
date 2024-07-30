@@ -1,32 +1,49 @@
 let brokerIp = '';
 
 document.addEventListener('DOMContentLoaded', (event) => {
-    const sensorTypeElement = document.getElementById('sensorType');
+    const sensorSelectElement = document.getElementById('sensorSelect');
     const modeElement = document.getElementById('mode');
     const thresholdModeConfig = document.getElementById('thresholdModeConfig');
     const reportOnChangeConfig = document.getElementById('reportOnChangeConfig');
 
-    if (sensorTypeElement) {
-        sensorTypeElement.addEventListener('change', (event) => {
-            const sensorType = event.target.value;
-            const waterSensorConfig = document.getElementById('waterSensorConfig');
-            const tempHumiditySensorConfig = document.getElementById('tempHumiditySensorConfig');
+    fetch('/get_sensors')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Fetched sensors:", data.sensors);  // Debug log
+            data.sensors.forEach(sensor => {
+                const option = document.createElement('option');
+                option.value = sensor.DevEUI;
+                option.textContent = `${sensor.DevEUI} (${sensor.sensor_type})`;
+                sensorSelectElement.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching sensors:', error);
+        });
 
-            waterSensorConfig.style.display = sensorType === 'water_sensor' ? 'block' : 'none';
-            tempHumiditySensorConfig.style.display = sensorType === 'temp_humidity_sensor' ? 'block' : 'none';
+    if (sensorSelectElement) {
+        sensorSelectElement.addEventListener('change', (event) => {
+            const selectedSensorText = sensorSelectElement.options[sensorSelectElement.selectedIndex].textContent;
+            console.log("Selected sensor text:", selectedSensorText); // Debug log
+            const selectedSensorType = selectedSensorText.split('(')[1].split(')')[0].toLowerCase();
+            console.log("Selected sensor type:", selectedSensorType); // Debug log
 
-            const waterSensorInputs = waterSensorConfig.querySelectorAll('input, select');
-            const tempHumiditySensorInputs = tempHumiditySensorConfig.querySelectorAll('input, select');
-
-            waterSensorInputs.forEach(input => input.required = sensorType === 'water_sensor');
-            tempHumiditySensorInputs.forEach(input => input.required = sensorType === 'temp_humidity_sensor');
+            if (selectedSensorType.includes('water')) {
+                document.getElementById('waterSensorConfig').style.display = 'block';
+                document.getElementById('tempHumiditySensorConfig').style.display = 'none';
+            } else if (selectedSensorType.includes('temperature') && selectedSensorType.includes('humidity')) {
+                document.getElementById('waterSensorConfig').style.display = 'none';
+                document.getElementById('tempHumiditySensorConfig').style.display = 'block';
+            } else {
+                document.getElementById('waterSensorConfig').style.display = 'none';
+                document.getElementById('tempHumiditySensorConfig').style.display = 'none';
+            }
         });
     }
 
     if (modeElement) {
         modeElement.addEventListener('change', (event) => {
             const mode = event.target.value;
-
             thresholdModeConfig.style.display = mode === '0x00' ? 'block' : 'none';
             reportOnChangeConfig.style.display = mode === '0x01' ? 'block' : 'none';
         });
@@ -78,26 +95,26 @@ function connectToBroker(event) {
 
 function sendDownlink(event) {
     event.preventDefault();
-    const topic = document.getElementById('downlinkTopic').value;
-    const sensorTypeElement = document.getElementById('sensorType');
-    const sensorType = sensorTypeElement ? sensorTypeElement.value : null;
+    const sensorSelectElement = document.getElementById('sensorSelect');
+    const sensorType = sensorSelectElement ? sensorSelectElement.options[sensorSelectElement.selectedIndex].text.split(' ')[1].toLowerCase() : null;
+    const devEui = sensorSelectElement ? sensorSelectElement.value.replace(/-/g, '') : ''; // Remove dashes from DevEUI
+    const topic = `lora/${devEui}/down`; // Construct the topic
     let downlinkData = { topic, sensor_type: sensorType };
 
-    console.log("Sensor Type:", sensorType);
-
-    if (sensorType === 'water_sensor') {
+    if (sensorType.includes('water')) {
         const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;
         const enableWaterNotPresent = document.querySelector('input[name="enable_water_not_present"]:checked').value;
         const threshold = document.getElementById('threshold').value;
         const restoral = document.getElementById('restoral').value;
         downlinkData = {
             ...downlinkData,
+            sensor_type: 'water_sensor',  // Set the correct sensor type
             enableWaterPresent,
             enableWaterNotPresent,
             threshold,
             restoral
         };
-    } else if (sensorType === 'temp_humidity_sensor') {
+    } else if (sensorType.includes('temperature') && sensorType.includes('humidity')) {
         const mode = document.getElementById('mode').value;
         if (mode === '0x00') {
             const reportingInterval = document.getElementById('reportingInterval').value;
@@ -108,6 +125,7 @@ function sendDownlink(event) {
             const upperHumidityThreshold = document.getElementById('upperHumidityThreshold').value;
             downlinkData = {
                 ...downlinkData,
+                sensor_type: 'temp_humidity_sensor',  // Set the correct sensor type
                 mode,
                 reportingInterval,
                 restoralMargin,
@@ -123,6 +141,7 @@ function sendDownlink(event) {
             const humidityDecrease = document.getElementById('humidityDecrease').value;
             downlinkData = {
                 ...downlinkData,
+                sensor_type: 'temp_humidity_sensor',  // Set the correct sensor type
                 mode,
                 tempIncrease,
                 tempDecrease,
@@ -177,4 +196,4 @@ window.onclick = function(event) {
             modal.style.display = 'none';
         }
     });
-}
+};

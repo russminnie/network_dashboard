@@ -6,6 +6,7 @@ from static.data.config import message_type_map
 
 message_buffer = []
 mqtt_client = mqtt.Client()
+sensor_list = []
 
 def decode_sensor_data(data):
     padding = '=' * ((4 - len(data) % 4) % 4)
@@ -45,8 +46,7 @@ def decode_sensor_data(data):
 
         return decoded_message
     except (base64.binascii.Error, IndexError, ValueError) as e:
-        return f"Error decoding Base64 or interpreting the payload: {e}"
-
+        return {"error": f"Error decoding Base64 or interpreting the payload: {e}"}
 
 def decode_temp_humidity_sensor(payload):
     try:
@@ -71,14 +71,33 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(userdata['topic'])
 
 def on_message(client, userdata, msg):
-    global message_buffer
+    global message_buffer, sensor_list
     topic = msg.topic
     message = msg.payload.decode()
-    print(f"Received message: {message}")
+    print(f"Received message: {message}")  # Debug log
     try:
         data = json.loads(message)
         if isinstance(data, dict) and 'data' in data:
             data['data_decoded'] = decode_sensor_data(data['data'])
+            if "error" in data['data_decoded']:
+                print(data['data_decoded']["error"])  # Log the error
+            else:
+                print(f"Decoded data: {data['data_decoded']}")  # Debug log
+
+                # Scrape DevEUI and sensor type
+                dev_eui = data.get('deveui', None)
+                message_type = data['data_decoded'].get('message_type', None)
+                print(f"DevEUI: {dev_eui}, Message Type: {message_type}")  # Debug log
+
+                # Filter out unwanted message types
+                if dev_eui and message_type:
+                    sensor_type = message_type.lower()
+                    if not any(unwanted in sensor_type for unwanted in
+                               ["unknown", "supervisory message", "reset message", "downlink"]):
+                        sensor_entry = {'DevEUI': dev_eui, 'sensor_type': sensor_type}
+                        if sensor_entry not in sensor_list:
+                            sensor_list.append(sensor_entry)
+                            print(f"Sensor added: {sensor_entry}")  # Debug log
         message_buffer.append({
             'type': 'json',
             'topic': topic,
@@ -99,6 +118,7 @@ def on_message(client, userdata, msg):
         })
     if len(message_buffer) > 150:
         message_buffer.pop(0)
+
 
 def encode_temperature_humidity_downlink(data):
     mode = int(data['mode'])
@@ -143,13 +163,16 @@ def send_downlink(data, broker_ip):
             threshold = int(data['threshold'])
             restoral = int(data['restoral'])
             enable_events = ((not enable_water_present) << 1) | (not enable_water_not_present)
+
             downlink_message = [
                 0x08,  # Water sensor event
                 enable_events,
                 threshold,
                 restoral,
-                0x00, 0x00, 0x00, 0x00
+                0x00, 0x00, 0x00, 0x00  # Padding with zeros
             ]
+
+            print(f"Constructed downlink message: {downlink_message}")  # Debug log
         elif sensor_type == 'temp_humidity_sensor':
             mode = int(data['mode'], 16)
             reporting_interval = int(data['reportingInterval'])
@@ -169,11 +192,13 @@ def send_downlink(data, broker_ip):
                 upper_humidity_threshold
             ]
 
+        # Encode the message in base64
         downlink_message_base64 = base64.b64encode(bytes(downlink_message)).decode('utf-8')
+        print(f"Base64 encoded downlink message: {downlink_message_base64}")  # Debug log
 
         payload = json.dumps({'data': downlink_message_base64})
 
-        print("Sending downlink message:", payload)
+        print(f"Payload: {payload}")
 
         publish.single(topic, payload, hostname=broker_ip)
         return {"message": "Downlink message sent successfully"}, 200
@@ -183,3 +208,4 @@ def send_downlink(data, broker_ip):
     except Exception as e:
         print(f"Error sending downlink: {e}")
         return {"error": str(e)}, 500
+

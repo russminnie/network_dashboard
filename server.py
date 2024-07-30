@@ -4,7 +4,7 @@ import logging
 from paho.mqtt import client as mqtt
 from datetime import datetime
 
-from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink
+from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink, sensor_list
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -151,6 +151,16 @@ def send_downlink_route():
     response, status_code = send_downlink(data, broker_ip)
     print("Send downlink response:", response, "Status code:", status_code)
     return jsonify(response), status_code
+
+
+@app.route('/get_sensors', methods=['GET'])
+def get_sensors():
+    global sensor_list
+    print(f"Sensor list: {sensor_list}")  # Debug log
+    return jsonify({'sensors': sensor_list})
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
