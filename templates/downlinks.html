@@ -3,7 +3,8 @@
 {% block title %}Downlinks{% endblock %}
 
 {% block content %}
-    <script src="{{ url_for('static', filename='js/downlinks.js') }}"></script>
+    <script src="{{ url_for('static', filename='./js/downlinks.js') }}"></script>
+    <script src="{{ url_for('static', filename='./help_modal.js') }}"></script>
     <h1>Configure Downlink</h1>
     {% include 'connect_form.html' %}
     <form id="downlinkForm" onsubmit="sendDownlink(event)">
@@ -11,7 +12,6 @@
         <div class="form-group">
             <label for="sensorSelect">Select Sensor:</label>
             <select id="sensorSelect" name="sensor_select" required>
-                <!-- Options will be populated by JavaScript -->
             </select>
             <button type="button" class="help-button" data-modal="sensorSelectHelp">?</button>
         </div>
@@ -109,8 +109,8 @@
         <div class="modal-content">
             <span class="close" onclick="closeHelpModal('sensorSelectHelp')">&times;</span>
             <h2>Help - Select Sensor</h2>
-            <p>Select the sensor you want to send a downlink to.</p>
+            <p class="modal_p">Connect to a MultiTech Gateway to populate the dropdown field</p>
+            <p class="modal_p">Select the sensor you want to send a downlink to.</p>
         </div>
     </div>
-    <!-- Other help modals here... -->
 {% endblock %}

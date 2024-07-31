@@ -3,7 +3,7 @@
 {% block title %}Upload MQTT Messages{% endblock %}
 
 {% block content %}
-    <script src="./static/js/mqtt_messages.js"></script>
+    <script src="{{ url_for('static', filename='./js/mqtt_messages.js') }}"></script>
     <h1>Upload and View MQTT Messages</h1>
     <form id="uploadForm" method="post" enctype="multipart/form-data" action="/import_messages">
         <div class="form-group">
