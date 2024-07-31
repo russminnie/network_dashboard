@@ -8,6 +8,33 @@ message_buffer = []
 mqtt_client = mqtt.Client()
 sensor_list = []
 
+def decode_temp_humidity_sensor(payload):
+    try:
+        reporting_event_type = payload[0]
+        integer_temp = payload[1] & 0x7F  # Mask to get the 7 bits of integer part
+        sign_temp = (payload[1] & 0x80) >> 7  # Get the sign bit
+        integer_temp = integer_temp if sign_temp == 0 else -integer_temp  # Apply sign
+        decimal_temp = (payload[2] >> 4) / 10.0  # Get the upper 4 bits and divide by 10 to get decimal part
+        temperature_celsius = integer_temp + decimal_temp
+
+        # Convert to Fahrenheit
+        temperature_fahrenheit = (temperature_celsius * 9/5) + 32
+
+        integer_humidity = payload[3]
+        decimal_humidity = (payload[4] >> 4) / 10.0  # Get the upper 4 bits and divide by 10 to get decimal part
+        humidity = integer_humidity + decimal_humidity
+
+        decoded_data = {
+            'reporting_event_type': reporting_event_type,
+            'temperature_celsius': temperature_celsius,
+            'temperature_fahrenheit': temperature_fahrenheit,
+            'humidity': humidity
+        }
+
+        return decoded_data
+    except (IndexError, ValueError) as e:
+        return {"error": f"Error decoding temperature and humidity sensor payload: {e}"}
+
 def decode_sensor_data(data):
     padding = '=' * ((4 - len(data) % 4) % 4)
     base64_data_padded = data + padding
@@ -41,6 +68,8 @@ def decode_sensor_data(data):
                 'battery_voltage_hex': battery_voltage_hex,
                 'battery_voltage': battery_voltage
             })
+        elif message_type == 0x0D:
+            decoded_message['data'] = decode_temp_humidity_sensor(payload)
         else:
             decoded_message['payload'] = payload.hex()
 
@@ -48,23 +77,8 @@ def decode_sensor_data(data):
     except (base64.binascii.Error, IndexError, ValueError) as e:
         return {"error": f"Error decoding Base64 or interpreting the payload: {e}"}
 
-def decode_temp_humidity_sensor(payload):
-    try:
-        reporting_event_type = payload[0]
-        integer_temp = payload[1]
-        decimal_temp = (payload[2] >> 4) / 10.0
-        integer_humidity = payload[3]
-        decimal_humidity = (payload[4] >> 4) / 10.0
 
-        decoded_data = {
-            'reporting_event_type': reporting_event_type,
-            'temperature': integer_temp + decimal_temp if integer_temp < 128 else integer_temp - 256 + decimal_temp,
-            'humidity': integer_humidity + decimal_humidity
-        }
 
-        return decoded_data
-    except (IndexError, ValueError) as e:
-        return f"Error decoding temperature and humidity sensor payload: {e}"
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))

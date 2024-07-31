@@ -90,6 +90,18 @@ function fetchMessages(filter = '') {
         });
 }
 
+const eventTypeMap = {
+    0x00: "Periodic Report",
+    0x01: "Temperature has risen above upper threshold",
+    0x02: "Temperature has fallen below lower threshold",
+    0x03: "Temperature report-on-change increase",
+    0x04: "Temperature report-on-change decrease",
+    0x05: "Humidity has risen above upper threshold",
+    0x06: "Humidity has fallen below lower threshold",
+    0x07: "Humidity report-on-change increase",
+    0x08: "Humidity report-on-change decrease"
+};
+
 function formatContent(data) {
     let content = ``;
 
@@ -116,10 +128,11 @@ function formatContent(data) {
             content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
             content += `<em>Angle of Tilt:</em> <strong>${data.angle_of_tilt}</strong><br>`;
             break;
-        case 'Air Temperature Sensor':
-            content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
-            content += `<em>Temperature:</em> <strong>${data.temperature}</strong><br>`;
-            content += `<em>Humidity:</em> <strong>${data.humidity}</strong><br>`;
+         case 'Temperature and Humidity Sensor':
+            const eventTypeDescription = eventTypeMap[data.data.reporting_event_type] || `Unknown (${data.data.reporting_event_type})`;
+            content += `<em>Event Type:</em> <strong>${eventTypeDescription}</strong><br>`;
+            content += `<em>Temperature:</em> <strong>${data.data.temperature_fahrenheit.toFixed(2)} °F</strong><br>`;
+            content += `<em>Humidity:</em> <strong>${data.data.humidity}%</strong><br>`;
             break;
         case 'Supervisory Message':
             content += `<em>Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
