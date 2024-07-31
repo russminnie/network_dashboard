@@ -100,7 +100,7 @@ function fetchMessages(filter = '') {
                                 messageData3Cell.innerHTML = `<em>Humidity:</em> <strong>${data.data.humidity}%</strong><br>`;
                                 break;
                             case 'Supervisory Message':
-                                messageData1Cell.innerHTML = message.data.data_decoded.battery_voltage.toFixed(1) + 'V';
+                                messageData1Cell.innerHTML = `<em>Battery Voltage:</em> <strong>${data.battery_voltage.toFixed(1)}V</strong><br>`;
                                 messageData2Cell.innerHTML = `<em>Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
                                 messageData3Cell.innerHTML = `<em>Sensor State:</em> <strong>${data.current_sensor_state}<strong><br>`;
                                 break;
