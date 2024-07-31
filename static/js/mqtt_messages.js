@@ -42,8 +42,9 @@ function fetchMessages(filter = '') {
                 const devEUICell = document.createElement('td');
                 const topicCell = document.createElement('td');
                 const messageTypeCell = document.createElement('td');
-                const batteryVoltageCell = document.createElement('td');
-                const messageCell = document.createElement('td');
+                const messageData1Cell = document.createElement('td');
+                const messageData2Cell = document.createElement('td');
+                const messageData3Cell = document.createElement('td');
                 const buttonCell = document.createElement('td');
                 const moreInfoButton = document.createElement('button');
 
@@ -67,11 +68,43 @@ function fetchMessages(filter = '') {
                     if ('data_decoded' in message.data) {
                         if ('message_type' in message.data.data_decoded) {
                             messageTypeCell.textContent = message.data.data_decoded.message_type;
+                            data = message.data.data_decoded;
                         }
-                        if ('battery_voltage' in message.data.data_decoded) {
-                            batteryVoltageCell.textContent = message.data.data_decoded.battery_voltage.toFixed(1) + 'V';
+                        switch (data.message_type) {
+                            case 'Water Leak Sensor':
+                                messageData1Cell.innerHTML = `<em>Water Status:</em> <strong>${data.water_status}</strong><br>`;
+                                messageData2Cell.innerHTML = `<em>Measurement (0-255):</em> <strong>${data['Measurement (0-255)']}</strong><br>`;
+                                break;
+                            case 'Door/Window Sensor Event':
+                                messageData1Cell.innerHTML = `<em>Status:</em> <strong>${data.open_close_status}</strong><br>`;
+                                break;
+                            case 'Push Button Sensor':
+                                messageData1Cell.innerHTML = `<em>Button ID:</em> <strong>${data.button_id}</strong><br>`;
+                                messageData2Cell.innerHTML = `<em>Action Performed:</em> <strong>${data.action_performed}</strong><br>`;
+                                break;
+                            case 'Dry Contact Sensor':
+                                messageData1Cell.innerHTML = `<em>Connection Status:</em> <strong>${data.connection_status}</strong><br>`;
+                                break;
+                            case 'Thermistor Temperature Sensor':
+                                messageData1Cell.innerHTML = `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
+                                messageData2Cell.innerHTML = `<em>Temperature:</em> <strong>${data.current_temperature}</strong><br>`;
+                                break;
+                            case 'Tilt Sensor':
+                                messageData1Cell.innerHTML = `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
+                                messageData2Cell.innerHTML = `<em>Angle of Tilt:</em> <strong>${data.angle_of_tilt}</strong><br>`;
+                                break;
+                            case 'Temperature and Humidity Sensor':
+                                const eventTypeDescription = eventTypeMap[data.data.reporting_event_type] || `Unknown (${data.data.reporting_event_type})`;
+                                messageData1Cell.innerHTML = `<em>Event Type:</em> <strong>${eventTypeDescription}</strong><br>`;
+                                messageData2Cell.innerHTML = `<em>Temperature:</em> <strong>${data.data.temperature_fahrenheit.toFixed(2)} °F</strong><br>`;
+                                messageData3Cell.innerHTML = `<em>Humidity:</em> <strong>${data.data.humidity}%</strong><br>`;
+                                break;
+                            case 'Supervisory Message':
+                                messageData1Cell.innerHTML = message.data.data_decoded.battery_voltage.toFixed(1) + 'V';
+                                messageData2Cell.innerHTML = `<em>Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
+                                messageData3Cell.innerHTML = `<em>Sensor State:</em> <strong>${data.current_sensor_state}<strong><br>`;
+                                break;
                         }
-                        messageCell.innerHTML = formatContent(message.data.data_decoded);
                     }
                     moreInfoButton.textContent = 'More Info';
                     moreInfoButton.onclick = () => showModal(message.data);
@@ -82,8 +115,9 @@ function fetchMessages(filter = '') {
                 row.appendChild(devEUICell);
                 row.appendChild(topicCell);
                 row.appendChild(messageTypeCell);
-                row.appendChild(messageCell);
-                row.appendChild(batteryVoltageCell);
+                row.appendChild(messageData1Cell);
+                row.appendChild(messageData2Cell);
+                row.appendChild(messageData3Cell);
                 row.appendChild(buttonCell);
                 messageTable.appendChild(row);
             });
@@ -101,47 +135,6 @@ const eventTypeMap = {
     0x07: "Humidity report-on-change increase",
     0x08: "Humidity report-on-change decrease"
 };
-
-function formatContent(data) {
-    let content = ``;
-
-    switch (data.message_type) {
-        case 'Water Leak Sensor':
-            content += `<em>Water Status:</em> <strong>${data.water_status}</strong><br>`;
-            content += `<em>Measurement (0-255):</em> <strong>${data['Measurement (0-255)']}</strong><br>`;
-            break;
-        case 'Door/Window Sensor Event':
-            content += `<em>Status:</em> <strong>${data.open_close_status}</strong><br>`;
-            break;
-        case 'Push Button Sensor':
-            content += `<em>Button ID:</em> <strong>${data.button_id}</strong><br>`;
-            content += `<em>Action Performed:</em> <strong>${data.action_performed}</strong><br>`;
-            break;
-        case 'Dry Contact Sensor':
-            content += `<em>Connection Status:</em> <strong>${data.connection_status}</strong><br>`;
-            break;
-        case 'Thermistor Temperature Sensor':
-            content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
-            content += `<em>Temperature:</em> <strong>${data.current_temperature}</strong><br>`;
-            break;
-        case 'Tilt Sensor':
-            content += `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
-            content += `<em>Angle of Tilt:</em> <strong>${data.angle_of_tilt}</strong><br>`;
-            break;
-         case 'Temperature and Humidity Sensor':
-            const eventTypeDescription = eventTypeMap[data.data.reporting_event_type] || `Unknown (${data.data.reporting_event_type})`;
-            content += `<em>Event Type:</em> <strong>${eventTypeDescription}</strong><br>`;
-            content += `<em>Temperature:</em> <strong>${data.data.temperature_fahrenheit.toFixed(2)} °F</strong><br>`;
-            content += `<em>Humidity:</em> <strong>${data.data.humidity}%</strong><br>`;
-            break;
-        case 'Supervisory Message':
-            content += `<em>Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
-            content += `<em>Sensor State:</em> <strong>${data.current_sensor_state}<strong><br>`;
-            break;
-    }
-
-    return content;
-}
 
 function showModal(data) {
     const modal = document.getElementById('myModal');
