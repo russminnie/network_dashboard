@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-
 {% block title %}Downlinks{% endblock %}
-
-{% block content %}
+{% block head %}
     <script src="{{ url_for('static', filename='./js/downlinks.js') }}"></script>
     <script src="{{ url_for('static', filename='./help_modal.js') }}"></script>
+{% endblock %}
+{% block content %}
     <h1>Configure Downlink</h1>
     {% include 'connect_form.html' %}
     <form id="downlinkForm" onsubmit="sendDownlink(event)">

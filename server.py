@@ -5,6 +5,7 @@ from paho.mqtt import client as mqtt
 from datetime import datetime
 
 from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink, sensor_list
+from static.py.gpt import help_mqtt_json
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -45,6 +46,12 @@ def upload_messages():
 @app.route('/downlink')
 def downlink():
     return render_template('downlinks.html')
+
+
+@app.route('/gpt_response')
+def gpt_response():
+    message = request.args.get('message')
+    return render_template('gpt.html', show_helper=message)
 
 
 @app.route('/connect', methods=['POST'])
@@ -156,8 +163,15 @@ def send_downlink_route():
 @app.route('/get_sensors', methods=['GET'])
 def get_sensors():
     global sensor_list
-    print(f"Sensor list: {sensor_list}")  # Debug log
+    print(f"Sensor list: {sensor_list}")
     return jsonify({'sensors': sensor_list})
+
+
+@app.route('/gpt', methods=['POST'])
+def gpt():
+    json_data = request.json
+    show_helper = help_mqtt_json(json_data)
+    return show_helper
 
 
 if __name__ == '__main__':
