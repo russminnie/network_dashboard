@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-
 {% block title %}MQTT Messages{% endblock %}
-
-{% block content %}
+{% block head %}
     <script src="{{ url_for('static', filename='./js/mqtt_messages.js') }}"></script>
+{% endblock %}
+{% block content %}
     <h1>Live MQTT Messages</h1>
     {% include 'connect_form.html' %}
     <div class="dump">
