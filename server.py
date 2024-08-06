@@ -1,3 +1,12 @@
+"""
+Authors: Benjamin Lindeen, Austin Jacobson
+This file is used to create a Flask server. This will serve all of the HTML pages.
+Running this file will enable you to interact with the MQTT broker and send downlink messages to the sensors.
+"""
+
+"""
+Importing the required libraries.
+"""
 from flask import Flask, jsonify, request, render_template, send_file, Response, redirect, url_for
 import json
 import logging
@@ -7,10 +16,17 @@ from datetime import datetime
 from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink, sensor_list
 from static.py.gpt import help_mqtt_json
 
+"""
+Creating the Flask app and setting the template and static directories.
+"""
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+"""
+instantiate the MQTTHandler class to store the MQTT client and broker IP
+"""
 
 
 class MQTTHandler:
@@ -21,6 +37,10 @@ class MQTTHandler:
 
 
 mqtt_handler = MQTTHandler()
+
+"""
+Following renders the HTML pages in the templates directory.
+"""
 
 
 @app.errorhandler(404)
@@ -54,6 +74,11 @@ def gpt_response():
     return render_template('gpt.html', show_helper=message)
 
 
+"""
+Following is used to connect to the MQTT broker.
+"""
+
+
 @app.route('/connect', methods=['POST'])
 def connect():
     global mqtt_client, broker_ip
@@ -75,6 +100,11 @@ def connect():
     return jsonify({"message": "Connected to MQTT broker"})
 
 
+"""
+Following used for receiving messages from the MQTT broker, storing them in the message buffer and displaying them.
+"""
+
+
 @app.route('/messages', methods=['GET'])
 def get_messages():
     filter_type = request.args.get('filter', '')
@@ -94,6 +124,11 @@ def get_messages():
     return jsonify(messages=filtered_messages)
 
 
+"""
+Following is used to dump the messages in the message buffer to a JSON file and import messages from a JSON file.
+"""
+
+
 @app.route('/dump_messages')
 def dump_messages():
     data_json = json.dumps(message_buffer, indent=4)
@@ -101,6 +136,11 @@ def dump_messages():
     filename_json = f'mqttmessages{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.json'
     response.headers['Content-Disposition'] = 'attachment; filename=' + filename_json
     return response
+
+
+"""
+Following is used to import messages from a JSON file.
+"""
 
 
 @app.route('/import_messages', methods=['POST'])
@@ -123,6 +163,11 @@ def import_messages():
             return render_template('error.html', message='Invalid JSON file')
 
 
+"""
+Following routes is used to upload messages from JSON files to the message buffer list.
+"""
+
+
 @app.route('/upload', methods=['GET'])
 def upload():
     filter_type = request.args.get('filter', '')
@@ -140,6 +185,11 @@ def upload():
                 'data': m['data']
             })
     return jsonify(messages=filtered_messages)
+
+
+"""
+Following is used to send downlink messages to the MQTT broker.
+"""
 
 
 @app.route('/send_downlink', methods=['POST'])
@@ -160,11 +210,21 @@ def send_downlink_route():
     return jsonify(response), status_code
 
 
+"""
+Following is used to get the list of sensors.
+"""
+
+
 @app.route('/get_sensors', methods=['GET'])
 def get_sensors():
     global sensor_list
     print(f"Sensor list: {sensor_list}")
     return jsonify({'sensors': sensor_list})
+
+
+"""
+Following is used to send the JSON data to the GPT model and get the response.
+"""
 
 
 @app.route('/gpt', methods=['POST'])
@@ -174,5 +234,8 @@ def gpt():
     return show_helper
 
 
+"""
+Following used to run the Flask app.
+"""
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

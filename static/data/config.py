@@ -1,3 +1,11 @@
+"""
+Authors: Benjamin Lindeen, Austin Jacobson
+This file is used to store lists of data which is received in the JSON messages from the MQTT broker.
+"""
+
+"""
+List of abbreviations for data fields in the JSON messages.
+"""
 tooltips = {
     "ack": "Acknowledgment flag (true/false)",
     "adr": "Adaptive Data Rate (true/false)",
@@ -33,6 +41,9 @@ tooltips = {
     "conductance": "Analog measurement of the conductance between probes (scale of 0-255)"
 }
 
+"""
+List of hexcode values for the message types.
+"""
 message_type_map = {
     0x00: "Reset Message",
     0x01: "Supervisory Message",

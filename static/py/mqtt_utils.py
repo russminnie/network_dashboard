@@ -1,3 +1,12 @@
+"""
+Authors: Benjamin Lindeen, Austin Jacobson
+This file contains functions to decode the payload received from the sensor and to send downlink messages to the sensor.
+This file is used by and called by server.py.
+"""
+
+"""
+Importing the required libraries.
+"""
 import paho.mqtt.client as mqtt
 import base64
 import json
@@ -7,6 +16,11 @@ from static.data.config import message_type_map
 message_buffer = []
 mqtt_client = mqtt.Client()
 sensor_list = []
+
+"""
+Following functions are used to decode the payload received from the temperature and humidity sensor.
+"""
+
 
 def decode_temp_humidity_sensor(payload):
     try:
@@ -18,7 +32,7 @@ def decode_temp_humidity_sensor(payload):
         temperature_celsius = integer_temp + decimal_temp
 
         # Convert to Fahrenheit
-        temperature_fahrenheit = (temperature_celsius * 9/5) + 32
+        temperature_fahrenheit = (temperature_celsius * 9 / 5) + 32
 
         integer_humidity = payload[3]
         decimal_humidity = (payload[4] >> 4) / 10.0  # Get the upper 4 bits and divide by 10 to get decimal part
@@ -34,6 +48,12 @@ def decode_temp_humidity_sensor(payload):
         return decoded_data
     except (IndexError, ValueError) as e:
         return {"error": f"Error decoding temperature and humidity sensor payload: {e}"}
+
+
+"""
+Following function is used to decode the payload received from the sensor.
+"""
+
 
 def decode_sensor_data(data):
     padding = '=' * ((4 - len(data) % 4) % 4)
@@ -78,30 +98,34 @@ def decode_sensor_data(data):
         return {"error": f"Error decoding Base64 or interpreting the payload: {e}"}
 
 
+"""
+Following functions are used to connect to the MQTT broker and subscribe to the topic.
+"""
 
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code " + str(rc))
     client.subscribe(userdata['topic'])
 
+
 def on_message(client, userdata, msg):
     global message_buffer, sensor_list
     topic = msg.topic
     message = msg.payload.decode()
-    print(f"Received message: {message}")  # Debug log
+    print(f"Received message: {message}")
     try:
         data = json.loads(message)
         if isinstance(data, dict) and 'data' in data:
             data['data_decoded'] = decode_sensor_data(data['data'])
             if "error" in data['data_decoded']:
-                print(data['data_decoded']["error"])  # Log the error
+                print(data['data_decoded']["error"])
             else:
-                print(f"Decoded data: {data['data_decoded']}")  # Debug log
+                print(f"Decoded data: {data['data_decoded']}")
 
                 # Scrape DevEUI and sensor type
                 dev_eui = data.get('deveui', None)
                 message_type = data['data_decoded'].get('message_type', None)
-                print(f"DevEUI: {dev_eui}, Message Type: {message_type}")  # Debug log
+                print(f"DevEUI: {dev_eui}, Message Type: {message_type}")
 
                 # Filter out unwanted message types
                 if dev_eui and message_type:
@@ -111,7 +135,7 @@ def on_message(client, userdata, msg):
                         sensor_entry = {'DevEUI': dev_eui, 'sensor_type': sensor_type}
                         if sensor_entry not in sensor_list:
                             sensor_list.append(sensor_entry)
-                            print(f"Sensor added: {sensor_entry}")  # Debug log
+                            print(f"Sensor added: {sensor_entry}")
         message_buffer.append({
             'type': 'json',
             'topic': topic,
@@ -132,6 +156,11 @@ def on_message(client, userdata, msg):
         })
     if len(message_buffer) > 150:
         message_buffer.pop(0)
+
+
+"""
+Following function is used to configure the temperature and humidity sensor downlink message.
+"""
 
 
 def encode_temperature_humidity_downlink(data):
@@ -155,6 +184,12 @@ def encode_temperature_humidity_downlink(data):
     ]
 
     return base64.b64encode(bytes(downlink_message)).decode('utf-8')
+
+
+"""
+Following function is used to configure a sensor downlink message.
+"""
+
 
 def send_downlink(data, broker_ip):
     print(f"Using broker_ip in send_downlink: {broker_ip}")
@@ -186,7 +221,7 @@ def send_downlink(data, broker_ip):
                 0x00, 0x00, 0x00, 0x00  # Padding with zeros
             ]
 
-            print(f"Constructed downlink message: {downlink_message}")  # Debug log
+            print(f"Constructed downlink message: {downlink_message}")
         elif sensor_type == 'temp_humidity_sensor':
             mode = int(data['mode'], 16)
             reporting_interval = int(data['reportingInterval'])
@@ -208,7 +243,7 @@ def send_downlink(data, broker_ip):
 
         # Encode the message in base64
         downlink_message_base64 = base64.b64encode(bytes(downlink_message)).decode('utf-8')
-        print(f"Base64 encoded downlink message: {downlink_message_base64}")  # Debug log
+        print(f"Base64 encoded downlink message: {downlink_message_base64}")
 
         payload = json.dumps({'data': downlink_message_base64})
 
@@ -222,4 +257,3 @@ def send_downlink(data, broker_ip):
     except Exception as e:
         print(f"Error sending downlink: {e}")
         return {"error": str(e)}, 500
-

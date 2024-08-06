@@ -1,5 +1,23 @@
+/**
+ * Authors: Benjamin Lindeen, Austin Jacobson
+ * @file downlinks.js
+ * This file is used to handle the downlinks page functionality.
+ * It contains the following functions:
+ * - connectToBroker(event)
+ * - sendDownlink(event)
+ * - document.addEventListener('DOMContentLoaded', (event))
+ */
+
 let brokerIp = '';
 
+
+/**
+ * Function to fetch the sensors from the server and populate the sensor select dropdown
+ * Also, show/hide the configuration based on the selected sensor type
+ * Also, show/hide the configuration based on the selected mode
+ * @param event - The event object
+ * @returns {void}
+ */
 document.addEventListener('DOMContentLoaded', (event) => {
     const sensorSelectElement = document.getElementById('sensorSelect');
     const modeElement = document.getElementById('mode');
@@ -9,7 +27,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     fetch('/get_sensors')
         .then(response => response.json())
         .then(data => {
-            console.log("Fetched sensors:", data.sensors);  // Debug log
+            console.log("Fetched sensors:", data.sensors);
             data.sensors.forEach(sensor => {
                 const option = document.createElement('option');
                 option.value = sensor.DevEUI;
@@ -24,9 +42,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     if (sensorSelectElement) {
         sensorSelectElement.addEventListener('change', (event) => {
             const selectedSensorText = sensorSelectElement.options[sensorSelectElement.selectedIndex].textContent;
-            console.log("Selected sensor text:", selectedSensorText); // Debug log
+            console.log("Selected sensor text:", selectedSensorText);
             const selectedSensorType = selectedSensorText.split('(')[1].split(')')[0].toLowerCase();
-            console.log("Selected sensor type:", selectedSensorType); // Debug log
+            console.log("Selected sensor type:", selectedSensorType);
 
             if (selectedSensorType.includes('water')) {
                 document.getElementById('waterSensorConfig').style.display = 'block';
@@ -50,6 +68,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 });
 
+/**
+ * Function to connect to the MQTT broker
+ * and subscribe to the given topic
+ * Also, store the broker IP for downlink usage
+ * @param event - The event object
+ * @returns {void}
+ */
 function connectToBroker(event) {
     event.preventDefault();
     const broker = document.getElementById('broker').value;
@@ -77,13 +102,20 @@ function connectToBroker(event) {
         });
 }
 
+/**
+ * Function to send downlink data to the selected sensor
+ * Also, construct the downlink data based on the selected sensor type
+ * and send it to the server
+ * @param event
+ * @returns {void}
+ */
 function sendDownlink(event) {
     event.preventDefault();
     const sensorSelectElement = document.getElementById('sensorSelect');
     const sensorType = sensorSelectElement ? sensorSelectElement.options[sensorSelectElement.selectedIndex].text.split(' ')[1].toLowerCase() : null;
     const devEui = sensorSelectElement ? sensorSelectElement.value.replace(/-/g, '') : ''; // Remove dashes from DevEUI
     const topic = `lora/${devEui}/down`; // Construct the topic
-    let downlinkData = { topic, sensor_type: sensorType };
+    let downlinkData = {topic, sensor_type: sensorType};
 
     if (sensorType.includes('water')) {
         const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;

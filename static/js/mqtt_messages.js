@@ -1,3 +1,22 @@
+/**
+ * Authors: Benjamin Lindeen, Austin Jacobson
+ * @file mqtt_messages.js
+ * This file contains the JavaScript code for the MQTT messages page.
+ * It contains the following functions:
+ * - connectToBroker(event)
+ * - fetchMessages(filter = '')
+ * - showModal(data)
+ * - closeModal()
+ * - startFetchingMessages()
+ * - dumpMessagesToJSON()
+ * - document.querySelector('.close').addEventListener('click', closeModal)
+ */
+
+/**
+ * Function to connect to the MQTT broker
+ * @param event - The event object
+ * @returns {void}
+ */
 function connectToBroker(event) {
     event.preventDefault();
     const broker = document.getElementById('broker').value;
@@ -25,11 +44,23 @@ function connectToBroker(event) {
         });
 }
 
+/**
+ * Function to fetch messages from the server
+ * and display them in the table
+ * @param filter - The filter to apply to the messages
+ * @returns {void}
+ */
 function fetchMessages(filter = '') {
     let currentPath = window.location.pathname;
     let endpoint = (currentPath === '/mqtt_messages') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
 
+    /**
+     * Fetch the messages from the server
+     * creates a table row for each message
+     * and appends it to the table
+     * @param currentURL - The URL to fetch the messages from
+     */
     fetch(currentURL)
         .then(response => response.json())
         .then(data => {
@@ -65,6 +96,12 @@ function fetchMessages(filter = '') {
                 devEUICell.textContent = message.data.deveui;
                 topicCell.textContent = message.topic.substring(message.topic.lastIndexOf('/') + 1);
 
+                /**
+                 * Check if the message type is 'json'
+                 * checks for which type of sensor the JSON has data for
+                 * and displays the data in the table
+                 * @param message - The message object
+                 */
                 if (message.type === 'json') {
                     if ('data_decoded' in message.data) {
                         if ('message_type' in message.data.data_decoded) {
@@ -107,6 +144,11 @@ function fetchMessages(filter = '') {
                                 break;
                         }
                     }
+                    /**
+                     * Create a button to show the full JSON data
+                     * and a button to ask GPT for a response
+                     * @param message - The message object
+                     */
                     moreInfoButton.textContent = 'Full JSON';
                     moreInfoButton.onclick = () => showModal(message.data);
                     buttonCell.appendChild(moreInfoButton);
@@ -140,6 +182,10 @@ function fetchMessages(filter = '') {
         });
 }
 
+/**
+ * Map of event types for the Temperature and Humidity Sensor
+ * @type {{0: string, 1: string, 2: string, 3: string, 4: string, 5: string, 6: string, 7: string, 8: string}}
+ */
 const eventTypeMap = {
     0x00: "Periodic Report",
     0x01: "Temperature has risen above upper threshold",
@@ -152,6 +198,11 @@ const eventTypeMap = {
     0x08: "Humidity report-on-change decrease"
 };
 
+/**
+ * Function to show the modal with the given data
+ * @param data - The data to show in the modal
+ * @returns {void}
+ */
 function showModal(data) {
     const modal = document.getElementById('myModal');
     const modalContent = document.getElementById('modalText');
@@ -159,17 +210,33 @@ function showModal(data) {
     modal.style.display = 'block';
 }
 
+/**
+ * Function to close the modal
+ * @returns {void}
+ */
 function closeModal() {
     const modal = document.getElementById('myModal');
     modal.style.display = 'none';
 }
 
+/**
+ * Function to start fetching messages every 5 seconds
+ * @returns {void}
+ */
 function startFetchingMessages() {
     setInterval(() => fetchMessages(document.getElementById('filter').value), 5000);
 }
 
+/**
+ * Close the modal when the user clicks the close button
+ * @returns {void}
+ */
 document.querySelector('.close').addEventListener('click', closeModal);
 
+/**
+ * Close the modal when the user clicks outside of it
+ * @returns {void}
+ */
 window.addEventListener('click', (event) => {
     const modal = document.getElementById('myModal');
     if (event.target === modal) {
@@ -177,8 +244,15 @@ window.addEventListener('click', (event) => {
     }
 });
 
+/**
+ * Dump messages to JSON
+ * @returns {void}
+ */
 function dumpMessagesToJSON() {
     window.location.href = '/dump_messages';
 }
 
+/**
+ * Dump messages to JSON when the button is clicked
+ */
 document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);
