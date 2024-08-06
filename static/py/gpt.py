@@ -2,15 +2,26 @@ from dotenv import load_dotenv, find_dotenv
 from openai import OpenAI
 import os, json
 
+"""
+Load the OpenAI API key from the environment file and use it to call the OpenAI API
+"""
 ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
 
 api_key = os.environ.get('OPENAI_API_KEY')
-client = OpenAI(api_key=api_key)
 
+if api_key:
+    client = OpenAI(api_key=api_key)
 
+"""
+Import the OpenAI API key and use it to call the OpenAI API
+Pass in MQTT JSON data and return a response from the OpenAI API
+"""
 def help_mqtt_json(json_data):
+    if not api_key:
+        return "OpenAI API key not found in the environment file."
+
     json_str = json.dumps(json_data, indent=2)
     completion = client.chat.completions.create(
         model="gpt-3.5-turbo",
