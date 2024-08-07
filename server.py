@@ -156,8 +156,7 @@ def import_messages():
             if not isinstance(imported_data, list):
                 return render_template('error.html', message='Invalid JSON file')
 
-            global upload_buffer
-            upload_buffer = imported_data
+            mqtt_handler.upload_buffer = imported_data
             return redirect(url_for('upload_messages'))
         except json.JSONDecodeError:
             return render_template('error.html', message='Invalid JSON file')
@@ -172,7 +171,7 @@ Following routes is used to upload messages from JSON files to the message buffe
 def upload():
     filter_type = request.args.get('filter', '')
     filtered_messages = []
-    for m in upload_buffer:
+    for m in mqtt_handler.upload_buffer:
         if not filter_type or (
                 m['type'] == 'json' and
                 isinstance(m['data'], dict) and
