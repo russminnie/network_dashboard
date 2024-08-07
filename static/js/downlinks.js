@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 option.textContent = `${sensor.DevEUI} (${sensor.sensor_type})`;
                 sensorSelectElement.appendChild(option);
             });
+            // Trigger change event if only one sensor is present
+            if (data.sensors.length === 1) {
+                sensorSelectElement.dispatchEvent(new Event('change'));
+            }
         })
         .catch(error => {
             console.error('Error fetching sensors:', error);
@@ -46,6 +50,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const mode = event.target.value;
             thresholdModeConfig.style.display = mode === '0x00' ? 'block' : 'none';
             reportOnChangeConfig.style.display = mode === '0x01' ? 'block' : 'none';
+        });
+    }
+
+    document.querySelectorAll('.help-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const modalId = event.target.getAttribute('data-modal');
+            openHelpModal(modalId);
+        });
+    });
+
+    window.onclick = function(event) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         });
     }
 });
@@ -92,7 +112,6 @@ function sendDownlink(event) {
         const restoral = document.getElementById('restoral').value;
         downlinkData = {
             ...downlinkData,
-            sensor_type: 'water_sensor',  // Set the correct sensor type
             enableWaterPresent,
             enableWaterNotPresent,
             threshold,
@@ -102,19 +121,20 @@ function sendDownlink(event) {
         const mode = document.getElementById('mode').value;
         if (mode === '0x00') {
             const reportingInterval = document.getElementById('reportingInterval').value;
-            const restoralMargin = document.getElementById('restoralMargin').value;
+            const restoralMarginTemp = document.getElementById('restoralMarginTemp').value;
             const lowerTempThreshold = document.getElementById('lowerTempThreshold').value;
             const upperTempThreshold = document.getElementById('upperTempThreshold').value;
+            const restoralMarginHumidity = document.getElementById('restoralMarginHumidity').value;
             const lowerHumidityThreshold = document.getElementById('lowerHumidityThreshold').value;
             const upperHumidityThreshold = document.getElementById('upperHumidityThreshold').value;
             downlinkData = {
                 ...downlinkData,
-                sensor_type: 'temp_humidity_sensor',  // Set the correct sensor type
                 mode,
                 reportingInterval,
-                restoralMargin,
+                restoralMarginTemp,
                 lowerTempThreshold,
                 upperTempThreshold,
+                restoralMarginHumidity,
                 lowerHumidityThreshold,
                 upperHumidityThreshold
             };
@@ -125,7 +145,6 @@ function sendDownlink(event) {
             const humidityDecrease = document.getElementById('humidityDecrease').value;
             downlinkData = {
                 ...downlinkData,
-                sensor_type: 'temp_humidity_sensor',  // Set the correct sensor type
                 mode,
                 tempIncrease,
                 tempDecrease,
@@ -135,7 +154,7 @@ function sendDownlink(event) {
         }
     }
 
-    console.log("Sending downlink data:", JSON.stringify(downlinkData, null, 2));
+    console.log("Sending downlink data:", JSON.stringify(downlinkData, null, 2)); // Debug log
 
     fetch('/send_downlink', {
         method: 'POST',
@@ -146,7 +165,7 @@ function sendDownlink(event) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log('Response data:', data);
+            console.log('Response data:', data); // Debug log
             if (data.message) {
                 alert('Downlink sent: ' + data.message);
             } else {
@@ -158,3 +177,27 @@ function sendDownlink(event) {
             alert('Error sending downlink: ' + error);
         });
 }
+
+function openHelpModal(modalId) {
+    const helpModal = document.getElementById(modalId);
+    if (helpModal) {
+        helpModal.style.display = 'block';
+    }
+}
+
+function closeHelpModal(modalId) {
+    const helpModal = document.getElementById(modalId);
+    if (helpModal) {
+        helpModal.style.display = 'none';
+    }
+}
+
+// Add the existing function to close the modal when clicking outside of it
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+};
