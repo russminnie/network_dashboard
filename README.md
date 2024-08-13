@@ -17,6 +17,7 @@ about these libraries used in the app see the docs below
 - `static/`: Contains the CSS JavaScript, Python, data and image files for the dashboard.
 - `requirements.txt`: Contains the Python libraries required for the project.
 - `README.md`: The file you are currently reading.
+- `.env`: create this file and make sure that it is not uploaded to any public database. This contains private API keys. As of version 2.0.0 add the openai API key to this file to enable chatGPT integration functionality. If hosting on the cloud make sure to specify the environment variables on the cloud hosting service.
 - other files you can ignore for now.
 
 ### Requirements
