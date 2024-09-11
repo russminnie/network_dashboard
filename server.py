@@ -14,7 +14,6 @@ from paho.mqtt import client as mqtt
 from datetime import datetime
 
 from static.py.mqtt_utils import mqtt_client, on_connect, on_message, message_buffer, send_downlink, sensor_list
-from static.py.gpt import help_mqtt_json
 
 """
 Creating the Flask app and setting the template and static directories.
@@ -66,12 +65,6 @@ def upload_messages():
 @app.route('/downlink')
 def downlink():
     return render_template('downlinks.html')
-
-
-@app.route('/gpt_response')
-def gpt_response():
-    message = request.args.get('message')
-    return render_template('gpt.html', show_helper=message)
 
 
 """
@@ -219,22 +212,11 @@ def get_sensors():
     global sensor_list
     print(f"Sensor list: {sensor_list}")
     return jsonify({'sensors': sensor_list})
-
-
-"""
-Following is used to send the JSON data to the GPT model and get the response.
-"""
-
-
-@app.route('/gpt', methods=['POST'])
-def gpt():
-    json_data = request.json
-    show_helper = help_mqtt_json(json_data)
-    return show_helper
+""
 
 
 """
 Following used to run the Flask app.
 """
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host="192.168.2.1",debug=True, port=5000)
