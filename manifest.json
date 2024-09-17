@@ -1,0 +1,7 @@
+{
+  "AppName": "Network Dashboard" ,
+  "AppVersion": "0.0.2" ,
+  "AppDescription": "Configure sensor downlinks and decode and analyze MQTT uplink packets",
+  "AppVersionNotes":"Update to bind to IP",
+  "PersistentStorage": true
+}

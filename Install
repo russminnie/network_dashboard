@@ -1,0 +1,141 @@
+#!/bin/bash
+
+OPKG_CMD_PREFIX="opkg install --force-depends ./provisioning/"
+OPKG_CMD_PREFIX_R="opkg remove --force-depends "
+MANIFEST="./provisioning/p_manifest.json"
+NAME="Install"
+
+#
+# This function is called via the install argument.  It is invoked by the
+# app-manager process during the install of a custom app.  It reads the
+# p_manifest.json file in the provisioning directory of the application,
+# and executes an "opkg install" on each package file listed in the p_manifest.
+#
+function install_packages {
+    if [ ! -f "$MANIFEST" ]; then
+        return
+    fi
+    JSONTXT=$(<./provisioning/p_manifest.json)
+    PKGCNT=$(echo $JSONTXT | jsparser --count -p /pkgs)
+
+    RETURNCODE=$?
+    if [ $RETURNCODE -ne 0 ]; then
+      echo "Failed to parse p_manifest.json as json"
+      exit $RETURNCODE
+    fi
+
+    for ((i=0; i < PKGCNT; i++))
+    do
+        PKG=$(echo $JSONTXT | jsparser --jsobj -p /pkgs/$i)
+        PKGNM=$(echo $PKG | jsparser -p /FileName)
+        PKGTYPE=$(echo $PKG | jsparser -p /type)
+
+        if [ "$PKGTYPE" == "ipk" ]; then
+            PKGCMD=$OPKG_CMD_PREFIX$PKGNM
+            echo "Executing: $PKGCMD"
+            eval $PKGCMD
+            if [ $? != 0 ]; then
+                echo "Command [$PKGCMD] failed with status $?"
+                logger -t Install "Command [$PKGCMD] failed with status $?"
+                exit $?
+            fi
+        fi
+        logger -t Install "Command [$PKGCMD] succeeded"
+    done
+
+    
+}
+
+#
+# The Install script is invoked with the postinstall argument by the app-manager
+# process after it has install an application succesfully and before it tries
+# to start the app.  One example of something that might be done by this
+# function would be to reboot the Conduit after the install if necessary.
+#
+function post_install {
+    pip3 install -r requirements.txt
+}
+
+#
+# This function is called via the remove argument.  It is invoked by app-manager
+# during the uninstall of a custom app.  It reads the p_manifest.json file in
+# the provisioning direcgtory of the application and executes an "opkg remove"
+# on each package listed in the p_manifest.json.
+#
+function remove_packages {
+    if [ ! -f "$MANIFEST" ]; then
+        echo "provisioning manifest file not found"
+        return
+    fi
+    JSONTXT=$(<./provisioning/p_manifest.json)
+    PKGCNT=$(echo $JSONTXT | jsparser --count -p /pkgs)
+
+    RETURNCODE=$?
+    if [ $RETURNCODE -ne 0 ]; then
+      echo "Failed to parse p_manifest.json as json"
+      exit $RETURNCODE
+    fi
+
+    for ((i=0; i < PKGCNT; i++))
+    do
+        PKG=$(echo $JSONTXT | jsparser --jsobj -p /pkgs/$i)
+        PKGNM=$(echo $PKG | jsparser -p /PkgName)
+        PKGTYPE=$(echo $PKG | jsparser -p /type)
+
+        if [ "$PKGTYPE" == "ipk" ]; then
+            PKGCMD=$OPKG_CMD_PREFIX_R$PKGNM
+            echo "Executing: $PKGCMD"
+            eval $PKGCMD
+            if [ $? != 0 ]; then
+                echo "Command [$PKGCMD] failed with status $?"
+                logger -t Install "Command [$PKGCMD] failed with status $?"
+                exit $?
+            fi
+        fi
+        logger -t Install "Command [$PKGCMD] succeeded"
+    done
+}
+
+#
+# The Install script is invoked with the postremove argument by the app-manager
+# process after it has removed an application succesfully. One example of 
+# something that might be done by this function would be to reboot the Conduit 
+# after the remove if necessary.
+#
+function post_remove {
+    echo "post_remove"
+}
+
+case "$1" in
+  install)
+      echo -n "Installing dependencies: "
+      logger -t Install "Installing Dependencies: "
+      install_packages
+      echo "$NAME."
+      ;;
+  remove)
+      echo -n "Removing Dependencies: "
+      logger -t Install "Removing Dependencies: "
+      remove_packages
+      echo "$NAME."
+      ;;
+  postinstall)
+      echo -n "Running app post install "
+      logger -t Install "Running app post install "
+      post_install
+      echo "$NAME."
+      ;;
+  postremove)
+      echo -n "Running app post remove "
+      logger -t Install "Running app post remove "
+      post_remove
+      echo "$NAME."
+      ;;
+  *)
+      N=$NAME
+      echo "Usage: $N {install|remove}" >&2
+      exit 1
+      ;;
+esac
+
+exit 0
