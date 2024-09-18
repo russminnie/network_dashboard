@@ -177,18 +177,19 @@ li {
 }
 
 button, a.button {
-    /* display: inline-block; */
-    display: flex;
-    justify-content: center;
+    display: inline-block;
+    /* display: flex;
+    justify-content: center; */
     /* align-items: center; */
     width: 120px;
-    margin: 5px 0px;
+    margin: 5px;
+    padding: 5px;
     /* background-color: white; */
     background-color: #f5f5f5;
     /* color: #0072ce; */
     text-align: center;
     cursor: pointer;
-    padding: 1em 2em;
+    /* padding: 1em 2em; */
     border: none;
     font-family: 'PoppinsFont';
     /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
@@ -197,6 +198,7 @@ button, a.button {
     text-decoration: none;
     font-size: 1em;
     transition-duration: 0.4s;
+    /* border: 1px solid #333; */
 }
 
 button:hover, a.button:hover {
