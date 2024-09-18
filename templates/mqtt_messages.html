@@ -7,7 +7,9 @@
     <h1>Live MQTT Messages</h1>
     {% include 'connect_form.html' %}
     <div class="dump">
-        <button type="button" id="dumpMessages" onclick="dumpMessagesToJSON()">Dump Messages to JSON</button>
+        <button type="button" id="dumpMessages" onclick="dumpMessagesToJSON()">
+            <img src="../static/icons/download.svg" width="24" height="24" class="icon-margin">Dump Messages to JSON
+        </button>
     </div>
     {% include 'mqtt_table.html' %}
 {% endblock %}

@@ -1,9 +1,18 @@
-<link href='https://fonts.googleapis.com/css?family=Lexend' rel='stylesheet'>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/navbar.css') }}">
+
+
 <nav>
-    <img src="../static/img/MultiTech_Logo_Color_3000px_RGB.png" class="logo">
-    <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('mqtt_messages') }}">MQTT Messages</a>
-    <a href="{{ url_for('upload_messages') }}">Upload Messages</a>
-    <a href="{{ url_for('downlink') }}">Downlinks</a>
+    <div class="container">
+        <div class="nav-leftside">
+            <ul>
+                <li class="item"><img src="../static/icons/house.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="item"><img src="../static/icons/chat-right-text.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('mqtt_messages') }}">MQTT messages</a></li>
+                <li class="item"><img src="../static/icons/upload.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('upload_messages') }}">Upload</a></li>
+                <li class="item"><img src="../static/icons/download.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('downlink') }}">Downlinks</a></li>
+            </ul>
+        </div>
+        <div class="nav-profile">
+            <p class="my-profile">&copy; 2022 Multitech Systems, Inc.</p>
+            <p>All rights reserved.</p>
+        </div>
+    </div>        
 </nav>

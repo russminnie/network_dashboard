@@ -2,20 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/flex-box.css">
+    <title>MQTT</title>
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/index.css') }}">
     {% block head %}{% endblock %}
 </head>
 <body onload="fetchMessages()">
-<div class="background"></div>
-<div class="wrapper">
-    <main>
-        {% include 'navbar.html' %}
+
+    <header>
         <div class="container">
-            {% block content %}
-            {% endblock %}
+            <div class="my-logo">
+                <img src="../static/icons/hub.svg" width="60" height="60" />
+                <h1>MQTT</h1>
+            </div>
+            <div class="my-nav">
+                <ul>
+                    <li class="item"><img src="../static/icons/house.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="item"><img src="../static/icons/chat-right-text.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('mqtt_messages') }}">MQTT message</a></li>
+                    <li class="item"><img src="../static/icons/upload.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('upload_messages') }}">Upload</a></li>
+                    <li class="item"><img src="../static/icons/download.svg" width="24" height="24" class="icon-margin"><a href="{{ url_for('downlink') }}">Downlinks</a></li>
+                </ul>
+            </div>
         </div>
-    </main>
-</div>
+    </header>
+
+    <!-- <main> -->
+        {% include 'navbar.html' %}
+        <section>
+            <div class="container">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </section>
+    <!-- </main> -->
+
 </body>
 </html>
