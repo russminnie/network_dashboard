@@ -78,7 +78,6 @@ function fetchMessages(filter = '') {
                 const messageData3Cell = document.createElement('td');
                 const buttonCell = document.createElement('td');
                 const moreInfoButton = document.createElement('button');
-                const gptButton = document.createElement('button');
 
                 const time = message.data.time;
                 const date = new Date(time);
@@ -152,22 +151,6 @@ function fetchMessages(filter = '') {
                     moreInfoButton.textContent = 'Full Json';
                     moreInfoButton.onclick = () => showModal(message.data);
                     buttonCell.appendChild(moreInfoButton);
-                    gptButton.textContent = 'Ask gpt';
-                    gptButton.onclick = () => {
-                        fetch('/gpt', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(message.data)
-                        })
-                            .then(response => response.text())
-                            .then(data => {
-                                window.location.href = `/gpt_response?message=${encodeURIComponent(data)}`;
-                            });
-                    };
-                    buttonCell.appendChild(gptButton);
-                }
 
                 row.appendChild(timeCell);
                 row.appendChild(devEUICell);

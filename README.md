@@ -20,11 +20,9 @@ about these libraries used in the app see the docs below
 
 ### Requirements
 
-- Python 3
-- Pip
 - Multitech Gateway
 - Web Browser
-- CLI interface
+
 
 ### Configuring Gateway
 
@@ -60,13 +58,15 @@ about these libraries used in the app see the docs below
 
 ### Installation
 
-```bash
-pip install -r requirements.txt
-```
+- Through the UI
+  - Navigate to **Apps** --> **Custom Apps*
+  - Click *Add Custom App*
+  - Enter Application Information
+
+  App will take a minute to download and the process can be monited in the **Status and Logs** in the system log.
 
 ### Running the Application
 
-```bash
-python3 server.py
-```
+-Navigate to your gateways IP:5000 to access the dashboard
+  - ex: 192.168.2.1:5000 
 
