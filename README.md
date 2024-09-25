@@ -49,12 +49,7 @@ about these libraries used in the app see the docs below
       /etc/init.d/mosquitto restart
       ```
     - exit the ssh session.
-- Remote PC:
-    - Install the mosquitto software - https://mosquitto.org/download/
-  ```bash
-  mosquitto_sub -t lora/+/+ -v -h 192.168.2.1
-  ```
-    - Then reboot MDot
+
 
 ### Installation
 
