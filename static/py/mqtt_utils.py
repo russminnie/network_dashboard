@@ -12,6 +12,7 @@ import base64
 import json
 import paho.mqtt.publish as publish
 from static.data.config import message_type_map
+from static.py import RB_packet_decoder
 
 message_buffer = []
 mqtt_client = mqtt.Client()
@@ -72,26 +73,7 @@ def decode_sensor_data(data):
             'message_type': message_type_map.get(message_type, f"Unknown ({message_type})")
         }
 
-        if message_type == 0x08:
-            decoded_message.update({
-                'water_status': 'Water present' if payload[0] == 0x00 else 'Water not present',
-                'Measurement (0-255)': payload[1]
-            })
-        elif message_type == 0x00:
-            decoded_message['reset_info'] = payload[:6].hex()
-        elif message_type == 0x01:
-            battery_voltage_hex = format(payload[2], '02x')
-            battery_voltage = int(battery_voltage_hex) * 0.1
-            decoded_message.update({
-                'device_error_code': payload[0],
-                'current_sensor_state': payload[1],
-                'battery_voltage_hex': battery_voltage_hex,
-                'battery_voltage': battery_voltage
-            })
-        elif message_type == 0x0D:
-            decoded_message['data'] = decode_temp_humidity_sensor(payload)
-        else:
-            decoded_message['payload'] = payload.hex()
+        decoded_message.update(RB_packet_decoder.Decoder.Generic_Decoder(payload))
 
         return decoded_message
     except (base64.binascii.Error, IndexError, ValueError) as e:
