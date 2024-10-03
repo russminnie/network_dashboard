@@ -54,7 +54,7 @@ about these libraries used in the app see the docs below
 ### Installation
 
 - Through the UI
-  - Navigate to **Apps** --> **Custom Apps*
+  - Navigate to **Apps** --> **Custom Apps**
   - Click *Add Custom App*
   - Enter Application Information
 
