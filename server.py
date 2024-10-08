@@ -41,11 +41,6 @@ mqtt_handler = MQTTHandler()
 Following renders the HTML pages in the templates directory.
 """
 
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('error.html', message='Page not found'), 404
-
 @app.route('/upload_messages')
 def upload_messages():
     if 'username' in session:
@@ -100,30 +95,33 @@ Following is used to connect to the MQTT broker.
 @app.route('/connect', methods=['POST'])
 def connect():
 
-    global mqtt_client, broker_ip
-    data = request.json
-    broker_ip = data['broker']
-    port = int(data['port'])
-    topic = data['topic']
-    print(f"Setting broker_ip to: {broker_ip}")
+    if 'username' in session:
 
-    if mqtt_client is not None:
-        mqtt_client.disconnect()
+        global mqtt_client, broker_ip
+        data = request.json
+        broker_ip = data['broker']
+        port = int(data['port'])
+        topic = data['topic']
+        print(f"Setting broker_ip to: {broker_ip}")
 
-    mqtt_client = mqtt.Client(userdata={'topic': topic})
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_message
+        if mqtt_client is not None:
+            mqtt_client.disconnect()
+
+        mqtt_client = mqtt.Client(userdata={'topic': topic})
+        mqtt_client.on_connect = on_connect
+        mqtt_client.on_message = on_message
 
 
-    try:
-        mqtt_client.connect(broker_ip, port, 60)
-        mqtt_client.loop_start()
-        return jsonify({"message": "Connected to MQTT broker"}), 200
-    except Exception as e:
-        # Log the error message
-        print(f"Error connecting to MQTT broker: {e}")
-        return jsonify({"error": f"Could not connect to MQTT broker: {str(e)}"}), 500
- 
+        try:
+            mqtt_client.connect(broker_ip, port, 60)
+            mqtt_client.loop_start()
+            return jsonify({"message": "Connected to MQTT broker"}), 200
+        except Exception as e:
+            # Log the error message
+            print(f"Error connecting to MQTT broker: {e}")
+            return jsonify({"error": f"Could not connect to MQTT broker: {str(e)}"}), 500
+    else:
+        return redirect(url_for('login'))  
     
 """
 Following used for receiving messages from the MQTT broker, storing them in the message buffer and displaying them.
@@ -185,7 +183,7 @@ Following is used to import messages from a JSON file.
 """
 
 
-@app.route('/import_messages', methods=['POST'])
+@app.route('/import_messages', methods=['GET','POST'])
 def import_messages():
 
     if 'username' in session:
@@ -357,7 +355,10 @@ def logout():
     return redirect(url_for('login'))
 
 
-
+# Catch-all route to handle unmatched routes and redirect to login
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect(url_for('login'))
 
 """
 Following used to run the Flask app.

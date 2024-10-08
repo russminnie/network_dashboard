@@ -78,6 +78,11 @@ def on_message(client, userdata, msg):
             'topic': topic,
             'data': data
         })
+        print('\n')
+        print('=======================================================================')        
+        print('BT - message_buffer length: {}'.format(message_buffer.qsize()))
+        print('=======================================================================')
+        print('\n')
         
     except json.JSONDecodeError:
         message_buffer.put({
@@ -95,7 +100,8 @@ def on_message(client, userdata, msg):
         
     # BT - If the queue exceeds 150 messages, remove the oldest one
     if message_buffer.qsize() > 150:
-        message_buffer.get()
+        message = message_buffer.get()
+        # print(f'Removed message: {message}')  # Print the message
 
 
 """

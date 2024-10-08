@@ -97,7 +97,8 @@ function fetchMessages(filter = '') {
             const messageTable = document.getElementById('messageTableBody');
             messageTable.innerHTML = '';
             data.messages.reverse();
-            console.log(`BT - Receiving data from the server: ${JSON.stringify(data.messages)}`);
+            // console.log(`BT - Receiving data from the server: ${JSON.stringify(data.messages)}`);
+            // console.log(`BT - receive data from server length: ${data.messages.length}`)
             data.messages.forEach((message, index) => {
                 const row = document.createElement('tr');
                 const timeCell = document.createElement('td');
