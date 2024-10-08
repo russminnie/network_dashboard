@@ -1,5 +1,5 @@
 /**
- * Authors: Benjamin Lindeen, Austin Jacobson
+ * Authors: Benjamin Lindeen, Austin Jacobson, Bryan Tran
  * @file help_modal.js
  * This file is used to handle the help modals on the connect and downlinks pages.
  * It contains the following functions:

@@ -1,16 +1,91 @@
 {% extends "base.html" %}
 {% block title %}Upload MQTT Messages{% endblock %}
-{% block head %}
-    <script src="{{ url_for('static', filename='./js/mqtt_messages.js') }}"></script>
+
+{%block notification %}
+<div id="notification" style="display: none; position: fixed; top: 100px; right: 20px; background-color: #f5f5f5; color: #333; padding: 10px; border-radius: 5px; z-index: 1000;">
+    Disconnected from MQTT Broker!
+</div>
 {% endblock %}
+
 {% block content %}
     <h1>Upload and View MQTT Messages</h1>
     <form id="uploadForm" method="post" enctype="multipart/form-data" action="/import_messages">
-        <div class="form-group">
+        <div class="form-group1">
             <label for="file">Upload JSON File:</label>
-            <input class="upload-button" type="file" id="file" name="file" required>
+            <input class="upload-button" type="file" id="file" name="file" required onchange="updateFileName()"></input>
+            <p id="fileName" style="margin-left: 50px"></p>
         </div>
-        <button type="submit">Upload</button>
+        
+        <button type="submit" id="upload"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-upload icon-margin" viewBox="0 0 16 16">
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5"/>
+            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z"/>
+          </svg>Upload</button>
     </form>
-    {% include 'mqtt_table.html' %}
+    <br>
+    <h3>MQTT message table</h3>
+    <br>
+    <!-- Search field for keystroke-based search -->
+    <label for="search">Search MQTT Messages:</label>
+    <input type="text" id="filter" placeholder="Search for messages...">
+    <br><br>
+    <table class="mqtt_table">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>DevEUI</th>
+            <th>Topic</th>
+            <th>Message Type</th>
+            <th>Message Data</th>
+            <th>Help</th>
+        </tr>
+        </thead>
+        <tbody id="messageTableBody">
+        </tbody>
+    </table>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <pre id="modalText"></pre>
+        </div>
+    </div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Function to search table based on keystrokes
+        function searchMessages() {
+            // Get the search query
+            const searchQuery = document.getElementById('filter').value.toLowerCase();
+            
+            // Get the table body rows
+            const tableRows = document.getElementById('messageTableBody').getElementsByTagName('tr');
+            
+            // Loop through all table rows and hide those that don't match the search query
+            for (let i = 0; i < tableRows.length; i++) {
+                const row = tableRows[i];
+                const rowText = row.innerText.toLowerCase(); // Get the text of the row
+                
+                // If the row text contains the search query, display the row, otherwise hide it
+                if (rowText.includes(searchQuery)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        // Attach the keyup event to the filter input field
+        document.getElementById('filter').addEventListener('keyup', searchMessages);
+    });
+</script>
+
+
+
 {% endblock %}
+
+{% block javascript %}
+    <script src="../static/js/mqtt_messages.js"></script>
+    <script src="../static/js/upload_messages.js"></script>
+{% endblock %}
+

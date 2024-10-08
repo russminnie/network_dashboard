@@ -5,4 +5,5 @@ flask-restful~=0.3.10
 paho-mqtt~=2.1.0
 gunicorn~=22.0.0
 python-dotenv~=1.0.1
+simplejson~=3.19.3
 dataclasses

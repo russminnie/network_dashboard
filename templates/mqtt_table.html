@@ -1,15 +1,11 @@
+
+<br>
 <h3>MQTT message table</h3>
-<label for="filter">Filter:</label>
-<select id="filter" class="filter-dropdown" onchange="fetchMessages(this.value)">
-    <option value="">All</option>
-    <option value="Water Leak Sensor">Water Leak Sensor</option>
-    <option value="Reset Message">Reset</option>
-    <option value="Supervisory Message">Supervisory</option>
-    <option value="Temperature and Humidity Sensor">Temp & Humidity Sensor</option>
-    <option value="Tamper Sensor">Tamper Sensor</option>
-    <option value="Tilt Sensor">Tilt Sensor</option>
-    <option value="Door/Window Sensor">Door/Window Sensor</option>
-</select>
+
+<br>
+<!-- Search field for keystroke-based search -->
+<label for="search">Search MQTT Messages:</label>
+<input type="text" id="filter" placeholder="Search for messages..." onkeyup="fetchMessages(this.value)">
 <br><br>
 <table class="mqtt_table">
     <thead>
@@ -18,9 +14,7 @@
         <th>DevEUI</th>
         <th>Topic</th>
         <th>Message Type</th>
-        <th>Message Data 1</th>
-        <th>Message Data 2</th>
-        <th>Message Data 3</th>
+        <th>Message Data</th>
         <th>Help</th>
     </tr>
     </thead>
@@ -33,3 +27,12 @@
         <pre id="modalText"></pre>
     </div>
 </div>
+
+<script>
+// Function to search table based on keystrokes
+function searchMessages() {
+    // Get the search query
+    const searchQuery = document.getElementById('search').value.toLowerCase();
+
+}
+</script>

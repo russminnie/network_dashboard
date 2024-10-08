@@ -1,5 +1,5 @@
 /**
- * Authors: Benjamin Lindeen, Austin Jacobson
+ * Authors: Benjamin Lindeen, Austin Jacobson, Bryan Tran
  * @file downlinks.js
  * This file is used to handle the downlinks page functionality.
  * It contains the following functions:
@@ -7,6 +7,8 @@
  * - sendDownlink(event)
  * - document.addEventListener('DOMContentLoaded', (event))
  */
+
+// import { json_data } from 'mqtt_messages.js';
 
 let brokerIp = '';
 
@@ -18,48 +20,56 @@ let brokerIp = '';
  * @param event - The event object
  * @returns {void}
  */
+
+//###############################################################################################
+// BT - When you select a sensor from the sensor dropdown list box, it will call this function.
+//###############################################################################################
 document.addEventListener('DOMContentLoaded', (event) => {
     const sensorSelectElement = document.getElementById('sensorSelect');
     const modeElement = document.getElementById('mode');
     const thresholdModeConfig = document.getElementById('thresholdModeConfig');
     const reportOnChangeConfig = document.getElementById('reportOnChangeConfig');
 
-    fetch('/get_sensors')
-        .then(response => response.json())
-        .then(data => {
-            console.log("Fetched sensors:", data.sensors);
-            data.sensors.forEach(sensor => {
-                const option = document.createElement('option');
-                option.value = sensor.DevEUI;
-                option.textContent = `${sensor.DevEUI} (${sensor.sensor_type})`;
-                sensorSelectElement.appendChild(option);
-            });
-            // Trigger change event if only one sensor is present
-            if (data.sensors.length === 1) {
-                sensorSelectElement.dispatchEvent(new Event('change'));
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching sensors:', error);
-        });
+    // console.log(`BT - downlink() get json_data: ${window.json_data}`)
+    
+
+    // fetch('/get_sensors')
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         console.log("Fetched sensors:", data.sensors);
+    //         data.sensors.forEach(sensor => {
+    //             const option = document.createElement('option');
+    //             option.value = sensor.DevEUI;
+    //             option.textContent = `${sensor.DevEUI} (${sensor.sensor_type})`;
+    //             sensorSelectElement.appendChild(option);
+    //         });
+    //         // Trigger change event if only one sensor is present
+    //         if (data.sensors.length === 1) {
+    //             sensorSelectElement.dispatchEvent(new Event('change'));
+    //         }
+    //     })
+    //     .catch(error => {
+    //         console.error('Error fetching sensors:', error);
+    //     });
 
     if (sensorSelectElement) {
         sensorSelectElement.addEventListener('change', (event) => {
             const selectedSensorText = sensorSelectElement.options[sensorSelectElement.selectedIndex].textContent;
             console.log("Selected sensor text:", selectedSensorText);
-            const selectedSensorType = selectedSensorText.split('(')[1].split(')')[0].toLowerCase();
-            console.log("Selected sensor type:", selectedSensorType);
+            updateDownlinkTopic();
+            // const selectedSensorType = selectedSensorText.split('(')[1].split(')')[0].toLowerCase();
+            // console.log("Selected sensor type:", selectedSensorType);
 
-            if (selectedSensorType.includes('water')) {
-                document.getElementById('waterSensorConfig').style.display = 'block';
-                document.getElementById('tempHumiditySensorConfig').style.display = 'none';
-            } else if (selectedSensorType.includes('temperature') && selectedSensorType.includes('humidity')) {
-                document.getElementById('waterSensorConfig').style.display = 'none';
-                document.getElementById('tempHumiditySensorConfig').style.display = 'block';
-            } else {
-                document.getElementById('waterSensorConfig').style.display = 'none';
-                document.getElementById('tempHumiditySensorConfig').style.display = 'none';
-            }
+            // if (selectedSensorType.includes('water')) {
+            //     document.getElementById('waterSensorConfig').style.display = 'block';
+            //     document.getElementById('tempHumiditySensorConfig').style.display = 'none';
+            // } else if (selectedSensorType.includes('temperature') && selectedSensorType.includes('humidity')) {
+            //     document.getElementById('waterSensorConfig').style.display = 'none';
+            //     document.getElementById('tempHumiditySensorConfig').style.display = 'block';
+            // } else {
+            //     document.getElementById('waterSensorConfig').style.display = 'none';
+            //     document.getElementById('tempHumiditySensorConfig').style.display = 'none';
+            // }
         });
     }
 
@@ -96,7 +106,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
  * @returns {void}
  */
 function connectToBroker(event) {
-    event.preventDefault();
+    // event.preventDefault();
+
+    if (event) {
+        event.preventDefault();  // Prevent form submission if the event exists
+    }
     const broker = document.getElementById('broker').value;
     const port = document.getElementById('port').value;
     const topic = document.getElementById('topic').value;
@@ -111,8 +125,7 @@ function connectToBroker(event) {
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                alert(data.message);
-                brokerIp = broker; // Store broker IP for downlink usage
+                showNotification(data.message)
             } else {
                 alert('Failed to connect to the broker');
             }
@@ -132,59 +145,42 @@ function connectToBroker(event) {
 function sendDownlink(event) {
     event.preventDefault();
     const sensorSelectElement = document.getElementById('sensorSelect');
-    const sensorType = sensorSelectElement ? sensorSelectElement.options[sensorSelectElement.selectedIndex].text.split(' ')[1].toLowerCase() : null;
-    const devEui = sensorSelectElement ? sensorSelectElement.value.replace(/-/g, '') : ''; // Remove dashes from DevEUI
-    const topic = `lora/${devEui}/down`; // Construct the topic
-    let downlinkData = {topic, sensor_type: sensorType};
+    // const sensorType = sensorSelectElement ? sensorSelectElement.options[sensorSelectElement.selectedIndex].text.split(' ')[1].toLowerCase() : null;
+    const sensorType = sensorSelectElement.options[sensorSelectElement.selectedIndex].text;
+    // const devEui = sensorSelectElement ? sensorSelectElement.value.replace(/-/g, '') : ''; // Remove dashes from DevEUI
+    const devEui = sensorType.replace(/-/g, '');
 
-    if (sensorType.includes('water')) {
-        const enableWaterPresent = document.querySelector('input[name="enable_water_present"]:checked').value;
-        const enableWaterNotPresent = document.querySelector('input[name="enable_water_not_present"]:checked').value;
-        const threshold = document.getElementById('threshold').value;
-        const restoral = document.getElementById('restoral').value;
-        downlinkData = {
-            ...downlinkData,
-            enableWaterPresent,
-            enableWaterNotPresent,
-            threshold,
-            restoral
-        };
-    } else if (sensorType.includes('temperature') && sensorType.includes('humidity')) {
-        const mode = document.getElementById('mode').value;
-        if (mode === '0x00') {
-            const reportingInterval = document.getElementById('reportingInterval').value;
-            const restoralMarginTemp = document.getElementById('restoralMarginTemp').value;
-            const lowerTempThreshold = document.getElementById('lowerTempThreshold').value;
-            const upperTempThreshold = document.getElementById('upperTempThreshold').value;
-            const restoralMarginHumidity = document.getElementById('restoralMarginHumidity').value;
-            const lowerHumidityThreshold = document.getElementById('lowerHumidityThreshold').value;
-            const upperHumidityThreshold = document.getElementById('upperHumidityThreshold').value;
-            downlinkData = {
-                ...downlinkData,
-                mode,
-                reportingInterval,
-                restoralMarginTemp,
-                lowerTempThreshold,
-                upperTempThreshold,
-                restoralMarginHumidity,
-                lowerHumidityThreshold,
-                upperHumidityThreshold
-            };
-        } else if (mode === '0x01') {
-            const tempIncrease = document.getElementById('tempIncrease').value;
-            const tempDecrease = document.getElementById('tempDecrease').value;
-            const humidityIncrease = document.getElementById('humidityIncrease').value;
-            const humidityDecrease = document.getElementById('humidityDecrease').value;
-            downlinkData = {
-                ...downlinkData,
-                mode,
-                tempIncrease,
-                tempDecrease,
-                humidityIncrease,
-                humidityDecrease
-            };
-        }
-    }
+
+    const downlink_topic = document.getElementById('downlink_topic');
+    const topic = downlink_topic.value;
+
+    // BT - Remove the dash in deveui.
+    const topicWithoutDashes = topic.replace(/-/g, '');
+
+    const hex_topic = document.getElementById('hex_topic');
+    const hex = hex_topic.value;
+
+    // console.log(`BT - Sensor select indext: ${sensorType}`);
+    // console.log(`BT - Topic: ${topic}`);
+    // console.log(`BT - hex: ${hex}`);
+    //##############################################
+    // BT - Convert hex to base64 encoded
+    //##############################################
+    // {'data': base64_encoded_data_here,
+    //  'port': 2,
+    //  'topic': lora/70741400000deb04/down
+    // }
+    //###############################################
+
+    
+    // BT - Todo: We need to provide an input for entering downlink in hex.
+    let downlink_data_base64encoded = hexToBase64(hex);
+
+    const data = downlink_data_base64encoded;
+
+    const port = 2;
+
+    let downlinkData = {topic, data, port};
 
     console.log("Sending downlink data:", JSON.stringify(downlinkData, null, 2)); // Debug log
 
@@ -233,3 +229,57 @@ window.onclick = function(event) {
         }
     });
 };
+
+function hexToBase64(hexString) {
+    // Step 1: Convert hex to bytes
+    const bytes = new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    
+    // Step 2: Convert bytes to Base64
+    const base64String = btoa(String.fromCharCode(...bytes));
+    
+    return base64String;
+};
+
+function updateDownlinkTopic() {
+
+
+    // Get the selected option value
+    const selectedSensor = document.getElementById('sensorSelect').value;
+
+    // Update the input field with the selected sensor's downlink topic
+    const downlinkInput = document.getElementById('downlink_topic');
+    downlinkInput.value = `lora/${selectedSensor}/down`;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's stored data in localStorage
+    const savedBroker = localStorage.getItem('broker');
+    const savedPort = localStorage.getItem('port');
+    const savedTopic = localStorage.getItem('topic');
+
+    // If saved data exists, populate the form inputs
+    if (savedBroker && savedPort && savedTopic) {
+        document.getElementById('broker').value = savedBroker;
+        document.getElementById('port').value = savedPort;
+        document.getElementById('topic').value = savedTopic;
+
+        console.log(`BT - Call connectToBroker()....`);
+
+        // Reconnect to the MQTT server automatically
+        connectToBroker();
+    }
+});
+
+// Function to show notification
+function showNotification(message) {
+    const notificationDiv = document.getElementById('notification');
+    notificationDiv.textContent = message;
+    notificationDiv.style.display = 'block';
+
+    // Automatically fade out the notification after 3 seconds
+    setTimeout(() => {
+        notificationDiv.style.display = 'none';
+    }, 3000); // Adjust time as needed
+}
+
+

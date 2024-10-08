@@ -53,7 +53,61 @@ function install_packages {
 # function would be to reboot the Conduit after the install if necessary.
 #
 function post_install {
+    localhost="http://127.0.0.1/api/filters"
+    allow_5000_input_filter_rule='{
+                "__v": 2,
+                "chain": "INPUT",
+                "description": "",
+                "dstAddr": "ANY",
+                "dstInterface": "ANY",
+                "dstMask": "",
+                "dstPort": "5000:5000",
+                "dstSpecInterface": "",
+                "enabled": true,
+                "name": "multitech_http_5000",
+                "protocol": "TCP/UDP",
+                "srcAddr": "ANY",
+                "srcInterface": "LAN",
+                "srcMask": "",
+                "srcMac": "ANY",
+                "srcPort": "ANY",
+                "srcSpecInterface": "",
+                "target": "ACCEPT"
+            }'
+    allow_1883_input_filter_rule='{
+                "__v": 2,
+                "chain": "INPUT",
+                "description": "",
+                "dstAddr": "ANY",
+                "dstInterface": "ANY",
+                "dstMask": "",
+                "dstPort": "1883:1883",
+                "dstSpecInterface": "",
+                "enabled": true,
+                "name": "multitech_mqtt_1883",
+                "protocol": "TCP/UDP",
+                "srcAddr": "ANY",
+                "srcInterface": "LAN",
+                "srcMask": "",
+                "srcMac": "ANY",
+                "srcPort": "ANY",
+                "srcSpecInterface": "",
+                "target": "ACCEPT"
+            }'
+    res=$(curl -X POST -H 'Content-Type:application/json' "$localhost" -d "$allow_5000_input_filter_rule")
+    echo "$res"
+
+    # res=$(curl -X POST -H 'Content-Type:application/json' "$localhost" -d "$allow_1883_input_filter_rule")
+    # echo "$res"
+
+    res=$(curl -X POST -H 'Content-Type:application/json' "http://127.0.0.1/api/command/save_apply" -d "")
+
+    # sed -i 's/bind_address 127.0.0.1/bind_address 0.0.0.0/g' /etc/mosquitto/mosquitto.conf
+
+    # /etc/init.d/mosquitto restart
+
     pip3 install -r requirements.txt
+
 }
 
 #
@@ -104,6 +158,10 @@ function remove_packages {
 #
 function post_remove {
     echo "post_remove"
+
+    # sed -i 's/bind_address 0.0.0.0/bind_address 127.0.0.1/g' /etc/mosquitto/mosquitto.conf
+
+    # /etc/init.d/mosquitto restart
 }
 
 case "$1" in

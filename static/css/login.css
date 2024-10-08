@@ -1,0 +1,94 @@
+@font-face {
+    font-family: 'PoppinsFont';
+    src: url('../fonts/Poppins-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+
+/* BT - Login form */
+body {
+    font-family: 'PoppinsFont';
+    font-size:13px;
+    line-height: 1.6em;
+    background-color: #f5f5f5; /* Background color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #00394d;
+}
+
+.login-container {
+    display: flex;
+    /* border: 1px solid black; */
+    background-color: white;
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 500px;
+    justify-content: center;
+
+}
+
+.form-head{
+    display: flex;
+    /* margin-bottom: 30px; */
+}
+
+.form-head h2{
+    margin-left: 30px;
+}
+
+.login{
+    display: flex;
+    /* border: 1px solid black; */
+    justify-content: center;
+}
+
+
+.form-group{
+    display: flex;
+    /* border: 1px solid black; */
+    height: auto;
+
+}
+
+.form-group label {
+
+    color: #00394d;
+    margin-right: 10px;
+    align-self: center;
+
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.5em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 20px;
+    align-self: center;
+
+}
+
+.submit-button {
+
+    align-items: center;
+    width: 100%;
+    padding: 0.75em;
+    border: none;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #e0e0e0;
+}

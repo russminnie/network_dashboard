@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <link rel="stylesheet" href="../static/css/login.css">
+</head>
+<body>
+    
+    <div id="notification" style="display: none; position: fixed; top: 100px; right: 20px; background-color: #e0e0e0; color: #333; padding: 10px; border-radius: 5px; z-index: 1000;">
+        
+    </div>
+    
+    <div class="login-container">
+        <form id="loginForm">
+            <div class="form-head">
+                <div>
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" height="50px" viewBox="0 -960 960 960" width="50px" fill="#000000"><path d="M238.59-66q-38.09 0-65.34-27.13T146-158.35q0-38.09 26.98-64.87T238.51-250q11.49 0 23.33 3 11.85 3 23.16 9l124-153q-17-19-23.5-41t-2.5-46l-182-60q-12 23-33.79 36.5-21.78 13.5-49.6 13.5-37.28 0-64.44-26.87Q26-541.74 26-580.12q0-38.38 27.13-65.13Q80.26-672 118.35-672t64.87 26.83Q210-618.33 210-580q0 5-.5 8t-.5 6l182 63q11-21 29.5-35.5T466-558v-193q-38-6-58-33t-20-58.41q0-37.09 26.87-64.34T480.12-934q38.38 0 65.13 27.17Q572-879.67 572-842q0 31-20 58t-58 33v193q27 5 45.5 19.5T570-503l181-63q-1-2.75-1-6v-8q0-38.33 26.66-65.17Q803.32-672 841.41-672t65.34 26.87Q934-618.26 934-579.88q0 38.38-27.17 65.13Q879.67-488 842.39-488q-27.5 0-49.44-14Q771-516 759-538l-182 60q5 24-2 46.5T551-392l124 154q10-6 22.5-9t23.56-3q39.48 0 66.21 26.66Q814-196.68 814-158.59t-27.13 65.34Q759.74-66 721.65-66t-64.87-26.92Q630-119.83 630-158.29q0-17.9 5.04-32.37Q640.08-205.13 654-220L530-375q-21.13 14-50.16 14-29.03 0-49.84-14L306-219q13 14 18.5 28.4 5.5 14.41 5.5 32.31 0 38.46-26.66 65.37Q276.68-66 238.59-66ZM118.21-510q28.79 0 49.29-20.71t20.5-49.5q0-28.79-20.71-49.29t-49.5-20.5Q89-650 68.5-629.29T48-579.79Q48-551 68.71-530.5t49.5 20.5Zm120 422q28.79 0 49.29-20.71t20.5-49.5q0-28.79-20.71-49.29t-49.5-20.5q-28.79 0-49.29 20.71t-20.5 49.5q0 28.79 20.71 49.29t49.5 20.5Zm242-684q28.79 0 49.29-20.71t20.5-49.5q0-28.79-20.71-49.29t-49.5-20.5q-28.79 0-49.29 20.71t-20.5 49.5q0 28.79 20.71 49.29t49.5 20.5ZM480-383q32 0 54.5-22.5T557-460q0-32-22.63-54.5T480-537q-32 0-54.5 22.63T403-460q0 32 22.5 54.5T480-383ZM722.21-88q28.79 0 49.29-20.71t20.5-49.5q0-28.79-20.71-49.29t-49.5-20.5q-28.79 0-49.29 20.71t-20.5 49.5q0 28.79 20.71 49.29t49.5 20.5Zm120-422q28.79 0 49.29-20.71t20.5-49.5q0-28.79-20.71-49.29t-49.5-20.5q-28.79 0-49.29 20.71t-20.5 49.5q0 28.79 20.71 49.29t49.5 20.5ZM480-842ZM118-580Zm362 120Zm362-120ZM238-158Zm484 0Z"/></svg>
+                </div>
+                <div>
+                    <h2>Live MQTT messages</h2>
+                </div>
+            </div>
+
+            <div class="login">
+                <h1>Log in</h1>
+            </div>
+                   
+            <div class="form-group">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#000000"><path d="M249.33-252q53.67-36.67 108.84-58 55.16-21.33 121.83-21.33T601.83-310q55.17 21.33 108.84 58Q753-295.67 778.5-353.39T804-480q0-135-94.5-229.5T480-804q-135 0-229.5 94.5T156-480q0 68.89 25.5 126.61T249.33-252Zm230.5-216q-47.83 0-80.5-32.83-32.66-32.84-32.66-80.67T399.5-662q32.84-32.67 80.67-32.67t80.5 32.84q32.66 32.83 32.66 80.66 0 47.84-32.83 80.5Q527.66-468 479.83-468Zm.48 336q-73.31 0-136.62-27t-110.5-74.33Q186-280.67 159-343.68q-27-63.01-27-136.16 0-73.16 27-136.33 27-63.16 74.33-110.5Q280.67-774 343.68-801q63.01-27 136.16-27 73.16 0 136.33 27 63.16 27 110.5 74.33Q774-679.33 801-616.15q27 63.19 27 135.84 0 73.31-27 136.62t-74.33 110.5Q679.33-186 616.15-159q-63.19 27-135.84 27Zm-.31-24q56.67 0 113.17-20.5t98.16-58.17q-41.66-33.33-95.5-53Q542-307.33 480-307.33t-116.33 19.16q-54.34 19.17-94.34 53.5 41 37.67 97.5 58.17T480-156Zm.09-336q37.91 0 63.58-25.76 25.66-25.76 25.66-63.67 0-37.9-25.76-63.57t-63.66-25.67q-37.91 0-63.58 25.76-25.66 25.76-25.66 63.67t25.76 63.57Q442.19-492 480.09-492Zm-.09-89.33Zm0 349.66Z"/></svg>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#000000"><path d="M268-132q-22.83 0-39.42-16.58Q212-165.17 212-188v-342.67q0-23.35 16.58-39.67 16.59-16.33 39.42-16.33h66V-670q0-61.17 42.45-103.59Q418.9-816 480.12-816q61.21 0 103.55 42.41Q626-731.17 626-670v83.33h66q22.83 0 39.42 16.33Q748-554.02 748-530.67V-188q0 22.83-16.58 39.42Q714.83-132 692-132H268Zm0-24h424q14 0 23-9t9-23v-342.67q0-14-9-23t-23-9H268q-14 0-23 9t-9 23V-188q0 14 9 23t23 9Zm212.11-150q22.22 0 37.72-15.52t15.5-37.81q0-21.67-15.61-37.5-15.61-15.84-37.83-15.84t-37.72 15.84Q426.67-381 426.67-359t15.61 37.5q15.61 15.5 37.83 15.5ZM358-586.67h244V-670q0-50.83-35.55-86.42Q530.9-792 480.12-792q-50.79 0-86.45 35.58Q358-720.83 358-670v83.33ZM236-156v-406.67V-156Z"/></svg>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+                <!-- Hidden input for the IP address -->
+                <input type="hidden" id="ipAddress" name="ipAddress" />
+            <div class="form-group">
+                <button type="submit" class="submit-button">Login</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Function to extract IP address from the URL
+            function getIpAddress() {
+                // Get the full URL
+                const url = window.location.href;
+                
+                // Use a Regular Expression to extract the IP address (or domain name)
+                const ipPattern = /https?:\/\/([^\/:]+)/;
+                const match = url.match(ipPattern);
+                
+                // Return the IP address or domain, or an empty string if not found
+                return match ? match[1] : '';
+            }
+
+            // Function to handle form submission
+            document.getElementById('loginForm').addEventListener('submit', function(event) {
+                event.preventDefault();  // Prevent default form submission
+
+                // Get username and password from the form
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Get the IP address from the URL
+                const ipAddress = getIpAddress();
+
+                // Prepare the data to send in the POST request
+                const postData = {
+                    username: username,
+                    password: password,
+                    ip: ipAddress  // Include the IP address
+                };
+
+                // Send the POST request to the /login route
+                fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showNotification('Connected successfully');
+                        // Redirect to the index page or handle successful login
+                        window.location.href = '/';
+                    } else {
+
+                        console.log(`BT - response: ${JSON.stringify(response)}`);
+                        showNotification('Login failed. Please check your credentials.')
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during login:', error);
+                });
+            });
+
+        })
+
+        // Function to show notification
+        function showNotification(message) {
+            const notificationDiv = document.getElementById('notification');
+            notificationDiv.textContent = message;
+            notificationDiv.style.display = 'block';
+
+            // Automatically fade out the notification after 3 seconds
+            setTimeout(() => {
+                notificationDiv.style.display = 'none';
+            }, 3000); // Adjust time as needed
+        }
+    </script>
+</body>
+</html>

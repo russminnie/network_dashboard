@@ -1,5 +1,5 @@
 /**
- * Authors: Benjamin Lindeen, Austin Jacobson
+ * Authors: Benjamin Lindeen, Austin Jacobson, Bryan Tran
  * @file mqtt_messages.js
  * This file contains the JavaScript code for the MQTT messages page.
  * It contains the following functions:
@@ -18,10 +18,19 @@
  * @returns {void}
  */
 function connectToBroker(event) {
-    event.preventDefault();
+
+    if (event) {
+        // Prevent form submission if the event exists
+        event.preventDefault();  
+    }
     const broker = document.getElementById('broker').value;
     const port = document.getElementById('port').value;
     const topic = document.getElementById('topic').value;
+
+    // Save the input data to localStorage
+    localStorage.setItem('broker', broker);
+    localStorage.setItem('port', port);
+    localStorage.setItem('topic', topic);
 
     fetch('/connect', {
         method: 'POST',
@@ -33,10 +42,14 @@ function connectToBroker(event) {
         .then(response => response.json())
         .then(data => {
             if (data.message) {
-                alert(data.message);
+                //BT - Show connected message.
+                showNotification(data.message)
+                // BT - Start fetching the messages from the server.
                 startFetchingMessages();
+
             } else {
-                alert('Failed to connect to the broker');
+                // alert('Failed to connect to the broker');
+                showNotification('Failed to connect to the broker');
             }
         })
         .catch(error => {
@@ -51,9 +64,12 @@ function connectToBroker(event) {
  * @returns {void}
  */
 function fetchMessages(filter = '') {
+
     let currentPath = window.location.pathname;
-    let endpoint = (currentPath === '/mqtt_messages') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
+    let endpoint = (currentPath === '/') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
+
+    console.log(`BT - Fetching current url: ${currentURL}`);
 
     /**
      * Fetch the messages from the server
@@ -62,22 +78,38 @@ function fetchMessages(filter = '') {
      * @param currentURL - The URL to fetch the messages from
      */
     fetch(currentURL)
-        .then(response => response.json())
+        .then(response => {
+
+            // BT - Handle if there is an 404
+            if (response.status === 404) {
+                // Handle the 404 error specifically
+                return {}; // Or return an empty object, depending on your needs
+            }
+            // Check for other potential errors (e.g., 500, 403, etc.)
+            if (!response.ok) {
+                throw new Error('Network response was not ok, status: ' + response.status);
+            }
+            // console.log(`BT - Fetching data from Python server at: ${currentURL}`)
+            return response.json(); // Only parse if the response is okay
+
+        })
         .then(data => {
             const messageTable = document.getElementById('messageTableBody');
             messageTable.innerHTML = '';
             data.messages.reverse();
+            console.log(`BT - Receiving data from the server: ${JSON.stringify(data.messages)}`);
             data.messages.forEach((message, index) => {
                 const row = document.createElement('tr');
                 const timeCell = document.createElement('td');
                 const devEUICell = document.createElement('td');
                 const topicCell = document.createElement('td');
                 const messageTypeCell = document.createElement('td');
-                const messageData1Cell = document.createElement('td');
-                const messageData2Cell = document.createElement('td');
-                const messageData3Cell = document.createElement('td');
+                const messageDataCell = document.createElement('td');
+                // const messageData2Cell = document.createElement('td');
+                // const messageData3Cell = document.createElement('td');
                 const buttonCell = document.createElement('td');
                 const moreInfoButton = document.createElement('button');
+                buttonCell.style.textAlign = 'center';  // Center the button inside the cell
 
                 const time = message.data.time;
                 const date = new Date(time);
@@ -91,9 +123,14 @@ function fetchMessages(filter = '') {
                     timeZoneName: 'short'
                 };
 
+                // console.log(`BT - process a message: ${JSON.stringify(message)} - index: ${index}`);
+
                 timeCell.textContent = date.toLocaleDateString('en-US', options);
+                timeCell.style.textAlign = 'center'; // Center the text in the topicCell
                 devEUICell.textContent = message.data.deveui;
+                devEUICell.style.textAlign = 'center'; // Center the text in the topicCell
                 topicCell.textContent = message.topic.substring(message.topic.lastIndexOf('/') + 1);
+                topicCell.style.textAlign = 'center'; // Center the text in the topicCell
 
                 /**
                  * Check if the message type is 'json'
@@ -103,46 +140,20 @@ function fetchMessages(filter = '') {
                  */
                 if (message.type === 'json') {
                     if ('data_decoded' in message.data) {
-                        if ('message_type' in message.data.data_decoded) {
-                            messageTypeCell.textContent = message.data.data_decoded.message_type;
-                            data = message.data.data_decoded;
-                        }
-                        switch (data.message_type) {
-                            case 'Water Leak Sensor':
-                                messageData1Cell.innerHTML = `<em>Water Status:</em> <strong>${data.water_status}</strong><br>`;
-                                messageData2Cell.innerHTML = `<em>Measurement (0-255):</em> <strong>${data['Measurement (0-255)']}</strong><br>`;
-                                break;
-                            case 'Door/Window Sensor Event':
-                                messageData1Cell.innerHTML = `<em>Status:</em> <strong>${data.open_close_status}</strong><br>`;
-                                break;
-                            case 'Push Button Sensor':
-                                messageData1Cell.innerHTML = `<em>Button ID:</em> <strong>${data.button_id}</strong><br>`;
-                                messageData2Cell.innerHTML = `<em>Action Performed:</em> <strong>${data.action_performed}</strong><br>`;
-                                break;
-                            case 'Dry Contact Sensor':
-                                messageData1Cell.innerHTML = `<em>Connection Status:</em> <strong>${data.connection_status}</strong><br>`;
-                                break;
-                            case 'Thermistor Temperature Sensor':
-                                messageData1Cell.innerHTML = `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
-                                messageData2Cell.innerHTML = `<em>Temperature:</em> <strong>${data.current_temperature}</strong><br>`;
-                                break;
-                            case 'Tilt Sensor':
-                                messageData1Cell.innerHTML = `<em>Event Type:</em> <strong>${data.event_type}</strong><br>`;
-                                messageData2Cell.innerHTML = `<em>Angle of Tilt:</em> <strong>${data.angle_of_tilt}</strong><br>`;
-                                break;
-                            case 'Temperature and Humidity Sensor':
-                                const eventTypeDescription = eventTypeMap[data.data.reporting_event_type] || `Unknown (${data.data.reporting_event_type})`;
-                                messageData1Cell.innerHTML = `<em>Event Type:</em> <strong>${eventTypeDescription}</strong><br>`;
-                                messageData2Cell.innerHTML = `<em>Temperature:</em> <strong>${data.data.temperature_fahrenheit.toFixed(2)} °F</strong><br>`;
-                                messageData3Cell.innerHTML = `<em>Humidity:</em> <strong>${data.data.humidity}%</strong><br>`;
-                                break;
-                            case 'Supervisory Message':
-                                messageData1Cell.innerHTML = `<em>Battery Voltage:</em> <strong>${data.battery_voltage.toFixed(1)}V</strong><br>`;
-                                messageData2Cell.innerHTML = `<em>Error Code:</em> <strong>${data.device_error_code}</strong><br>`;
-                                messageData3Cell.innerHTML = `<em>Sensor State:</em> <strong>${data.current_sensor_state}<strong><br>`;
-                                break;
+                        if ('event' in message.data.data_decoded) {
+                            messageTypeCell.textContent = message.data.data_decoded.event;
+                            messageTypeCell.style.textAlign = 'center'; // Center the text in the topicCell
+                            messageDataCell.textContent = JSON.stringify(message.data.data_decoded, null, 1);
                         }
                     }
+                    else if (topicCell.textContent === 'down_queued'){
+                        messageTypeCell.textContent = `Received response id: ${message.data.id}`;
+                        messageTypeCell.style.textAlign = 'center'; // Center the text in the topicCell
+                        messageDataCell.textContent = JSON.stringify(message.data.data_decoded, null, 1);                        
+                    }
+
+                }//(message.type === 'json')
+                
                     /**
                      * Create a button to show the full JSON data
                      * and a button to ask GPT for a response
@@ -152,34 +163,21 @@ function fetchMessages(filter = '') {
                     moreInfoButton.onclick = () => showModal(message.data);
                     buttonCell.appendChild(moreInfoButton);
 
-                row.appendChild(timeCell);
-                row.appendChild(devEUICell);
-                row.appendChild(topicCell);
-                row.appendChild(messageTypeCell);
-                row.appendChild(messageData1Cell);
-                row.appendChild(messageData2Cell);
-                row.appendChild(messageData3Cell);
-                row.appendChild(buttonCell);
-                messageTable.appendChild(row);
+                    row.appendChild(timeCell);
+                    row.appendChild(devEUICell);
+                    row.appendChild(topicCell);
+                    row.appendChild(messageTypeCell);
+                    row.appendChild(messageDataCell);
+                    // row.appendChild(messageData2Cell);
+                    // row.appendChild(messageData3Cell);
+                    row.appendChild(buttonCell);
+                    messageTable.appendChild(row);
             });
-        });
+        }) 
+        .catch(error => {
+            return {}
+        })
 }
-
-/**
- * Map of event types for the Temperature and Humidity Sensor
- * @type {{0: string, 1: string, 2: string, 3: string, 4: string, 5: string, 6: string, 7: string, 8: string}}
- */
-const eventTypeMap = {
-    0x00: "Periodic Report",
-    0x01: "Temperature has risen above upper threshold",
-    0x02: "Temperature has fallen below lower threshold",
-    0x03: "Temperature report-on-change increase",
-    0x04: "Temperature report-on-change decrease",
-    0x05: "Humidity has risen above upper threshold",
-    0x06: "Humidity has fallen below lower threshold",
-    0x07: "Humidity report-on-change increase",
-    0x08: "Humidity report-on-change decrease"
-};
 
 /**
  * Function to show the modal with the given data
@@ -207,14 +205,17 @@ function closeModal() {
  * @returns {void}
  */
 function startFetchingMessages() {
-    setInterval(() => fetchMessages(document.getElementById('filter').value), 5000);
-}
+   
+    const filterElement = document.getElementById('filter');
 
-/**
- * Close the modal when the user clicks the close button
- * @returns {void}
- */
-document.querySelector('.close').addEventListener('click', closeModal);
+    // Check if the element with id 'filter' exists
+    if (filterElement) {
+        // Start fetching messages if the element exists
+        setInterval(() => fetchMessages(filterElement.value), 5000);
+    } else {
+        console.log('Element with ID "filter" not found.');
+    }
+}
 
 /**
  * Close the modal when the user clicks outside of it
@@ -235,7 +236,59 @@ function dumpMessagesToJSON() {
     window.location.href = '/dump_messages';
 }
 
-/**
- * Dump messages to JSON when the button is clicked
- */
-document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's stored data in localStorage
+    const savedBroker = localStorage.getItem('broker');
+    const savedPort = localStorage.getItem('port');
+    const savedTopic = localStorage.getItem('topic');
+
+    const connectForm = document.getElementById('connectForm');
+
+    if (connectForm){
+
+        // If saved data exists, populate the form inputs
+        if (savedBroker && savedPort && savedTopic) {
+            document.getElementById('broker').value = savedBroker;
+            document.getElementById('port').value = savedPort;
+            document.getElementById('topic').value = savedTopic;
+
+            console.log(`BT - Call connectToBroker()....`);
+
+            // Reconnect to the MQTT server automatically
+            connectToBroker();
+        } 
+
+    }
+
+    // Close the modal when the user clicks the close button
+    const closeButton = document.querySelector('.close');
+    if (closeButton) {
+        closeButton.addEventListener('click', closeModal);
+    } else {
+        console.error('Close button not found.');
+    }
+
+
+    /**
+     * Dump messages to JSON when the button is clicked
+     */
+
+    if (document.getElementById('dumpMessages')) {
+        document.getElementById('dumpMessages').addEventListener('click', dumpMessagesToJSON);
+    }
+
+
+});
+
+// Function to show notification
+function showNotification(message) {
+    const notificationDiv = document.getElementById('notification');
+    notificationDiv.textContent = message;
+    notificationDiv.style.display = 'block';
+
+    // Automatically fade out the notification after 3 seconds
+    setTimeout(() => {
+        notificationDiv.style.display = 'none';
+    }, 3000); // Adjust time as needed
+}
