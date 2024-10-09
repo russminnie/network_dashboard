@@ -360,17 +360,69 @@ def logout():
 def page_not_found(e):
     return redirect(url_for('login'))
 
+
+def do_get_command_line(endpoint):
+    
+    try:
+        command = [
+            'curl', 
+            '-X', 'GET',  
+            '-H', 'Content-Type: application/json',
+            f'http://127.0.0.1/api/{endpoint}'
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+
+        # Check if the command succeeded
+        if result.returncode == 0:
+            try:
+                response_data = json.loads(result.stdout)
+                return response_data
+                
+            except json.JSONDecodeError as e:
+                print(f"Failed to parse JSON: {e}")
+        else:
+            print(f"Command failed with return code {result.returncode}")
+
+    except Exception as e:
+        return {'status': 'failed', 'error': str(e)}
+    
+
 """
 Following used to run the Flask app.
 
 """
 if __name__ == '__main__':
+    
+    messages = []
+    
+    get_eth0_ip = do_get_command_line("/ni/nis/0")
+    get_br0_ip = do_get_command_line('/ni/nis/6')
+    get_ppp0_ip = do_get_command_line('/ni/nis/3')
+    
+    if get_eth0_ip['result']['ipv4']['ip'] != "":
+        # BT - eth0 is setup.
+        eth0_ip = get_eth0_ip['result']['ipv4']['ip']
+        messages.append("https://" + eth0_ip + ":5000")
+    else:
+        br0_ip = get_br0_ip['result']['ipv4']['ip']
+        messages.append("https://" + br0_ip + ":5000")
+
+    if get_ppp0_ip['result']['ipv4']['ip'] != "":
+        ppp0_ip = get_ppp0_ip['result']['ipv4']['ip']
+        messages.append("https://" + ppp0_ip + ":5000")
+        
+    displaying_messages = "Listenning at: "
+        
+    for item in messages:
+        displaying_messages += item + ", "
+                
+    clean_up_messages = displaying_messages.rstrip(", ")
 
     STATUS_FILE = 'status.json'
 
-    message = 'https://0.0.0.0:5000'
+    # message = 'https://0.0.0.0:5000'
 
-    status = {'pid': os.getpid(), 'AppInfo': message}
+    status = {'pid': os.getpid(), 'AppInfo': clean_up_messages}
     
     # Write to the status.json with the message
     with open(STATUS_FILE, 'w') as file:
