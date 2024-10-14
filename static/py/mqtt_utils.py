@@ -97,11 +97,12 @@ def on_message(client, userdata, msg):
         print('\n')
         
     except json.JSONDecodeError:
-        message_buffer.put({
-            'type': 'text',
-            'topic': topic,
-            'data': message
-        })
+        print("Error: Message payload is not valid JSON.")
+        # message_buffer.put({
+        #     'type': 'text',
+        #     'topic': topic,
+        #     'data': message
+        # })
     except TypeError as e:
         print(f"TypeError: {e}")
         message_buffer.put({
