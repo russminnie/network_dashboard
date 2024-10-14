@@ -129,7 +129,15 @@ function fetchMessages(filter = '') {
 
                 timeCell.textContent = date.toLocaleDateString('en-US', options);
                 timeCell.style.textAlign = 'center'; // Center the text in the topicCell
-                devEUICell.textContent = message.data.deveui;
+
+                if (!(message.data.deveui)){
+                    const parsedValue = message.topic.split('/')[1];
+                    devEUICell.textContent = parsedValue;
+                }
+                else{
+                    devEUICell.textContent = message.data.deveui;
+                }
+                
                 devEUICell.style.textAlign = 'center'; // Center the text in the topicCell
                 topicCell.textContent = message.topic.substring(message.topic.lastIndexOf('/') + 1);
                 topicCell.style.textAlign = 'center'; // Center the text in the topicCell
