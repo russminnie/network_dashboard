@@ -7,6 +7,8 @@ This file is used by and called by server.py.
 """
 Importing the required libraries.
 """
+
+from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 import base64
 import json
@@ -70,6 +72,16 @@ def on_message(client, userdata, msg):
                      
             # BT - Adding rb_data_decoded to data
             data['data_decoded'] = rb_data_decoded
+
+
+        # BT - Add time stamp for these below topic
+        if any(substring in topic for substring in ['geolocation', 'packet_sent', 'packet_recv', 'cleared', 'join_request', 'mac_sent', 'join', 'recv','down_queued','down']):
+
+            # If there is no timestamp, generate one
+            timeStamp1 = datetime.now(timezone.utc).isoformat()
+            data['time'] = timeStamp1
+
+
 
         # print('BT - message_buffer: {}'.format(json.dumps(list(message_buffer.queue))))
 

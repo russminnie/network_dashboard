@@ -112,6 +112,7 @@ function fetchMessages(filter = '') {
                 const moreInfoButton = document.createElement('button');
                 buttonCell.style.textAlign = 'center';  // Center the button inside the cell
 
+
                 const time = message.data.time;
                 const date = new Date(time);
                 const options = {
