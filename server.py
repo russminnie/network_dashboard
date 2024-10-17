@@ -126,6 +126,7 @@ def connect():
 """
 Following used for receiving messages from the MQTT broker, storing them in the message buffer and displaying them.
 """
+
 @app.route('/messages', methods=['GET'])
 def get_messages():
     if 'username' in session:
@@ -133,9 +134,17 @@ def get_messages():
         filtered_messages = []
 
         for _ in range(message_buffer.qsize()):
-            m = message_buffer.queue[_]  # Access the message from the buffer
+            m = message_buffer.queue[_]
 
-            # Check if the filter term matches topic, type, deveui, or any part of data_decoded
+            # Initialize formatted_time to an empty string to avoid the UnboundLocalError
+            formatted_time = ''
+
+            # Extract time portion if the timestamp is available and format it as hh:mm
+            if 'current_time' in m['data']:
+                message_time = m['data']['current_time']  # Assuming your timestamp is in m['data']['timestamp']
+                formatted_time = message_time[11:16]  # Extract the hh:mm portion
+
+            # Check if filter term matches topic, type, deveui, data_decoded, or time
             deveui_match = (
                 m['type'] == 'json' and
                 'deveui' in m['data'] and
@@ -147,19 +156,60 @@ def get_messages():
                 any(filter_type in str(value).lower() for key, value in m['data']['data_decoded'].items())
             )
 
+            time_match = filter_type in formatted_time
+
             if (filter_type in m['topic'].lower() or
                 filter_type in m['type'].lower() or
                 deveui_match or
-                data_decoded_match):
+                data_decoded_match or
+                time_match):
                 filtered_messages.append({
                     'topic': m['topic'],
                     'type': m['type'],
                     'data': m['data']
                 })
 
-        return jsonify(messages=filtered_messages)  # Return the filtered messages as JSON
+        return jsonify(messages=filtered_messages)
     else:
         return redirect(url_for('login'))
+
+
+
+
+# @app.route('/messages', methods=['GET'])
+# def get_messages():
+#     if 'username' in session:
+#         filter_type = request.args.get('filter', '').lower()
+#         filtered_messages = []
+
+#         for _ in range(message_buffer.qsize()):
+#             m = message_buffer.queue[_]  # Access the message from the buffer
+
+#             # Check if the filter term matches topic, type, deveui, or any part of data_decoded
+#             deveui_match = (
+#                 m['type'] == 'json' and
+#                 'deveui' in m['data'] and
+#                 filter_type in m['data']['deveui'].lower()
+#             )
+#             data_decoded_match = (
+#                 m['type'] == 'json' and
+#                 'data_decoded' in m['data'] and
+#                 any(filter_type in str(value).lower() for key, value in m['data']['data_decoded'].items())
+#             )
+
+#             if (filter_type in m['topic'].lower() or
+#                 filter_type in m['type'].lower() or
+#                 deveui_match or
+#                 data_decoded_match):
+#                 filtered_messages.append({
+#                     'topic': m['topic'],
+#                     'type': m['type'],
+#                     'data': m['data']
+#                 })
+
+#         return jsonify(messages=filtered_messages)  # Return the filtered messages as JSON
+#     else:
+#         return redirect(url_for('login'))
 
 """
 Following is used to dump the messages in the message buffer to a JSON file and import messages from a JSON file.
@@ -354,6 +404,56 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
+@app.route('/time')
+def time():
+    if 'username' in session:
+        return render_template('date_time.html')
+    else:
+        return redirect(url_for('login'))
+
+# BT - PUT https://192.168.2.42/api/system 
+# datetime	"10/16/2024 15:41:00"
+# https://192.168.2.42/api/sntp
+# {"enabled":true,"pollingTime":120,"timeZone":"US/Central","servers":["time.nist.gov","","","",""]}
+
+@app.route('/setTime',methods=['POST'])
+def setTime():
+    
+    data = request.get_json()
+    date = data.get('selectedDate')
+    time = data.get('selectedTime')
+    time_zone = data.get('selectedTimeZone')
+    seconds = data.get('seconds')
+
+    config_time_zone = json.dumps({"timeZone": time_zone})
+
+    # Step 1: Convert the date from YYYY-MM-DD to MM/DD/YYYY
+    formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%m/%d/%Y")
+
+    # Step 2: Combine the time and seconds to form HH:MM:SS
+    formatted_time = f"{time}:{seconds}"
+
+    # Step 3: Combine the formatted date and the complete time
+    datetime_str = f"{formatted_date} {formatted_time}"
+
+    # Step 4: Create the JSON object
+    data = json.dumps({"datetime": datetime_str})
+    # print('BT - Receiving time and date from web:{}'.format(data))
+
+    
+    res = do_command_line('PUT','system',data)
+    print('BT - set time command: {}'.format(res))
+    
+    if res['status'] == 'success':
+        set_time_zone = do_command_line('PUT','sntp',config_time_zone)
+        print('BT - set time zone command: {}'.format(set_time_zone))
+        save_res = do_command_line('POST','save_apply','','save_apply')
+        print('BT - save command: {}'.format(save_res))
+        if save_res['status'] == 'success':
+            return jsonify({"message": "Successful set time and date"})
+
+    return jsonify({"message": "Error! could set time and date"})
+
 
 # Catch-all route to handle unmatched routes and redirect to login
 @app.errorhandler(404)
@@ -361,15 +461,124 @@ def page_not_found(e):
     return redirect(url_for('login'))
 
 
-def do_get_command_line(endpoint):
+# def do_get_command_line(endpoint):
+    
+#     try:
+#         command = [
+#             'curl', 
+#             '-X', 'GET',  
+#             '-H', 'Content-Type: application/json',
+#             f'http://127.0.0.1/api/{endpoint}'
+#         ]
+#         result = subprocess.run(command, capture_output=True, text=True)
+
+#         # Check if the command succeeded
+#         if result.returncode == 0:
+#             try:
+#                 response_data = json.loads(result.stdout)
+#                 return response_data
+                
+#             except json.JSONDecodeError as e:
+#                 print(f"Failed to parse JSON: {e}")
+#         else:
+#             print(f"Command failed with return code {result.returncode}")
+
+#     except Exception as e:
+#         return {'status': 'failed', 'error': str(e)}
+    
+# def do_put_command_line(endpoint, data):
+    
+#     try:
+        
+#         # Format the JSON data with the date and time
+#         # data = json.dumps({"datetime": f"{date} {time}"})
+#         command = [
+#             'curl', 
+#             '-X', 'PUT',  # Change to POST request
+#             '-H', 'Content-Type: application/json',  # Ensure content type is JSON
+#             '-d', data,  # Data to send in the POST request
+#             f'http://127.0.0.1/api/{endpoint}'
+# ]
+#         result = subprocess.run(command, capture_output=True, text=True)
+
+#         # Check if the command succeeded
+#         if result.returncode == 0:
+#             try:
+#                 response_data = json.loads(result.stdout)
+#                 return response_data
+                
+#             except json.JSONDecodeError as e:
+#                 print(f"Failed to parse JSON: {e}")
+#         else:
+#             print(f"Command failed with return code {result.returncode}")
+
+#     except Exception as e:
+#         return {'status': 'failed', 'error': str(e)}
+
+# def do_save_command_line(endpoint):
+    
+#     try:
+        
+#         command = [
+#             'curl', 
+#             '-X', 'POST',  # Change to POST request
+#             '-H', 'Content-Type: application/json',  # Ensure content type is JSON
+#             '-d', '',  # Data to send in the POST request
+#             f'http://127.0.0.1/api/command/{endpoint}'
+# ]
+#         result = subprocess.run(command, capture_output=True, text=True)
+
+#         # Check if the command succeeded
+#         if result.returncode == 0:
+#             try:
+#                 response_data = json.loads(result.stdout)
+#                 return response_data
+                
+#             except json.JSONDecodeError as e:
+#                 print(f"Failed to parse JSON: {e}")
+#         else:
+#             print(f"Command failed with return code {result.returncode}")
+
+#     except Exception as e:
+#         return {'status': 'failed', 'error': str(e)}
+    
+# BT - Send command line
+
+def do_command_line(method,endpoint, data='',save_apply=''):
     
     try:
-        command = [
-            'curl', 
-            '-X', 'GET',  
-            '-H', 'Content-Type: application/json',
-            f'http://127.0.0.1/api/{endpoint}'
-        ]
+
+        if method == 'GET':
+        
+            command = [
+                'curl', 
+                '-X', f'{method}',  # Change to POST request
+                '-H', 'Content-Type: application/json',  # Ensure content type is JSON
+                '-d', '',  # Data to send in the POST request
+                f'http://127.0.0.1/api/{endpoint}'
+            ]
+
+        elif save_apply == 'save_apply':
+
+            command = [
+                'curl', 
+                '-X', f'{method}',  # Change to POST request
+                '-H', 'Content-Type: application/json',  # Ensure content type is JSON
+                '-d', '',  # Data to send in the POST request
+                f'http://127.0.0.1/api/command/{endpoint}'
+            ]
+        else:
+
+            command = [
+                'curl', 
+                '-X', f'{method}',  # Change to POST request
+                '-H', 'Content-Type: application/json',  # Ensure content type is JSON
+                '-d', data,  # Data to send in the POST request
+                f'http://127.0.0.1/api/{endpoint}'
+            ]
+
+
+
         result = subprocess.run(command, capture_output=True, text=True)
 
         # Check if the command succeeded
@@ -395,9 +604,9 @@ if __name__ == '__main__':
     
     messages = []
     
-    get_eth0_ip = do_get_command_line("/ni/nis/0")
-    get_br0_ip = do_get_command_line('/ni/nis/6')
-    get_ppp0_ip = do_get_command_line('/ni/nis/3')
+    get_eth0_ip = do_command_line('GET',"/ni/nis/0")
+    get_br0_ip = do_command_line('GET','/ni/nis/6')
+    get_ppp0_ip = do_command_line('GET','/ni/nis/3')
     
     if get_eth0_ip['result']['ipv4']['ip'] != "":
         # BT - eth0 is setup.

@@ -75,11 +75,12 @@ def on_message(client, userdata, msg):
 
 
         # BT - Add time stamp for these below topic
-        if any(substring in topic for substring in ['geolocation', 'packet_sent', 'packet_recv', 'cleared', 'join_request', 'mac_sent', 'join', 'recv','down_queued','down']):
+        # if any(substring in topic for substring in ['geolocation', 'packet_sent', 'packet_recv', 'cleared', 'join_request', 'mac_sent', 'join', 'recv','down_queued','down']):
 
-            # If there is no timestamp, generate one
-            timeStamp1 = datetime.now(timezone.utc).isoformat()
-            data['time'] = timeStamp1
+        # If there is no timestamp, generate one
+        timeStamp1 = datetime.now().isoformat()
+        print('BT - Timestamp: {}'.format(timeStamp1))
+        data['current_time'] = timeStamp1
 
 
 

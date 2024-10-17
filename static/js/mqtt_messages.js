@@ -113,7 +113,7 @@ function fetchMessages(filter = '') {
                 buttonCell.style.textAlign = 'center';  // Center the button inside the cell
 
 
-                const time = message.data.time;
+                const time = message.data.current_time;
                 const date = new Date(time);
                 const options = {
                     year: 'numeric',

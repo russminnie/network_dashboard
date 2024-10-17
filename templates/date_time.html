@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Configure Date and Time{% endblock %}
+
+{%block notification %}
+<div id="notification" style="display: none; position: fixed; top: 100px; right: 20px; background-color: #f5f5f5; color: #333; padding: 10px; border-radius: 5px; z-index: 1000;">
+    Configure Date and Time successful!
+</div>
+{% endblock %}
+
+
+{% block content %}
+
+<form id="dateForm" onsubmit="getDateAndTime(event)">
+    <div class="form-group">
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" name="date" required>
+    </div>
+    <div class="form-group">
+        <label for="time">Select Time:</label>
+        <input type="time" id="time" name="time" required>
+    </div>
+    <div class="form-group">
+        <label for="timezone">Select Time Zone:</label>
+        <select id="timezone" name="timezone" required>
+            <option value="UTC">UTC</option>
+            <option value="America/New_York">Eastern Time (US & Canada)</option>
+            <option value="America/Chicago">Central Time (US & Canada)</option>
+            <option value="America/Denver">Mountain Time (US & Canada)</option>
+            <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
+            <!-- Add more time zones as needed -->
+        </select>
+    </div>
+
+    <button type="submit">
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+            <path d="m612-292 56-56-148-148v-184h-80v216l172 172ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z"/>
+        </svg>
+        Set Time
+    </button>
+</form>
+
+
+<script>
+
+function getDateAndTime(event) {
+    event.preventDefault(); // Prevent the form from submitting
+
+    // Collecting date, time, and timezone input values
+    const selectedDate = document.getElementById('date').value;
+    const selectedTime = document.getElementById('time').value;
+    const selectedTimeZone = document.getElementById('timezone').value;
+
+    const seconds = '00'; // If you want to always append '00' seconds
+
+    // Log the inputs for debugging purposes
+    console.log("Selected Date:", selectedDate);
+    console.log("Selected Time:", selectedTime);
+    console.log("Selected Time Zone:", selectedTimeZone);
+
+
+    // Store values in localStorage
+    localStorage.setItem('selectedDate', selectedDate);
+    localStorage.setItem('selectedTime', selectedTime);
+    localStorage.setItem('selectedTimezone', selectedTimeZone);
+
+    // Send the collected values to the server
+    fetch('/setTime', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            selectedDate,
+            selectedTime,
+            selectedTimeZone,
+            seconds
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            showNotification(data.message);
+        } else {
+            alert('Failed to connect to the broker');
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+
+    // Function to populate form fields with stored values (if available)
+    function populateForm() {
+        const storedDate = localStorage.getItem('selectedDate');
+        const storedTime = localStorage.getItem('selectedTime');
+        const storedTimezone = localStorage.getItem('selectedTimezone');
+
+        if (storedDate) {
+            document.getElementById('date').value = storedDate;
+        }
+        if (storedTime) {
+            document.getElementById('time').value = storedTime;
+        }
+        if (storedTimezone) {
+            document.getElementById('timezone').value = storedTimezone;
+        }
+    }
+
+    // Call populateForm on page load to retain values
+    window.onload = populateForm;
+
+
+
+    // BT - Todo: Need to move this into its own file. Function to show notification
+    function showNotification(message) {
+        const notificationDiv = document.getElementById('notification');
+        notificationDiv.textContent = message;
+        notificationDiv.style.display = 'block';
+
+        // Automatically fade out the notification after 3 seconds
+        setTimeout(() => {
+            notificationDiv.style.display = 'none';
+        }, 3000); // Adjust time as needed
+    }
+    </script>
+
+{% endblock %}
+
