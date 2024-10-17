@@ -74,17 +74,10 @@ def on_message(client, userdata, msg):
             data['data_decoded'] = rb_data_decoded
 
 
-        # BT - Add time stamp for these below topic
-        # if any(substring in topic for substring in ['geolocation', 'packet_sent', 'packet_recv', 'cleared', 'join_request', 'mac_sent', 'join', 'recv','down_queued','down']):
-
-        # If there is no timestamp, generate one
+        # BT - Add current time to each received packets.
         timeStamp1 = datetime.now().isoformat()
         print('BT - Timestamp: {}'.format(timeStamp1))
         data['current_time'] = timeStamp1
-
-
-
-        # print('BT - message_buffer: {}'.format(json.dumps(list(message_buffer.queue))))
 
         message_buffer.put({
             'type': 'json',

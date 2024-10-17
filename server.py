@@ -136,15 +136,15 @@ def get_messages():
         for _ in range(message_buffer.qsize()):
             m = message_buffer.queue[_]
 
-            # Initialize formatted_time to an empty string to avoid the UnboundLocalError
+            # BT - Initialize formatted_time to an empty string to avoid the UnboundLocalError
             formatted_time = ''
 
-            # Extract time portion if the timestamp is available and format it as hh:mm
+            # BT - Extract time portion if the timestamp is available and format it as hh:mm
             if 'current_time' in m['data']:
                 message_time = m['data']['current_time']  # Assuming your timestamp is in m['data']['timestamp']
                 formatted_time = message_time[11:16]  # Extract the hh:mm portion
 
-            # Check if filter term matches topic, type, deveui, data_decoded, or time
+            # BT - Check if filter term matches topic, type, deveui, data_decoded, or time
             deveui_match = (
                 m['type'] == 'json' and
                 'deveui' in m['data'] and
@@ -172,44 +172,6 @@ def get_messages():
         return jsonify(messages=filtered_messages)
     else:
         return redirect(url_for('login'))
-
-
-
-
-# @app.route('/messages', methods=['GET'])
-# def get_messages():
-#     if 'username' in session:
-#         filter_type = request.args.get('filter', '').lower()
-#         filtered_messages = []
-
-#         for _ in range(message_buffer.qsize()):
-#             m = message_buffer.queue[_]  # Access the message from the buffer
-
-#             # Check if the filter term matches topic, type, deveui, or any part of data_decoded
-#             deveui_match = (
-#                 m['type'] == 'json' and
-#                 'deveui' in m['data'] and
-#                 filter_type in m['data']['deveui'].lower()
-#             )
-#             data_decoded_match = (
-#                 m['type'] == 'json' and
-#                 'data_decoded' in m['data'] and
-#                 any(filter_type in str(value).lower() for key, value in m['data']['data_decoded'].items())
-#             )
-
-#             if (filter_type in m['topic'].lower() or
-#                 filter_type in m['type'].lower() or
-#                 deveui_match or
-#                 data_decoded_match):
-#                 filtered_messages.append({
-#                     'topic': m['topic'],
-#                     'type': m['type'],
-#                     'data': m['data']
-#                 })
-
-#         return jsonify(messages=filtered_messages)  # Return the filtered messages as JSON
-#     else:
-#         return redirect(url_for('login'))
 
 """
 Following is used to dump the messages in the message buffer to a JSON file and import messages from a JSON file.
@@ -419,6 +381,7 @@ def time():
 @app.route('/setTime',methods=['POST'])
 def setTime():
     
+
     data = request.get_json()
     date = data.get('selectedDate')
     time = data.get('selectedTime')
@@ -427,18 +390,17 @@ def setTime():
 
     config_time_zone = json.dumps({"timeZone": time_zone})
 
-    # Step 1: Convert the date from YYYY-MM-DD to MM/DD/YYYY
+    # BT - Step 1: Convert the date from YYYY-MM-DD to MM/DD/YYYY
     formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%m/%d/%Y")
 
-    # Step 2: Combine the time and seconds to form HH:MM:SS
+    # BT - Step 2: Combine the time and seconds to form HH:MM:SS
     formatted_time = f"{time}:{seconds}"
 
-    # Step 3: Combine the formatted date and the complete time
+    # BT - Step 3: Combine the formatted date and the complete time
     datetime_str = f"{formatted_date} {formatted_time}"
 
-    # Step 4: Create the JSON object
+    # BT - Step 4: Create the JSON object
     data = json.dumps({"datetime": datetime_str})
-    # print('BT - Receiving time and date from web:{}'.format(data))
 
     
     res = do_command_line('PUT','system',data)
@@ -455,92 +417,12 @@ def setTime():
     return jsonify({"message": "Error! could set time and date"})
 
 
+
 # Catch-all route to handle unmatched routes and redirect to login
 @app.errorhandler(404)
 def page_not_found(e):
     return redirect(url_for('login'))
 
-
-# def do_get_command_line(endpoint):
-    
-#     try:
-#         command = [
-#             'curl', 
-#             '-X', 'GET',  
-#             '-H', 'Content-Type: application/json',
-#             f'http://127.0.0.1/api/{endpoint}'
-#         ]
-#         result = subprocess.run(command, capture_output=True, text=True)
-
-#         # Check if the command succeeded
-#         if result.returncode == 0:
-#             try:
-#                 response_data = json.loads(result.stdout)
-#                 return response_data
-                
-#             except json.JSONDecodeError as e:
-#                 print(f"Failed to parse JSON: {e}")
-#         else:
-#             print(f"Command failed with return code {result.returncode}")
-
-#     except Exception as e:
-#         return {'status': 'failed', 'error': str(e)}
-    
-# def do_put_command_line(endpoint, data):
-    
-#     try:
-        
-#         # Format the JSON data with the date and time
-#         # data = json.dumps({"datetime": f"{date} {time}"})
-#         command = [
-#             'curl', 
-#             '-X', 'PUT',  # Change to POST request
-#             '-H', 'Content-Type: application/json',  # Ensure content type is JSON
-#             '-d', data,  # Data to send in the POST request
-#             f'http://127.0.0.1/api/{endpoint}'
-# ]
-#         result = subprocess.run(command, capture_output=True, text=True)
-
-#         # Check if the command succeeded
-#         if result.returncode == 0:
-#             try:
-#                 response_data = json.loads(result.stdout)
-#                 return response_data
-                
-#             except json.JSONDecodeError as e:
-#                 print(f"Failed to parse JSON: {e}")
-#         else:
-#             print(f"Command failed with return code {result.returncode}")
-
-#     except Exception as e:
-#         return {'status': 'failed', 'error': str(e)}
-
-# def do_save_command_line(endpoint):
-    
-#     try:
-        
-#         command = [
-#             'curl', 
-#             '-X', 'POST',  # Change to POST request
-#             '-H', 'Content-Type: application/json',  # Ensure content type is JSON
-#             '-d', '',  # Data to send in the POST request
-#             f'http://127.0.0.1/api/command/{endpoint}'
-# ]
-#         result = subprocess.run(command, capture_output=True, text=True)
-
-#         # Check if the command succeeded
-#         if result.returncode == 0:
-#             try:
-#                 response_data = json.loads(result.stdout)
-#                 return response_data
-                
-#             except json.JSONDecodeError as e:
-#                 print(f"Failed to parse JSON: {e}")
-#         else:
-#             print(f"Command failed with return code {result.returncode}")
-
-#     except Exception as e:
-#         return {'status': 'failed', 'error': str(e)}
     
 # BT - Send command line
 
