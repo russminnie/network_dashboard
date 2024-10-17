@@ -108,21 +108,8 @@ function getDateAndTime(event) {
 
     // Call populateForm on page load to retain values
     window.onload = populateForm;
-
-
-
-    // BT - Todo: Need to move this into its own file. Function to show notification
-    function showNotification(message) {
-        const notificationDiv = document.getElementById('notification');
-        notificationDiv.textContent = message;
-        notificationDiv.style.display = 'block';
-
-        // Automatically fade out the notification after 3 seconds
-        setTimeout(() => {
-            notificationDiv.style.display = 'none';
-        }, 3000); // Adjust time as needed
-    }
     </script>
+    <script src="../static/js/notification.js"></script>
 
 {% endblock %}
 
