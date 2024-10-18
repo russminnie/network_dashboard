@@ -372,11 +372,7 @@ def config_time():
     else:
         return redirect(url_for('login'))
 
-# BT - PUT https://192.168.2.42/api/system 
-# datetime	"10/16/2024 15:41:00"
-# https://192.168.2.42/api/sntp
-# {"enabled":true,"pollingTime":120,"timeZone":"US/Central","servers":["time.nist.gov","","","",""]}
-
+# BT - Set system time and restart the server.
 @app.route('/setTime',methods=['POST'])
 def setTime():
     
@@ -400,36 +396,14 @@ def setTime():
 
     # BT - Step 4: Create the JSON object
     data = json.dumps({"datetime": datetime_str})
-    print('BT - Time is: {}'.format(data))
 
     set_time_zone = do_command_line('PUT','sntp',config_time_zone)
-    print('BT - set time zone command: {}'.format(set_time_zone))   
-
-    
+  
     if set_time_zone['status'] == 'success':
         res = do_command_line('PUT','system',data)
-        print('BT - set time command: {}'.format(res))
         save_res = do_command_line('POST','save_apply','','save_apply')
-        print('BT - save command: {}'.format(save_res))
+
         if save_res['status'] == 'success':
-            # https://192.168.2.42/api?fields=system,apps,nodeRed,remoteManagement,customApps,customAppsConfig,selfDiagnostic                                                                                             
-                                                                                                                             
-            get_app_id = do_command_line('GET','customApps')                                                                 
-            print('BT - AppManger.json: {}'.format(get_app_id))
-
-
-            # Specify the description you're looking for
-            search_description = 'Configure sensor downlinks and decode and analyze MQTT uplink packets'
-
-            # Search through the result array
-            for item in get_app_id['result']:
-                if item['description'] == search_description:
-                    _id = item['_id']
-                    print(f"Found description: {_id}")  # Output the corresponding _id value
-                    break
-            else:
-                print("Description not found")
-
 
             # BT - Function to restart the server after a delay
             def delayed_restart():
