@@ -8,7 +8,7 @@ Running this file will enable you to interact with the MQTT broker and send down
 Importing the required libraries.
 """
 from flask import Flask, jsonify, request, render_template, send_file, Response, redirect, url_for,session
-import json, os, subprocess, threading
+import json, os, subprocess, threading, time
 import logging
 from paho.mqtt import client as mqtt
 from datetime import datetime
@@ -365,8 +365,8 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
-@app.route('/time')
-def time():
+@app.route('/config_time')
+def config_time():
     if 'username' in session:
         return render_template('date_time.html')
     else:
@@ -383,7 +383,7 @@ def setTime():
 
     data = request.get_json()
     date = data.get('selectedDate')
-    time = data.get('selectedTime')
+    selected_time = data.get('selectedTime')
     time_zone = data.get('selectedTimeZone')
     seconds = data.get('seconds')
 
@@ -393,7 +393,7 @@ def setTime():
     formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%m/%d/%Y")
 
     # BT - Step 2: Combine the time and seconds to form HH:MM:SS
-    formatted_time = f"{time}:{seconds}"
+    formatted_time = f"{selected_time}:{seconds}"
 
     # BT - Step 3: Combine the formatted date and the complete time
     datetime_str = f"{formatted_date} {formatted_time}"
