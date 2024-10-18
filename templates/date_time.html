@@ -80,6 +80,12 @@ function getDateAndTime(event) {
     .then(data => {
         if (data.message) {
             showNotification(data.message);
+
+            // Optionally, redirect to login page after the alert
+            if (data.message.includes('restart')) {
+                window.location.href = "/login";  // Redirect to login page
+            }
+            
         } else {
             alert('Failed to connect to the broker');
         }

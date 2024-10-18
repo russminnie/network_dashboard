@@ -69,8 +69,6 @@ function fetchMessages(filter = '') {
     let endpoint = (currentPath === '/') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
 
-    console.log(`BT - Fetching current url: ${currentURL}`);
-
     /**
      * Fetch the messages from the server
      * creates a table row for each message
@@ -97,8 +95,9 @@ function fetchMessages(filter = '') {
             const messageTable = document.getElementById('messageTableBody');
             messageTable.innerHTML = '';
             data.messages.reverse();
+
             // console.log(`BT - Receiving data from the server: ${JSON.stringify(data.messages)}`);
-            // console.log(`BT - receive data from server length: ${data.messages.length}`)
+
             data.messages.forEach((message, index) => {
                 const row = document.createElement('tr');
                 const timeCell = document.createElement('td');
@@ -113,21 +112,20 @@ function fetchMessages(filter = '') {
                 buttonCell.style.textAlign = 'center';  // Center the button inside the cell
 
 
-                const time = message.data.current_time;
-                const date = new Date(time);
-                const options = {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    timeZoneName: 'short'
-                };
+                // const time = message.data.current_time;
+                // const date = new Date(time);
+                // const options = {
+                //     year: 'numeric',
+                //     month: 'long',
+                //     day: 'numeric',
+                //     hour: '2-digit',
+                //     minute: '2-digit',
+                //     second: '2-digit',
+                //     timeZoneName: 'short'
+                // };
 
-                // console.log(`BT - process a message: ${JSON.stringify(message)} - index: ${index}`);
-
-                timeCell.textContent = date.toLocaleDateString('en-US', options);
+                // timeCell.textContent = date.toLocaleDateString('en-US', options);
+                timeCell.textContent = message.data.current_time;
                 timeCell.style.textAlign = 'center'; // Center the text in the topicCell
 
                 if (!(message.data.deveui)){
@@ -262,8 +260,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('broker').value = savedBroker;
             document.getElementById('port').value = savedPort;
             document.getElementById('topic').value = savedTopic;
-
-            console.log(`BT - Call connectToBroker()....`);
 
             // Reconnect to the MQTT server automatically
             connectToBroker();

@@ -73,31 +73,38 @@
 #
 NAME="NetworkDashboard"
 
-#
-#DAEMON
-# Fully qualified path to application executable.
-#
-# Examples:
-#  Python3 - execute interpreter directly:
-#   DAEMON="python3 ${APP_DIR}/example.py"
-#
-#  Compiled Executable (C, C++, etc):
-#   DAEMON="${APP_DIR}/example"
-#
-DAEMON="python3 ${APP_DIR}/server.py"
+# #
+# #DAEMON
+# # Fully qualified path to application executable.
+# #
+# # Examples:
+# #  Python3 - execute interpreter directly:
+# #   DAEMON="python3 ${APP_DIR}/example.py"
+# #
+# #  Compiled Executable (C, C++, etc):
+# #   DAEMON="${APP_DIR}/example"
+# #
+# DAEMON="python3 ${APP_DIR}/server.py"
 
-#
-#DAEMON_DEBUG_ARGS
-#
-# Uncomment to pass optional arguments to daemon when debugging.
-#
-DAEMON_DEBUG_ARGS="--logfile ${APP_DIR}/debug_log.txt"
+# #
+# #DAEMON_DEBUG_ARGS
+# #
+# # Uncomment to pass optional arguments to daemon when debugging.
+# #
+# DAEMON_DEBUG_ARGS="--logfile ${APP_DIR}/debug_log.txt"
 
-#
-#DAEMON_ARGS
-# Arguments supplied to the daemon.
-#
-DAEMON_ARGS="--cfgfile ${CONFIG_DIR}/example.cfg.json ${DAEMON_DEBUG_ARGS}"
+# #
+# #DAEMON_ARGS
+# # Arguments supplied to the daemon.
+# #
+# DAEMON_ARGS="--cfgfile ${CONFIG_DIR}/example.cfg.json ${DAEMON_DEBUG_ARGS}"
+
+
+
+DAEMON="/usr/bin/python3"
+# Use MultiTech Provided $APP_DIR environment variable
+DAEMON_ARGS="$APP_DIR/server.py"
+RUN_DIR=$APP_DIR
 
 
 ################################
@@ -142,13 +149,21 @@ function ChangeUser {
 function ExecuteStart {
     echo "ExecuteStart:"
 
+    # $START_STOP_DAEMON --start \
+    #                    --background \
+    #                    --make-pidfile \
+    #                    --pidfile "${PID_FILE}" \
+    #                    --chdir "${RUN_DIR}" \
+    #                    --startas "/bin/bash" \
+    #                    -- -c "exec ${DAEMON} ${DAEMON_ARGS}"
+
     $START_STOP_DAEMON --start \
-                       --background \
-                       --make-pidfile \
-                       --pidfile "${PID_FILE}" \
-                       --chdir "${RUN_DIR}" \
-                       --startas "/bin/bash" \
-                       -- -c "exec ${DAEMON} ${DAEMON_ARGS}"
+                    --background \
+                    --pidfile "$PID_FILE" \
+                    --make-pidfile \
+                    --chdir "$RUN_DIR" \
+                    --startas "$DAEMON" \
+                    -- "$DAEMON_ARGS"
 }
 
 # Start the application running process(es)

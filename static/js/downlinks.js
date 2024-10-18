@@ -30,46 +30,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const thresholdModeConfig = document.getElementById('thresholdModeConfig');
     const reportOnChangeConfig = document.getElementById('reportOnChangeConfig');
 
-    // console.log(`BT - downlink() get json_data: ${window.json_data}`)
-    
-
-    // fetch('/get_sensors')
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         console.log("Fetched sensors:", data.sensors);
-    //         data.sensors.forEach(sensor => {
-    //             const option = document.createElement('option');
-    //             option.value = sensor.DevEUI;
-    //             option.textContent = `${sensor.DevEUI} (${sensor.sensor_type})`;
-    //             sensorSelectElement.appendChild(option);
-    //         });
-    //         // Trigger change event if only one sensor is present
-    //         if (data.sensors.length === 1) {
-    //             sensorSelectElement.dispatchEvent(new Event('change'));
-    //         }
-    //     })
-    //     .catch(error => {
-    //         console.error('Error fetching sensors:', error);
-    //     });
-
     if (sensorSelectElement) {
         sensorSelectElement.addEventListener('change', (event) => {
             const selectedSensorText = sensorSelectElement.options[sensorSelectElement.selectedIndex].textContent;
             console.log("Selected sensor text:", selectedSensorText);
             updateDownlinkTopic();
-            // const selectedSensorType = selectedSensorText.split('(')[1].split(')')[0].toLowerCase();
-            // console.log("Selected sensor type:", selectedSensorType);
 
-            // if (selectedSensorType.includes('water')) {
-            //     document.getElementById('waterSensorConfig').style.display = 'block';
-            //     document.getElementById('tempHumiditySensorConfig').style.display = 'none';
-            // } else if (selectedSensorType.includes('temperature') && selectedSensorType.includes('humidity')) {
-            //     document.getElementById('waterSensorConfig').style.display = 'none';
-            //     document.getElementById('tempHumiditySensorConfig').style.display = 'block';
-            // } else {
-            //     document.getElementById('waterSensorConfig').style.display = 'none';
-            //     document.getElementById('tempHumiditySensorConfig').style.display = 'none';
-            // }
         });
     }
 
@@ -160,9 +126,6 @@ function sendDownlink(event) {
     const hex_topic = document.getElementById('hex_topic');
     const hex = hex_topic.value;
 
-    // console.log(`BT - Sensor select indext: ${sensorType}`);
-    // console.log(`BT - Topic: ${topic}`);
-    // console.log(`BT - hex: ${hex}`);
     //##############################################
     // BT - Convert hex to base64 encoded
     //##############################################

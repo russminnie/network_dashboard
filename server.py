@@ -8,7 +8,7 @@ Running this file will enable you to interact with the MQTT broker and send down
 Importing the required libraries.
 """
 from flask import Flask, jsonify, request, render_template, send_file, Response, redirect, url_for,session
-import json, os, subprocess
+import json, os, subprocess, threading
 import logging
 from paho.mqtt import client as mqtt
 from datetime import datetime
@@ -139,9 +139,9 @@ def get_messages():
             # BT - Initialize formatted_time to an empty string to avoid the UnboundLocalError
             formatted_time = ''
 
-            # BT - Extract time portion if the timestamp is available and format it as hh:mm
+            # BT - Extract time portion if the current_time is available and format it as hh:mm
             if 'current_time' in m['data']:
-                message_time = m['data']['current_time']  # Assuming your timestamp is in m['data']['timestamp']
+                message_time = m['data']['current_time']  # Assuming your timestamp is in m['data']['current_time']
                 formatted_time = message_time[11:16]  # Extract the hh:mm portion
 
             # BT - Check if filter term matches topic, type, deveui, data_decoded, or time
@@ -208,13 +208,12 @@ def import_messages():
             return render_template('error.html', message='No selected file')
         if file:
             try:
-                print('BT - loading the receiving file to json format...')
                 imported_data = json.load(file)
                 if not isinstance(imported_data, list):
                     return render_template('error.html', message='Invalid JSON file')
 
                 mqtt_handler.upload_buffer = imported_data
-                print('BT - Data json: {}'.format(imported_data))
+                
                 return redirect(url_for('upload_messages'))
             except json.JSONDecodeError:
                 return render_template('error.html', message='Invalid JSON file')
@@ -412,7 +411,51 @@ def setTime():
         save_res = do_command_line('POST','save_apply','','save_apply')
         print('BT - save command: {}'.format(save_res))
         if save_res['status'] == 'success':
-            return jsonify({"message": "Successful set time and date"})
+            # https://192.168.2.42/api?fields=system,apps,nodeRed,remoteManagement,customApps,customAppsConfig,selfDiagnostic
+            # BT - Send a restart the python server? How?
+            # BT - Get app id.
+            # BT - Get app id.                                                                                               
+                                                                                                                             
+            get_app_id = do_command_line('GET','customApps')                                                                 
+            print('BT - AppManger.json: {}'.format(get_app_id))
+
+
+            # Specify the description you're looking for
+            search_description = 'Configure sensor downlinks and decode and analyze MQTT uplink packets'
+
+            # Search through the result array
+            for item in get_app_id['result']:
+                if item['description'] == search_description:
+                    _id = item['_id']
+                    print(f"Found description: {_id}")  # Output the corresponding _id value
+                    break
+            else:
+                print("Description not found")
+
+
+            # BT - Function to restart the server after a delay
+            def delayed_restart():
+                time.sleep(5)  # Delay to allow the response to complete
+                restart_app = f'app-manager --command restart --appid {_id}'
+                os.system(restart_app)
+
+            ########################################################################################
+            # BT - Start the background thread for server restart. This thread will be separate
+            #      and running in the background. It will sleep for 5 secs and then will run the
+            #      the command to restart the flask server.
+            #      The reason we do this is that, we want the server send the response back to 
+            #      notity the user that - we will restart the server in 5secs.
+            ########################################################################################
+            threading.Thread(target=delayed_restart).start()
+
+            # Return a JSON response to the client
+            return jsonify({
+                "message": "The server will restart shortly. Please log in again."
+            })
+
+            # restart_app = f'app-manager --command restart --appid {_id}'                             
+            # os.system(restart_app) 
+            # return jsonify({"message": "Successful set time and date"})
 
     return jsonify({"message": "Error! could set time and date"})
 

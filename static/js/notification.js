@@ -7,5 +7,5 @@
         // Automatically fade out the notification after 3 seconds
         setTimeout(() => {
             notificationDiv.style.display = 'none';
-        }, 3000); // Adjust time as needed
+        }, 5000); // Adjust time as needed
     }
