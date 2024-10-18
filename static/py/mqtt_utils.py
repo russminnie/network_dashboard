@@ -74,8 +74,8 @@ def on_message(client, userdata, msg):
             data['data_decoded'] = rb_data_decoded
 
 
-        # BT - Add current time to each received packets.
-        timeStamp1 = datetime.now().isoformat()
+        # Get the current system time including the timezone
+        timeStamp1 = datetime.now().astimezone().isoformat()
         print('BT - Timestamp: {}'.format(timeStamp1))
         data['current_time'] = timeStamp1
 

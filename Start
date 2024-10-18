@@ -2,11 +2,11 @@
 #
 # Start
 #
-# Script used by the app-manager program to start and stop applications. 
+# Script used by the app-manager program to start and stop applications.
 #
-# This script is a fully cusomizable template that can be used to 
-# initialize the environment for executing the application and starting 
-# all processes. This script is part of the required mPower custom 
+# This script is a fully cusomizable template that can be used to
+# initialize the environment for executing the application and starting
+# all processes. This script is part of the required mPower custom
 # application framework to start and stop an application.
 #
 # app-manager requires this script to accept the following command line
@@ -17,8 +17,8 @@
 #   restart - restart the application process(es)
 #   reload - reload the application configuration (new config downloaded)
 #
-#  Script is invoked with the 'start' option on boot and when the 
-#  `app-manager` 'start' command is run. Script is invoked with the 
+#  Script is invoked with the 'start' option on boot and when the
+#  `app-manager` 'start' command is run. Script is invoked with the
 #  'stop' option on shutdown and when the `app-manager` 'stop' command
 #  is run.
 #
@@ -27,17 +27,17 @@
 #    CONFIG_DIR - Directory containing the configuration file.
 #
 # Debugging Tips:
-#  - The `Start` file can be invoked manually from the command line using 
+#  - The `Start` file can be invoked manually from the command line using
 #  the following:
 #
 #   `$ sudo APP_DIR=$(pwd) CONFIG_DIR=$(pwd)/config ./Start start`
 #
-#  - Enable verbose output during bash processing of the `Start` script 
+#  - Enable verbose output during bash processing of the `Start` script
 #  using:
 #
 #   `set -x`
 #
-#  - Log output from `Start` script to `/var/log/messages` by using the 
+#  - Log output from `Start` script to `/var/log/messages` by using the
 #  `logger` command.
 #
 #   Logger Example:
@@ -47,7 +47,7 @@
 #    As appears in `/var/log/messages`:
 #     `-09T09:31:35.765713-05:00 mtcap3 root: [Example] DAEMON = /var/config/app/Example/example.exe`
 #
-#  - Write application to log to debug file on file system. 
+#  - Write application to log to debug file on file system.
 #     See commented 'DAEMON_DEBUG_ARGS' variable below for suggestion.
 #
 
@@ -57,7 +57,7 @@
 ################################
 
 #
-# DEBUG: uncomment to enable verbose output during shell processing of 
+# DEBUG: uncomment to enable verbose output during shell processing of
 # the `Start` script.
 #
 #set -x
@@ -72,35 +72,6 @@
 # Application name.
 #
 NAME="NetworkDashboard"
-
-# #
-# #DAEMON
-# # Fully qualified path to application executable.
-# #
-# # Examples:
-# #  Python3 - execute interpreter directly:
-# #   DAEMON="python3 ${APP_DIR}/example.py"
-# #
-# #  Compiled Executable (C, C++, etc):
-# #   DAEMON="${APP_DIR}/example"
-# #
-# DAEMON="python3 ${APP_DIR}/server.py"
-
-# #
-# #DAEMON_DEBUG_ARGS
-# #
-# # Uncomment to pass optional arguments to daemon when debugging.
-# #
-# DAEMON_DEBUG_ARGS="--logfile ${APP_DIR}/debug_log.txt"
-
-# #
-# #DAEMON_ARGS
-# # Arguments supplied to the daemon.
-# #
-# DAEMON_ARGS="--cfgfile ${CONFIG_DIR}/example.cfg.json ${DAEMON_DEBUG_ARGS}"
-
-
-
 DAEMON="/usr/bin/python3"
 # Use MultiTech Provided $APP_DIR environment variable
 DAEMON_ARGS="$APP_DIR/server.py"
@@ -140,7 +111,7 @@ function CreateAccess {
     echo "CreateAccess:"
 }
 
-# Intended to be a hook allowing the application to be executed as a non-root user. 
+# Intended to be a hook allowing the application to be executed as a non-root user.
 function ChangeUser {
     echo "ChangeUser:"
 }
@@ -148,14 +119,6 @@ function ChangeUser {
 # The nuts and bolts of starting the application process.
 function ExecuteStart {
     echo "ExecuteStart:"
-
-    # $START_STOP_DAEMON --start \
-    #                    --background \
-    #                    --make-pidfile \
-    #                    --pidfile "${PID_FILE}" \
-    #                    --chdir "${RUN_DIR}" \
-    #                    --startas "/bin/bash" \
-    #                    -- -c "exec ${DAEMON} ${DAEMON_ARGS}"
 
     $START_STOP_DAEMON --start \
                     --background \
@@ -182,7 +145,7 @@ function Stop {
 
 # Effectively stop and start the application again.
 function Restart {
-    echo "Restart:"	
+    echo "Restart:"
     Stop
     sleep 1
     Start

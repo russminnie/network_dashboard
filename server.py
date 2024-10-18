@@ -8,7 +8,7 @@ Running this file will enable you to interact with the MQTT broker and send down
 Importing the required libraries.
 """
 from flask import Flask, jsonify, request, render_template, send_file, Response, redirect, url_for,session
-import json, os, subprocess, threading, time
+import json, os, subprocess, threading, time, signal
 import logging
 from paho.mqtt import client as mqtt
 from datetime import datetime
@@ -400,21 +400,19 @@ def setTime():
 
     # BT - Step 4: Create the JSON object
     data = json.dumps({"datetime": datetime_str})
+    print('BT - Time is: {}'.format(data))
+
+    set_time_zone = do_command_line('PUT','sntp',config_time_zone)
+    print('BT - set time zone command: {}'.format(set_time_zone))   
 
     
-    res = do_command_line('PUT','system',data)
-    print('BT - set time command: {}'.format(res))
-    
-    if res['status'] == 'success':
-        set_time_zone = do_command_line('PUT','sntp',config_time_zone)
-        print('BT - set time zone command: {}'.format(set_time_zone))
+    if set_time_zone['status'] == 'success':
+        res = do_command_line('PUT','system',data)
+        print('BT - set time command: {}'.format(res))
         save_res = do_command_line('POST','save_apply','','save_apply')
         print('BT - save command: {}'.format(save_res))
         if save_res['status'] == 'success':
-            # https://192.168.2.42/api?fields=system,apps,nodeRed,remoteManagement,customApps,customAppsConfig,selfDiagnostic
-            # BT - Send a restart the python server? How?
-            # BT - Get app id.
-            # BT - Get app id.                                                                                               
+            # https://192.168.2.42/api?fields=system,apps,nodeRed,remoteManagement,customApps,customAppsConfig,selfDiagnostic                                                                                             
                                                                                                                              
             get_app_id = do_command_line('GET','customApps')                                                                 
             print('BT - AppManger.json: {}'.format(get_app_id))
@@ -436,8 +434,26 @@ def setTime():
             # BT - Function to restart the server after a delay
             def delayed_restart():
                 time.sleep(5)  # Delay to allow the response to complete
-                restart_app = f'app-manager --command restart --appid {_id}'
-                os.system(restart_app)
+                
+                
+                # Get the process ID (PID) of the current server process (this process)
+                current_pid = os.getpid()
+                print(f"BT - Current PID: {current_pid}")
+                
+                try:
+                    os.system('./Start restart')
+
+                except Exception as e:
+                    print(f"BT - Failed to restart app: {e}")
+                
+                # Find the existing process by the server.py file or by name
+                # Kill the current process gracefully
+                try:
+                    os.kill(current_pid, signal.SIGTERM)  # Send SIGTERM to terminate gracefully
+                    print(f"Terminating process with PID {current_pid}")
+                except Exception as e:
+                    print(f"Failed to terminate process: {e}")
+                
 
             ########################################################################################
             # BT - Start the background thread for server restart. This thread will be separate
@@ -452,10 +468,6 @@ def setTime():
             return jsonify({
                 "message": "The server will restart shortly. Please log in again."
             })
-
-            # restart_app = f'app-manager --command restart --appid {_id}'                             
-            # os.system(restart_app) 
-            # return jsonify({"message": "Successful set time and date"})
 
     return jsonify({"message": "Error! could set time and date"})
 
@@ -554,15 +566,12 @@ if __name__ == '__main__':
 
     STATUS_FILE = 'status.json'
 
-    # message = 'https://0.0.0.0:5000'
-
     status = {'pid': os.getpid(), 'AppInfo': clean_up_messages}
     
     # Write to the status.json with the message
     with open(STATUS_FILE, 'w') as file:
         json.dump(status, file, indent=2)
 
-    # BT - Comment out for tesing.
-    app.run(host="0.0.0.0", debug=True, port=5000, ssl_context=('certs/cert.pem', 'certs/key.pem'))
-    # BT - Uncomment for testing.
-    # app.run(host="0.0.0.0", debug=True, port=5000)
+    # BT - Debug false
+    app.run(host="0.0.0.0", debug=False, port=5000, ssl_context=('certs/cert.pem', 'certs/key.pem'))
+
