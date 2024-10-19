@@ -39,13 +39,18 @@
                 <svg xmlns="http://www.w3.org/2000/svg" height="70px" viewBox="0 -960 960 960" width="70px" fill="#000000"><path d="M268-132q-22.83 0-39.42-16.58Q212-165.17 212-188v-342.67q0-23.35 16.58-39.67 16.59-16.33 39.42-16.33h66V-670q0-61.17 42.45-103.59Q418.9-816 480.12-816q61.21 0 103.55 42.41Q626-731.17 626-670v83.33h66q22.83 0 39.42 16.33Q748-554.02 748-530.67V-188q0 22.83-16.58 39.42Q714.83-132 692-132H268Zm0-24h424q14 0 23-9t9-23v-342.67q0-14-9-23t-23-9H268q-14 0-23 9t-9 23V-188q0 14 9 23t23 9Zm212.11-150q22.22 0 37.72-15.52t15.5-37.81q0-21.67-15.61-37.5-15.61-15.84-37.83-15.84t-37.72 15.84Q426.67-381 426.67-359t15.61 37.5q15.61 15.5 37.83 15.5ZM358-586.67h244V-670q0-50.83-35.55-86.42Q530.9-792 480.12-792q-50.79 0-86.45 35.58Q358-720.83 358-670v83.33ZM236-156v-406.67V-156Z"/></svg>
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
+                <span id="togglePassword">
+                <svg xmlns="http://www.w3.org/2000/svg" id="eyeIcon" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                    <path id="eyePath" d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/>
+                </svg>
+                </span>
             </div>
                 <!-- Hidden input for the IP address -->
                 <input type="hidden" id="ipAddress" name="ipAddress" />
             <div class="form-group">
                 <button type="submit" class="submit-button">Login</button>
             </div>
-        </form>
+        </i.tform>
     </div>
 
     <script>
@@ -65,6 +70,26 @@
                 // Return the IP address or domain, or an empty string if not found
                 return match ? match[1] : '';
             }
+
+
+            // Toggle password visibility
+            const passwordInput = document.getElementById('password');
+            const togglePassword = document.getElementById('togglePassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            togglePassword.addEventListener('click', function() {
+                // Toggle the type attribute of the password input field
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                // Toggle the icon by changing the SVG path
+                if (type === 'password') {
+                    // If input is password, show the "eye" icon (visible password)
+                    eyePath.setAttribute('d', "m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z");
+                } else {
+                    // If input is text, show the "closed eye" icon (hidden password)
+                    eyePath.setAttribute('d', "M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z");
+                }
+            });
 
             // Function to handle form submission
             document.getElementById('loginForm').addEventListener('submit', function(event) {
