@@ -58,7 +58,10 @@
         // Wait for the DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
 
-            // Function to extract IP address from the URL
+            //###############################################################################
+            // BT - Function to extract IP address from the URL. This ip address is needed
+            //      for login to the gateway for authentication. 127.0.0.1 did not work.
+            //###############################################################################
             function getIpAddress() {
                 // Get the full URL
                 const url = window.location.href;

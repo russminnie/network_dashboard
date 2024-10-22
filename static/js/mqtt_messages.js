@@ -23,14 +23,27 @@ function connectToBroker(event) {
         // Prevent form submission if the event exists
         event.preventDefault();  
     }
-    const broker = document.getElementById('broker').value;
-    const port = document.getElementById('port').value;
-    const topic = document.getElementById('topic').value;
 
-    // Save the input data to localStorage
-    localStorage.setItem('broker', broker);
-    localStorage.setItem('port', port);
-    localStorage.setItem('topic', topic);
+
+    // Check if there's stored data in localStorage
+    const broker = localStorage.getItem('broker');
+    const port = localStorage.getItem('port');
+    const topic = localStorage.getItem('topic');
+
+    if (!broker && port && topic){
+
+        //BT - Get user configuration
+        broker = document.getElementById('broker').value;
+        port = document.getElementById('port').value;
+        topic = document.getElementById('topic').value;
+
+        // Save the input data to localStorage
+        localStorage.setItem('broker', broker);
+        localStorage.setItem('port', port);
+        localStorage.setItem('topic', topic);
+
+
+    }
 
     fetch('/connect', {
         method: 'POST',
@@ -68,7 +81,7 @@ function fetchMessages(filter = '') {
     let currentPath = window.location.pathname;
     let endpoint = (currentPath === '/') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-
+    console.log(`BT - currentURL: ${currentURL}`);
     /**
      * Fetch the messages from the server
      * creates a table row for each message
@@ -244,28 +257,35 @@ function dumpMessagesToJSON() {
     window.location.href = '/dump_messages';
 }
 
-
+//#############################################################
+// BT - Magic starts here.
+//#############################################################
 document.addEventListener('DOMContentLoaded', function() {
+
+    console.log(`BT - Event Listener setup in fetchMessage()`);
     // Check if there's stored data in localStorage
-    const savedBroker = localStorage.getItem('broker');
-    const savedPort = localStorage.getItem('port');
-    const savedTopic = localStorage.getItem('topic');
+    // const savedBroker = localStorage.getItem('broker');
+    // const savedPort = localStorage.getItem('port');
+    // const savedTopic = localStorage.getItem('topic');
 
-    const connectForm = document.getElementById('connectForm');
+    // const connectForm = document.getElementById('connectForm');
+    // const sensorSelected = document.getElementById('sensorSelected');
 
-    if (connectForm){
+    // if (connectForm){
 
-        // If saved data exists, populate the form inputs
-        if (savedBroker && savedPort && savedTopic) {
-            document.getElementById('broker').value = savedBroker;
-            document.getElementById('port').value = savedPort;
-            document.getElementById('topic').value = savedTopic;
+    //     // If saved data exists, populate the form inputs
+    //     if (savedBroker && savedPort && savedTopic) {
+    //         document.getElementById('broker').value = savedBroker;
+    //         document.getElementById('port').value = savedPort;
+    //         document.getElementById('topic').value = savedTopic;
 
-            // Reconnect to the MQTT server automatically
-            connectToBroker();
-        } 
+    //         // Reconnect to the MQTT server automatically
+    //         connectToBroker();
+    //     } 
 
-    }
+    // }
+
+    connectToBroker();
 
     // Close the modal when the user clicks the close button
     const closeButton = document.querySelector('.close');

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Upload MQTT Messages{% endblock %}
 
-{%block notification %}
+{% block notification %}
 <div id="notification" style="display: none; position: fixed; top: 100px; right: 20px; background-color: #f5f5f5; color: #333; padding: 10px; border-radius: 5px; z-index: 1000;">
     Disconnected from MQTT Broker!
 </div>
@@ -85,6 +85,7 @@
 {% endblock %}
 
 {% block javascript %}
+    <script src="../static/js/notification.js"></script>
     <script src="../static/js/mqtt_messages.js"></script>
     <script src="../static/js/upload_messages.js"></script>
 {% endblock %}

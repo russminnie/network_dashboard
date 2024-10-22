@@ -37,6 +37,95 @@ class MQTTHandler:
 
 mqtt_handler = MQTTHandler()
 
+
+####################################################
+# BT - Display the charts.html
+####################################################
+@app.route('/charts')
+def charts():
+    if 'username' in session:
+        ###########################
+        # BT - Get all the deveui.
+        ###########################
+        list_of_deveuis = []
+
+        for _ in range(message_buffer.qsize()):
+
+            # Get an item from the queue without removing it
+            m = message_buffer.queue[_]  # Accessing the item by index
+            
+            # Check if the 'deveui' key exists in the expected structure
+            if 'data' in m and 'deveui' in m['data']:
+                list_of_deveuis.append({
+                    'deveui': m['data']['deveui'],
+                })
+
+        # Create a set to track unique 'deveui' values
+        seen_deveuis = set()
+
+        # Create a new list to store unique entries
+        unique_bt_list = []
+
+        # Loop through the original list and filter out duplicates
+        for item in list_of_deveuis:
+            deveui = item['deveui']
+            if deveui not in seen_deveuis:
+                unique_bt_list.append(item)
+                seen_deveuis.add(deveui)
+        print('BT - list of deveui: {}'.format(unique_bt_list))
+        return render_template('charts.html', list_of_deveuis=unique_bt_list)
+    else:
+        return redirect(url_for('login')) 
+
+####################################################
+# BT - Get charts data
+####################################################
+@app.route('/getCharts', methods=['GET'])
+def getCharts():
+    if 'username' in session:
+        filter_type = request.args.get('filter', '').lower()
+        filtered_messages = []
+
+        for _ in range(message_buffer.qsize()):
+            m = message_buffer.queue[_]
+
+            # BT - Initialize formatted_time to an empty string to avoid the UnboundLocalError
+            formatted_time = ''
+
+            # BT - Extract time portion if the current_time is available and format it as hh:mm
+            if 'current_time' in m['data']:
+                message_time = m['data']['current_time']  # Assuming your timestamp is in m['data']['current_time']
+                formatted_time = message_time[11:16]  # Extract the hh:mm portion
+
+            # BT - Check if filter term matches topic, type, deveui, data_decoded, or time
+            deveui_match = (
+                m['type'] == 'json' and
+                'deveui' in m['data'] and
+                filter_type in m['data']['deveui'].lower()
+            )
+            data_decoded_match = (
+                m['type'] == 'json' and
+                'data_decoded' in m['data'] and
+                any(filter_type in str(value).lower() for key, value in m['data']['data_decoded'].items())
+            )
+
+            time_match = filter_type in formatted_time
+
+            if (filter_type in m['topic'].lower() or
+                filter_type in m['type'].lower() or
+                deveui_match or
+                data_decoded_match or
+                time_match):
+                filtered_messages.append({
+                    'topic': m['topic'],
+                    'type': m['type'],
+                    'data': m['data']
+                })
+
+        return jsonify(messages=filtered_messages)
+    else:
+        return redirect(url_for('login'))
+
 """
 Following renders the HTML pages in the templates directory.
 """
