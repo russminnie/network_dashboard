@@ -46,8 +46,8 @@ function initChart() {
             },{
                 label: 'LSNR vs Time',
                 data: lsnrValues, // Initial empty data
-                backgroundColor: 'rgba(0, 255, 0, 0.2)', // Fill color
-                borderColor: 'rgba(75, 192, 192, 1)',       // Border color
+                backgroundColor: 'rgba(255, 165, 0, 0.2)', // Fill color
+                borderColor: 'rgba(255, 165, 0, 1)',       // Border color
                 borderWidth: 1,
                 fill: false // No area under the line
             }]
