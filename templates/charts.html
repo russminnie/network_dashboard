@@ -23,12 +23,13 @@
         <button type="button" class="help-button" data-modal="sensorSelectHelp">?</button>
     </div>
 
-    {% include 'mqtt_table.html' %}
+    {% include 'chart_canvas.html' %}
 
 
 {% endblock %}
 
 {% block javascript %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../static/js/notification.js"></script>
     <script src="../static/js/display_charts.js"></script>
 {% endblock %}
