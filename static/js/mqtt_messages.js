@@ -12,63 +12,6 @@
  * - document.querySelector('.close').addEventListener('click', closeModal)
  */
 
-// /**
-//  * Function to connect to the MQTT broker
-//  * @param event - The event object
-//  * @returns {void}
-//  */
-// function connectToBroker(event) {
-
-//     if (event) {
-//         // Prevent form submission if the event exists
-//         event.preventDefault();  
-//     }
-
-
-//     // Check if there's stored data in localStorage
-//     const broker = localStorage.getItem('broker');
-//     const port = localStorage.getItem('port');
-//     const topic = localStorage.getItem('topic');
-
-//     if (!broker && port && topic){
-
-//         //BT - Get user configuration
-//         broker = document.getElementById('broker').value;
-//         port = document.getElementById('port').value;
-//         topic = document.getElementById('topic').value;
-
-//         // Save the input data to localStorage
-//         localStorage.setItem('broker', broker);
-//         localStorage.setItem('port', port);
-//         localStorage.setItem('topic', topic);
-
-
-//     }
-
-//     fetch('/connect', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({broker, port, topic})
-//     })
-//         .then(response => response.json())
-//         .then(data => {
-//             if (data.message) {
-//                 //BT - Show connected message.
-//                 showNotification(data.message)
-//                 // BT - Start fetching the messages from the server.
-//                 startFetchingMessages();
-
-//             } else {
-//                 // alert('Failed to connect to the broker');
-//                 showNotification('Failed to connect to the broker');
-//             }
-//         })
-//         .catch(error => {
-//             alert('Error: ' + error);
-//         });
-// }
 
 /**
  * Function to fetch messages from the server
@@ -221,22 +164,6 @@ function closeModal() {
     modal.style.display = 'none';
 }
 
-// /**
-//  * Function to start fetching messages every 5 seconds
-//  * @returns {void}
-//  */
-// function startFetchingMessages() {
-   
-//     const filterElement = document.getElementById('filter');
-
-//     // Check if the element with id 'filter' exists
-//     if (filterElement) {
-//         // Start fetching messages if the element exists
-//         setInterval(() => fetchMessages(filterElement.value), 5000);
-//     } else {
-//         console.log('Element with ID "filter" not found.');
-//     }
-// }
 
 /**
  * Close the modal when the user clicks outside of it
