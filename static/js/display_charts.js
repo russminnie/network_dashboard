@@ -1,66 +1,66 @@
 
-function connectToBroker(event) {
+// function connectToBroker(event) {
 
-    if (event) {
-        // Prevent form submission if the event exists
-        event.preventDefault();  
-    }
-
-
-    // Check if there's stored data in localStorage
-    const broker = localStorage.getItem('broker');
-    const port = localStorage.getItem('port');
-    const topic = localStorage.getItem('topic');
-
-    if (!broker && port && topic){
-
-        //BT - Get user configuration
-        broker = document.getElementById('broker').value;
-        port = document.getElementById('port').value;
-        topic = document.getElementById('topic').value;
-
-        // Save the input data to localStorage
-        localStorage.setItem('broker', broker);
-        localStorage.setItem('port', port);
-        localStorage.setItem('topic', topic);
+//     if (event) {
+//         // Prevent form submission if the event exists
+//         event.preventDefault();  
+//     }
 
 
-    }
+//     // Check if there's stored data in localStorage
+//     const broker = localStorage.getItem('broker');
+//     const port = localStorage.getItem('port');
+//     const topic = localStorage.getItem('topic');
 
-    fetch('/connect', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({broker, port, topic})
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                //BT - Show connected message.
-                showNotification(data.message)
-                // BT - Start fetching the messages from the server.
-                startFetchingMessages();
+//     if (!broker && port && topic){
 
-            } else {
-                // alert('Failed to connect to the broker');
-                showNotification('Failed to connect to the broker');
-            }
-        })
-        .catch(error => {
-            alert('Error: ' + error);
-        });
-}
+//         //BT - Get user configuration
+//         broker = document.getElementById('broker').value;
+//         port = document.getElementById('port').value;
+//         topic = document.getElementById('topic').value;
+
+//         // Save the input data to localStorage
+//         localStorage.setItem('broker', broker);
+//         localStorage.setItem('port', port);
+//         localStorage.setItem('topic', topic);
+
+
+//     }
+
+//     fetch('/connect', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({broker, port, topic})
+//     })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.message) {
+//                 //BT - Show connected message.
+//                 showNotification(data.message)
+//                 // BT - Start fetching the messages from the server.
+//                 startFetchingMessages();
+
+//             } else {
+//                 // alert('Failed to connect to the broker');
+//                 showNotification('Failed to connect to the broker');
+//             }
+//         })
+//         .catch(error => {
+//             alert('Error: ' + error);
+//         });
+// }
 
 // Global variables to hold the chart instance and data
 let chart;  // Will hold the Chart.js instance
 let times = []; // Global times array
 let rssiValues = []; // Global rssiValues array
 
-// Function to start fetching messages every 5 seconds
-function startFetchingMessages() {
-    setInterval(() => getData(localStorage.getItem('sensorSelected')), 5000);
-}
+// // Function to start fetching messages every 5 seconds
+// function startFetchingMessages() {
+//     setInterval(() => getData(localStorage.getItem('sensorSelected')), 5000);
+// }
 
 // When the page loads, connect to the broker and set up the chart
 document.addEventListener('DOMContentLoaded', () => {

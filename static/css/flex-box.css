@@ -137,6 +137,11 @@ header .container {
     font-size: 11px;
 }
 
+#sensorChart{
+    width: 400px;
+    height: 200px;
+}
+
 /* BT - Intership stuff */
 h1, h3, a, ul, li, label, p {
     color: #00394d;
