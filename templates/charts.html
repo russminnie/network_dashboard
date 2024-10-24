@@ -23,6 +23,14 @@
         <button type="button" class="help-button" data-modal="sensorSelectHelp">?</button>
     </div>
 
+    <div id="sensorSelectHelp" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHelpModal('sensorSelectHelp')">&times;</span>
+            <h2>Help - Select Sensor</h2>
+            <p class="modal_p">Select your deveui to see the charts</p>
+        </div>
+    </div>
+
     {% include 'chart_canvas.html' %}
 
 

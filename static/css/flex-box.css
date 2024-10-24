@@ -33,7 +33,7 @@ body{
     'header header'
     'nav section'
     ;
-    grid-template-columns: 200px 6fr;
+    grid-template-columns: 200px auto;
     grid-template-rows: 90px 1fr;
 
 }
@@ -48,6 +48,9 @@ nav{
 section{
     grid-area: section;
     margin: 20px;
+    min-width: 90%;
+    max-width: 90%;
+    width:100%;
 }
 header{
     /* background-color: steelblue; */

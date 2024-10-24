@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
+    // BT - Get all the class help-button and then click addEventListener to each buttons.
     document.querySelectorAll('.help-button').forEach(button => {
         button.addEventListener('click', (event) => {
             const modalId = event.target.getAttribute('data-modal');

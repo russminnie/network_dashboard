@@ -23,6 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // BT - Get all the class help-button and then click addEventListener to each buttons.
+    document.querySelectorAll('.help-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const modalId = event.target.getAttribute('data-modal');
+            openHelpModal(modalId);
+        });
+    });
+
     // Initialize the chart when the page loads
     initChart();
 });
@@ -136,3 +144,27 @@ function updateChart(newTimes, newRssiValues, newLsnr) {
     chart.data.datasets[1].data = newLsnr;
     chart.update(); // Refresh the chart with the new data
 }
+
+function openHelpModal(modalId) {
+    const helpModal = document.getElementById(modalId);
+    if (helpModal) {
+        helpModal.style.display = 'block';
+    }
+}
+
+function closeHelpModal(modalId) {
+    const helpModal = document.getElementById(modalId);
+    if (helpModal) {
+        helpModal.style.display = 'none';
+    }
+}
+
+// Add the existing function to close the modal when clicking outside of it
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    });
+};
