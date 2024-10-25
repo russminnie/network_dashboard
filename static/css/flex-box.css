@@ -48,10 +48,16 @@ nav{
 section{
     grid-area: section;
     margin: 20px;
-    min-width: 90%;
-    max-width: 90%;
-    width:100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
 }
+
+.chart_container{
+
+    width: 80%;
+}
+
 header{
     /* background-color: steelblue; */
     background-color: #f5f5f5;
