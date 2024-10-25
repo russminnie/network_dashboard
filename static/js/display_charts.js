@@ -1,7 +1,7 @@
 
 // Global variables to hold the chart instance and data
 let chart;  // Will hold the Chart.js instance
-let times = []; // Global times array
+let freqs = []; // Global times array
 let rssiValues = []; // Global rssiValues array
 let lsnrValues = []; // Global rssiValues array
 
@@ -42,16 +42,16 @@ function initChart() {
     chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: times, // Initial empty labels
+            labels: freqs, // Initial empty labels
             datasets: [{
-                label: 'RSSI vs Time',
+                label: 'RSSI vs Freqs',
                 data: rssiValues, // Initial empty data
                 backgroundColor: 'rgba(75, 192, 192, 0.2)', // Fill color
                 borderColor: 'rgba(75, 192, 192, 1)',       // Border color
                 borderWidth: 1,
                 fill: false // No area under the line
             },{
-                label: 'LSNR vs Time',
+                label: 'LSNR vs Freqs',
                 data: lsnrValues, // Initial empty data
                 backgroundColor: 'rgba(255, 165, 0, 0.2)', // Fill color
                 borderColor: 'rgba(255, 165, 0, 1)',       // Border color
@@ -64,7 +64,7 @@ function initChart() {
                 x: {
                     title: {
                         display: true,
-                        text: 'Timestamp' // X-axis title
+                        text: 'Frequencies' // X-axis title
                     }
                 },
                 y: {
@@ -107,25 +107,25 @@ function getData(filter = '') {
             return response.json();
         })
         .then(data => {
-            // data.messages.reverse(); // Reverse data for chronological order
+
             // Clear old data arrays
-            times = [];
+            freqs = [];
             rssiValues = [];
             lsnrValues = []; 
 
             data.messages.forEach((message) => {
-                const currentTime = message.data.current_time;
+                const currentFreq = message.data.freq;
                 const rssi = message.data.rssi;
                 const lsnr = message.data.lsnr;
 
-                if (currentTime && rssi && lsnr !== undefined) {
-                    times.push(currentTime); // Push time for X-axis
+                if (currentFreq && rssi && lsnr !== undefined) {
+                    freqs.push(currentFreq); // Push time for X-axis
                     rssiValues.push(rssi);   // Push RSSI for Y-axis
                     lsnrValues.push(lsnr);
                 }
             });
 
-            updateChart(times, rssiValues,lsnrValues); // Update the chart with new data
+            updateChart(freqs, rssiValues,lsnrValues); // Update the chart with new data
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -133,8 +133,8 @@ function getData(filter = '') {
 }
 
 // Function to update the chart with new data
-function updateChart(newTimes, newRssiValues, newLsnr) {
-    chart.data.labels = newTimes; // Update X-axis labels
+function updateChart(newFreqs, newRssiValues, newLsnr) {
+    chart.data.labels = newFreqs; // Update X-axis labels
     chart.data.datasets[0].data = newRssiValues; // Update Y-axis data
     chart.data.datasets[1].data = newLsnr;
     chart.update(); // Refresh the chart with the new data
