@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sensorSelectElement) {
         sensorSelectElement.addEventListener('change', (event) => {
             const selectedSensorText = sensorSelectElement.options[sensorSelectElement.selectedIndex].textContent;
-            console.log("Selected sensor text:", selectedSensorText);
             localStorage.setItem('sensorSelected', selectedSensorText);
             // Fetch initial data for the selected sensor
             getData(selectedSensorText);
@@ -115,7 +114,6 @@ function getData(filter = '') {
             lsnrValues = []; 
 
             data.messages.forEach((message) => {
-                console.log('BT - Process each message: ', message);
                 const currentTime = message.data.current_time;
                 const rssi = message.data.rssi;
                 const lsnr = message.data.lsnr;
