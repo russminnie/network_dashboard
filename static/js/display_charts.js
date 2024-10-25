@@ -95,7 +95,6 @@ function getData(filter = '') {
     let currentPath = window.location.pathname;
     let endpoint = (currentPath === '/charts') ? 'messages' : 'default';
     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-    console.log(`BT - currentURL: ${currentURL}`);
 
     fetch(currentURL)
         .then(response => {
@@ -105,13 +104,11 @@ function getData(filter = '') {
             if (!response.ok) {
                 throw new Error('Network response was not ok, status: ' + response.status);
             }
-            console.log(`BT - Fetching data from Python server at: ${currentURL}`);
+
             return response.json();
         })
         .then(data => {
-            data.messages.reverse(); // Reverse data for chronological order
-            console.log(`BT - Receiving data from the server: ${JSON.stringify(data.messages)}`);
-
+            // data.messages.reverse(); // Reverse data for chronological order
             // Clear old data arrays
             times = [];
             rssiValues = [];

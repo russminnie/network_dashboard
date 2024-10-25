@@ -24,7 +24,7 @@ function fetchMessages(filter = '') {
     let currentPath = window.location.pathname;
     let endpoint = (currentPath === '/') ? 'messages' : (currentPath === '/upload_messages') ? 'upload' : 'default';
     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-    console.log(`BT - currentURL: ${currentURL}`);
+ 
     /**
      * Fetch the messages from the server
      * creates a table row for each message
@@ -189,7 +189,7 @@ function dumpMessagesToJSON() {
 //#############################################################
 document.addEventListener('DOMContentLoaded', function() {
 
-    console.log(`BT - Event Listener setup in fetchMessage()`);
+
     // Check if there's stored data in localStorage
     // const savedBroker = localStorage.getItem('broker');
     // const savedPort = localStorage.getItem('port');

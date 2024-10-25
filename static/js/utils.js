@@ -8,11 +8,11 @@ function connectToBroker(event) {
 
 
     // Check if there's stored data in localStorage
-    const broker = localStorage.getItem('broker');
-    const port = localStorage.getItem('port');
-    const topic = localStorage.getItem('topic');
+    let broker = localStorage.getItem('broker');
+    let port = localStorage.getItem('port');
+    let topic = localStorage.getItem('topic');
 
-    if (!broker && port && topic){
+    if (!broker && !port && !topic){
 
         //BT - Get user configuration
         broker = document.getElementById('broker').value;
