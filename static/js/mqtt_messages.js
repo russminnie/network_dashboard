@@ -191,28 +191,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Check if there's stored data in localStorage
-    // const savedBroker = localStorage.getItem('broker');
-    // const savedPort = localStorage.getItem('port');
-    // const savedTopic = localStorage.getItem('topic');
+    const savedBroker = localStorage.getItem('broker');
+    const savedPort = localStorage.getItem('port');
+    const savedTopic = localStorage.getItem('topic');
 
-    // const connectForm = document.getElementById('connectForm');
-    // const sensorSelected = document.getElementById('sensorSelected');
+    const connectForm = document.getElementById('connectForm');
+    const sensorSelected = document.getElementById('sensorSelected');
 
-    // if (connectForm){
+    if (connectForm){
 
-    //     // If saved data exists, populate the form inputs
-    //     if (savedBroker && savedPort && savedTopic) {
-    //         document.getElementById('broker').value = savedBroker;
-    //         document.getElementById('port').value = savedPort;
-    //         document.getElementById('topic').value = savedTopic;
+        // If saved data exists, populate the form inputs
+        if (savedBroker && savedPort && savedTopic) {
+            document.getElementById('broker').value = savedBroker;
+            document.getElementById('port').value = savedPort;
+            document.getElementById('topic').value = savedTopic;
 
-    //         // Reconnect to the MQTT server automatically
-    //         connectToBroker();
-    //     } 
+            // Reconnect to the MQTT server automatically
+            connectToBroker();
+        } 
 
-    // }
+    }
 
-    connectToBroker();
+    // connectToBroker();
 
     // Close the modal when the user clicks the close button
     const closeButton = document.querySelector('.close');
