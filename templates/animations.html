@@ -1,3 +1,6 @@
+<!-- BT - This is the main page for animation. It will load an appropriate door_window.html or
+          temperature.html...etc based on the sensorSelection below.
+ -->
 {% extends "base.html" %}
 {% block title %}MQTT Messages{% endblock %}
 
@@ -8,10 +11,10 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Live Charts</h1>
+    <h1>Animations</h1>
     <div class="form-group">
         <label for="sensorSelect">Select Sensor:</label>
-        <select id="sensorSelect-charts" name="sensor_select" required>
+        <select id="sensorSelect-animations" name="sensor_select" required>
             <option value="" disabled selected>Select a sensor</option> <!-- Placeholder Option -->
             {% for message in list_of_deveuis %}
                 
@@ -26,18 +29,16 @@
         <div class="modal-content">
             <span class="close" onclick="closeHelpModal('sensorSelectHelp')">&times;</span>
             <h2>Help - Select Sensor</h2>
-            <p class="modal_p">Select your deveui to see the charts</p>
+            <p class="modal_p">Select your deveui to see the animations</p>
         </div>
     </div>
-
-    {% include 'chart_canvas.html' %}
-
+    <!-- BT - This is where different animation web page load here. -->
+    <div id="sensorContent"></div>
 
 {% endblock %}
 
 {% block javascript %}
     <script src="../static/js/utils.js"></script>
-    <script src="../static/js/chart.js"></script>
+    <script src="../static/js/animations.js"></script>
     <script src="../static/js/notification.js"></script>
-    <script src="../static/js/display_charts.js"></script>
 {% endblock %}

@@ -58,12 +58,29 @@ function startFetchingMessages() {
 
     const connectForm = document.getElementById('connectForm');
     const filterElement = document.getElementById('filter');
+    const sensorSelectChartsElement = document.getElementById('sensorSelect-charts');
+    const sensorSelectAnimationsElement = document.getElementById('sensorSelect-animations')
 
     if(connectForm && filterElement){
         setInterval(() => fetchMessages(filterElement.value), 5000);
     }
-    else{
-        setInterval(() => getData(localStorage.getItem('sensorSelected')), 5000);
+    // BT - Select charts page.
+    else if (sensorSelectChartsElement){
+        setInterval(() => getData(localStorage.getItem('sensorSelected-charts')), 5000);
+    }
+    // BT - Select 'Animation' page
+    else if (sensorSelectAnimationsElement){
+        //#################################################################################
+        // BT - This is where we must call door_window, temperature, tilt...etc.
+        //#################################################################################
+        const sensorLocalStorage = localStorage.getItem('sensorSelected-animations');
+        // BT - Using pop() to get the last element
+        const partAfterDash = sensorLocalStorage.split('-').pop().trim();
+        console.log('BT - sensorSelected-animations: ', partAfterDash);
+        if (partAfterDash === 'door_window'){
+            setInterval(() => getDoorWindowAnimation(partAfterDash), 5000);
+        }
+        
     }
     
 }

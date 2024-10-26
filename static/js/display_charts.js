@@ -11,12 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     connectToBroker();
 
     // Check for the sensorSelect element
-    const sensorSelectElement = document.getElementById('sensorSelect');
+    const sensorSelectElement = document.getElementById('sensorSelect-charts');
 
     if (sensorSelectElement) {
         sensorSelectElement.addEventListener('change', (event) => {
             const selectedSensorText = sensorSelectElement.options[sensorSelectElement.selectedIndex].textContent;
-            localStorage.setItem('sensorSelected', selectedSensorText);
+            localStorage.setItem('sensorSelected-charts', selectedSensorText);
             // Fetch initial data for the selected sensor
             getData(selectedSensorText);
         });

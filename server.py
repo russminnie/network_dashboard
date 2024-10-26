@@ -37,45 +37,199 @@ class MQTTHandler:
 
 mqtt_handler = MQTTHandler()
 
+@app.route('/animation_load_page')
+def animation_load_page():
+    if 'username' in session:
+        filter_type = request.args.get('filter', '').lower()
+        return render_template(f"{filter_type}.html")
+    else:
+        return redirect(url_for('login'))
+
+####################################################################################
+# BT - Function to get the deveui to populate the select - charts and animation.
+####################################################################################
+def getDevEui():
+
+    ###########################
+    # BT - Get all the deveui.
+    ###########################
+    list_of_deveuis = []
+    excluded_events = {'reset', 'supervisory', 'device_info', 'contact','downlink_ack'}
+
+    for _ in range(message_buffer.qsize()):
+
+        # Get an item from the queue without removing it
+        m = message_buffer.queue[_]  # Accessing the item by index
+        
+        # Check if the necessary keys exist in the expected structure
+        if 'data' in m and 'deveui' in m['data'] and 'data_decoded' in m['data']:
+            event = m['data']['data_decoded'].get('event')
+            
+            # Skip if the event is in the excluded list
+            if event in excluded_events:
+                continue
+            
+            # Append deveui and event if it passes the filter
+            deveui = m['data']['deveui']
+            list_of_deveuis.append({
+                'deveui': f"{deveui} - {event if event else 'No Event'}",  # Format deveui - event
+            })
+
+    # Create a set to track unique 'deveui' values
+    seen_deveuis = set()
+
+    # Create a new list to store unique entries
+    unique_bt_list = []
+
+    # Loop through the original list and filter out duplicates
+    for item in list_of_deveuis:
+        deveui = item['deveui']
+        if deveui not in seen_deveuis:
+            unique_bt_list.append(item)
+            seen_deveuis.add(deveui)
+
+    print('BT - list of deveui: {}'.format(unique_bt_list))
+
+    return unique_bt_list
+
+
+
+@app.route('/animations')
+def animations():
+    if 'username' in session:
+        # ###########################
+        # # BT - Get all the deveui.
+        # ###########################
+        # list_of_deveuis = []
+        # excluded_events = {'reset', 'supervisory', 'device_info', 'contact','downlink_ack'}
+
+        # for _ in range(message_buffer.qsize()):
+
+        #     # Get an item from the queue without removing it
+        #     m = message_buffer.queue[_]  # Accessing the item by index
+            
+        #     # Check if the necessary keys exist in the expected structure
+        #     if 'data' in m and 'deveui' in m['data'] and 'data_decoded' in m['data']:
+        #         event = m['data']['data_decoded'].get('event')
+                
+        #         # Skip if the event is in the excluded list
+        #         if event in excluded_events:
+        #             continue
+                
+        #         # Append deveui and event if it passes the filter
+        #         deveui = m['data']['deveui']
+        #         list_of_deveuis.append({
+        #             'deveui': f"{deveui} - {event if event else 'No Event'}",  # Format deveui - event
+        #         })
+
+        # # Create a set to track unique 'deveui' values
+        # seen_deveuis = set()
+
+        # # Create a new list to store unique entries
+        # unique_bt_list = []
+
+        # # Loop through the original list and filter out duplicates
+        # for item in list_of_deveuis:
+        #     deveui = item['deveui']
+        #     if deveui not in seen_deveuis:
+        #         unique_bt_list.append(item)
+        #         seen_deveuis.add(deveui)
+
+        # print('BT - list of deveui: {}'.format(unique_bt_list))
+
+        unique_bt_list = getDevEui()
+        return render_template('animations.html', list_of_deveuis=unique_bt_list)
+    else:
+        return redirect(url_for('login'))
+
 
 ####################################################
 # BT - Display the charts.html
 ####################################################
+
 @app.route('/charts')
 def charts():
     if 'username' in session:
-        ###########################
-        # BT - Get all the deveui.
-        ###########################
-        list_of_deveuis = []
+        # ###########################
+        # # BT - Get all the deveui.
+        # ###########################
+        # list_of_deveuis = []
+        # excluded_events = {'reset', 'supervisory', 'device_info', 'contact', 'downlink_ack'}
 
-        for _ in range(message_buffer.qsize()):
+        # for _ in range(message_buffer.qsize()):
 
-            # Get an item from the queue without removing it
-            m = message_buffer.queue[_]  # Accessing the item by index
+        #     # Get an item from the queue without removing it
+        #     m = message_buffer.queue[_]  # Accessing the item by index
             
-            # Check if the 'deveui' key exists in the expected structure
-            if 'data' in m and 'deveui' in m['data']:
-                list_of_deveuis.append({
-                    'deveui': m['data']['deveui'],
-                })
+        #     # Check if the necessary keys exist in the expected structure
+        #     if 'data' in m and 'deveui' in m['data'] and 'data_decoded' in m['data']:
+        #         event = m['data']['data_decoded'].get('event')
+                
+        #         # Skip if the event is in the excluded list
+        #         if event in excluded_events:
+        #             continue
+                
+        #         # Append deveui and event if it passes the filter
+        #         deveui = m['data']['deveui']
+        #         list_of_deveuis.append({
+        #             'deveui': f"{deveui} - {event if event else 'No Event'}",  # Format deveui - event
+        #         })
 
-        # Create a set to track unique 'deveui' values
-        seen_deveuis = set()
+        # # Create a set to track unique 'deveui' values
+        # seen_deveuis = set()
 
-        # Create a new list to store unique entries
-        unique_bt_list = []
+        # # Create a new list to store unique entries
+        # unique_bt_list = []
 
-        # Loop through the original list and filter out duplicates
-        for item in list_of_deveuis:
-            deveui = item['deveui']
-            if deveui not in seen_deveuis:
-                unique_bt_list.append(item)
-                seen_deveuis.add(deveui)
-        print('BT - list of deveui: {}'.format(unique_bt_list))
+        # # Loop through the original list and filter out duplicates
+        # for item in list_of_deveuis:
+        #     deveui = item['deveui']
+        #     if deveui not in seen_deveuis:
+        #         unique_bt_list.append(item)
+        #         seen_deveuis.add(deveui)
+        
+        # print('BT - list of deveui: {}'.format(unique_bt_list))
+        unique_bt_list = getDevEui()
         return render_template('charts.html', list_of_deveuis=unique_bt_list)
     else:
-        return redirect(url_for('login')) 
+        return redirect(url_for('login'))
+
+
+# @app.route('/charts')
+# def charts():
+#     if 'username' in session:
+#         ###########################
+#         # BT - Get all the deveui.
+#         ###########################
+#         list_of_deveuis = []
+
+#         for _ in range(message_buffer.qsize()):
+
+#             # Get an item from the queue without removing it
+#             m = message_buffer.queue[_]  # Accessing the item by index
+            
+#             # Check if the 'deveui' key exists in the expected structure
+#             if 'data' in m and 'deveui' in m['data']:
+#                 list_of_deveuis.append({
+#                     'deveui': m['data']['deveui'],
+#                 })
+
+#         # Create a set to track unique 'deveui' values
+#         seen_deveuis = set()
+
+#         # Create a new list to store unique entries
+#         unique_bt_list = []
+
+#         # Loop through the original list and filter out duplicates
+#         for item in list_of_deveuis:
+#             deveui = item['deveui']
+#             if deveui not in seen_deveuis:
+#                 unique_bt_list.append(item)
+#                 seen_deveuis.add(deveui)
+#         print('BT - list of deveui: {}'.format(unique_bt_list))
+#         return render_template('charts.html', list_of_deveuis=unique_bt_list)
+#     else:
+#         return redirect(url_for('login')) 
 
 
 """
@@ -174,34 +328,55 @@ def get_messages():
         filter_type = request.args.get('filter', '').lower()
         filtered_messages = []
 
+        # Check if the filter matches the format 'deveui - event'
+        if ' - ' in filter_type:
+            deveui_filter, event_filter = map(str.strip, filter_type.split(' - '))
+        else:
+            deveui_filter = filter_type
+            event_filter = None
+
         for _ in range(message_buffer.qsize()):
             m = message_buffer.queue[_]
 
-            # BT - Initialize formatted_time to an empty string to avoid the UnboundLocalError
+            # Initialize formatted_time to an empty string to avoid the UnboundLocalError
             formatted_time = ''
 
-            # BT - Extract time portion if the current_time is available and format it as hh:mm
+            # Extract time portion if current_time is available and format it as hh:mm
             if 'current_time' in m['data']:
-                message_time = m['data']['current_time']  # Assuming your timestamp is in m['data']['current_time']
+                message_time = m['data']['current_time']
                 formatted_time = message_time[11:16]  # Extract the hh:mm portion
 
-            # BT - Check if filter term matches topic, type, deveui, data_decoded, or time
+            # Check if deveui and event match the filter when 'deveui - event' format is used
             deveui_match = (
                 m['type'] == 'json' and
                 'deveui' in m['data'] and
-                filter_type in m['data']['deveui'].lower()
+                deveui_filter == m['data']['deveui'].lower()
+            )
+            event_match = (
+                m['type'] == 'json' and
+                'data_decoded' in m['data'] and
+                'event' in m['data']['data_decoded'] and
+                event_filter and event_filter == m['data']['data_decoded']['event'].lower()
+            )
+
+            # General matching for topic, type, deveui, data_decoded, or time
+            general_deveui_match = (
+                m['type'] == 'json' and
+                'deveui' in m['data'] and
+                deveui_filter in m['data']['deveui'].lower()
             )
             data_decoded_match = (
                 m['type'] == 'json' and
                 'data_decoded' in m['data'] and
-                any(filter_type in str(value).lower() for key, value in m['data']['data_decoded'].items())
+                any(deveui_filter in str(value).lower() for key, value in m['data']['data_decoded'].items())
             )
+            time_match = deveui_filter in formatted_time
 
-            time_match = filter_type in formatted_time
-
-            if (filter_type in m['topic'].lower() or
+            # Append to filtered messages based on the matching criteria
+            if ((deveui_match and event_match) or  # Matches 'deveui - event' format
+                filter_type in m['topic'].lower() or
                 filter_type in m['type'].lower() or
-                deveui_match or
+                general_deveui_match or
                 data_decoded_match or
                 time_match):
                 filtered_messages.append({
@@ -213,6 +388,53 @@ def get_messages():
         return jsonify(messages=filtered_messages)
     else:
         return redirect(url_for('login'))
+
+
+# @app.route('/messages', methods=['GET'])
+# def get_messages():
+#     if 'username' in session:
+#         filter_type = request.args.get('filter', '').lower()
+#         filtered_messages = []
+
+#         for _ in range(message_buffer.qsize()):
+#             m = message_buffer.queue[_]
+
+#             # BT - Initialize formatted_time to an empty string to avoid the UnboundLocalError
+#             formatted_time = ''
+
+#             # BT - Extract time portion if the current_time is available and format it as hh:mm
+#             if 'current_time' in m['data']:
+#                 message_time = m['data']['current_time']  # Assuming your timestamp is in m['data']['current_time']
+#                 formatted_time = message_time[11:16]  # Extract the hh:mm portion
+
+#             # BT - Check if filter term matches topic, type, deveui, data_decoded, or time
+#             deveui_match = (
+#                 m['type'] == 'json' and
+#                 'deveui' in m['data'] and
+#                 filter_type in m['data']['deveui'].lower()
+#             )
+#             data_decoded_match = (
+#                 m['type'] == 'json' and
+#                 'data_decoded' in m['data'] and
+#                 any(filter_type in str(value).lower() for key, value in m['data']['data_decoded'].items())
+#             )
+
+#             time_match = filter_type in formatted_time
+
+#             if (filter_type in m['topic'].lower() or
+#                 filter_type in m['type'].lower() or
+#                 deveui_match or
+#                 data_decoded_match or
+#                 time_match):
+#                 filtered_messages.append({
+#                     'topic': m['topic'],
+#                     'type': m['type'],
+#                     'data': m['data']
+#                 })
+
+#         return jsonify(messages=filtered_messages)
+#     else:
+#         return redirect(url_for('login'))
 
 """
 Following is used to dump the messages in the message buffer to a JSON file and import messages from a JSON file.
