@@ -1,0 +1,31 @@
+/* Container to center lines */
+.line-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    position: relative;
+    height: 100px;
+}
+
+/* Base line */
+.baseline {
+    width: 400px;
+    height: 20px;
+    background-color: #e0e0e0;
+    position: absolute;
+}
+
+/* Overlay line (second line) */
+.angle-line {
+    width: 350px;
+    height: 20px;
+    background-color: #DAA520;
+    position: absolute;
+    transform-origin: left center;
+    transition: transform 0.3s ease; /* Smooth transition for angle changes */
+}
+
+#tilt-text{
+    margin-top: 30px;
+}

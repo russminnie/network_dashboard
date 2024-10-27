@@ -1,0 +1,31 @@
+/* Container to center the U shape and text */
+.u-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    position: relative;
+}
+
+/* U shape styling */
+.u-shape {
+    width: 400px;
+    height: 200px;
+    border: 40px solid #e0e0e0;
+    border-top: none; /* Open the top to form a "U" */
+    border-radius: 0 0 200px 200px; /* Rounded bottom corners */
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Text in the center of the U shape */
+.center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}

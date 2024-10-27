@@ -1,0 +1,20 @@
+/* Circle styles */
+.circle {
+    width: 400px; /* Adjust the size as needed */
+    height: 400px; /* Make sure it's equal to width to keep it circular */
+    border: 20px solid #e0e0e0; /* Grey border */
+    border-radius: 50%; /* Makes the shape circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9; /* Light background color */
+    /* font-family: Arial, sans-serif; */
+    position: relative;
+}
+
+/* Text styles inside the circle */
+.data {
+    text-align: center;
+    font-size: 1.5em; /* Size of the text */
+    color: #333; /* Text color */
+}

@@ -80,7 +80,21 @@ function startFetchingMessages() {
         if (partAfterDash === 'door_window'){
             setInterval(() => getDoorWindowAnimation(partAfterDash), 5000);
         }
-        
+        else if (partAfterDash === 'air_temperature_humidity'){
+            setInterval(() => getAirTempHumidityAnimation(partAfterDash), 5000);
+        }
+        else if (partAfterDash === 'tilt'){
+            setInterval(() => getTiltAnimation(partAfterDash), 5000);
+        }
+        else if (partAfterDash === 'temperature'){
+            setInterval(() => getTemperatureAnimation(partAfterDash), 5000);
+        }
+        else if (partAfterDash === 'water'){
+            setInterval(() => getWetAndDryAnimation(partAfterDash), 5000);
+        }
+        else if (partAfterDash === 'push_button'){
+            setInterval(() => getPushButtonAnimation(partAfterDash), 5000);
+        }  
     }
     
 }
