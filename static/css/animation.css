@@ -1,4 +1,4 @@
-/* Circle styles */
+
 .circle {
     width: 300px; /* Adjust the size as needed */
     height: 300px; /* Make sure it's equal to width to keep it circular */
@@ -16,5 +16,23 @@
 .data {
     text-align: center;
     font-size: 24px; /* Size of the text */
-    color: #333; /* Text color */
+    color: #00394d; /* Text color */
+}
+
+.circle-text {
+    margin-top: 40px;
+    font-size: 24px;
+    color: #00394d;
+}
+
+#temp-celsius{
+    margin-bottom: 10px;
+}
+
+#air-temp-humidity-celsius{
+    margin-bottom: 10px;
+}
+
+#air-temp-humidity-fharenheit{
+    margin-bottom: 10px;
 }

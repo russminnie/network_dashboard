@@ -40,8 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function loadSensorContent(selectedSensorText) {
     const sensorContentDiv = document.getElementById('sensorContent');
 
-    console.log('BT - loadSensorContent - selection to load web page: ', selectedSensorText);
-
     // BT - Using pop() to get the last element
     const partAfterDash = selectedSensorText.split('-').pop().trim(); 
 
@@ -61,7 +59,6 @@ function loadSensorContent(selectedSensorText) {
             return response.text();
         })
         .then(html => {
-            console.log('BT - Got html from server: ', html);
             sensorContentDiv.innerHTML = html; // Load the HTML content
         })
         .catch(error => {
@@ -146,7 +143,6 @@ let lastTimestampDoor = { value: null };
 
 function getDoorWindowAnimation(filter = '') {
     const url = getEndpointURL(filter);
-    console.log('Fetching Door Window data from:', url);
 
     // BT - Step1: We pass in a function to fetchData.
     fetchData(url, data => {
@@ -168,7 +164,6 @@ let lastTimestampAir = { value: null };
 
 function getAirTempHumidityAnimation(filter = '') {
     const url = getEndpointURL(filter);
-    console.log('Fetching Air Temp & Humidity data from:', url);
 
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampAir, decodedData => {
@@ -200,7 +195,6 @@ let lastTimestampTilt = { value: null };
 
 function getTiltAnimation(filter = '') {
     const url = getEndpointURL(filter);
-    console.log('Fetching Tilt data from:', url);
 
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampTilt, decodedData => {
@@ -210,7 +204,7 @@ function getTiltAnimation(filter = '') {
 }
 
 function updateAngle(degrees) {
-    document.getElementById('tilt-text').textContent = `${degrees} °`;
+    document.getElementById('tilt-text').textContent = `Angle tilted: ${degrees} °`;
 }
 
 //#####################################################################
@@ -221,7 +215,6 @@ let lastTimestampTemp = { value: null };
 
 function getTemperatureAnimation(filter = '') {
     const url = getEndpointURL(filter);
-    console.log('Fetching Temperature data from:', url);
 
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampTemp, decodedData => {
@@ -248,7 +241,6 @@ let lastTimestampWetDry = { value: null };
 
 function getWetAndDryAnimation(filter = '') {
     const url = getEndpointURL(filter);
-    console.log('Fetching Wet/Dry data from:', url);
 
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampWetDry, decodedData => {
@@ -269,7 +261,6 @@ let lastTimestampPush = { value: null };
 
 function getPushButtonAnimation(filter = '') {
     const url = getEndpointURL(filter);
-    console.log('Fetching Push Button data from:', url);
 
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampPush, decodedData => {
@@ -282,400 +273,6 @@ function updatePushButtonCenterText(state) {
     document.getElementById('push-button-text').textContent = state;
 }
 
-
-
-// //#####################################################################
-// // BT - Function to fetch data with /messages?filter='event_type'
-// // event_type: push_button, titl, door_windows...etc.
-// // Then process these data and run the animation part.
-// //#####################################################################
-
-
-// //#####################################################################
-// // BT - Door
-// //#####################################################################
-
-// // Track last processed timestamp
-// let lastTimestamp = null;
-
-// function getDoorWindowAnimation(filter = '') {
-
-//     // const filter = localStorage.getItem('sensorSelected-animations');
-
-//     let currentPath = window.location.pathname;
-//     let endpoint = (currentPath === '/animations') ? 'messages' : 'default';
-//     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-
-//     console.log('BT - in getDoorWindowAnimation - current URL: ', currentURL);
-
-//     fetch(currentURL)
-//         .then(response => {
-//             if (response.status === 404) return {}; // Handle 404 error
-//             if (!response.ok) throw new Error('Network response was not ok, status: ' + response.status);
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('BT - in getEventForDataAnimation - Data received from the python server: ', data.messages);
-
-//             // BT - Process each message
-//             data.messages.forEach(message => {
-//                 // BT - Check to make sure the message has data_decoded['state']
-//                 if (message.data && message.data.data_decoded && message.data.data_decoded.state) {
-//                     // BT - Read the state.
-//                     const currentState = message.data.data_decoded.state;
-//                     // BT - Convert time to milli for easy to comparing.
-//                     const timestamp = new Date(message.data.current_time).getTime();
-//                     console.log('BT - last timestamp befor if', lastTimestamp);
-//                     console.log('BT - timestamp before if: ', timestamp);
-//                     // BT - Only process if timestamp is new
-//                     if (timestamp >= lastTimestamp) {
-//                         // BT - Store the last time stamp. This is for comparing with the new
-//                         //      message with a newer time stamp.
-//                         lastTimestamp = timestamp;
-//                         console.log('BT - last timestamp in if: ', lastTimestamp);
-//                         console.log("Current State:", currentState);
-//                         // BT - Toggle the door.
-//                         toggleDoorState(currentState);
-//                     } else {
-//                         console.log("Old data, skipping toggle.");
-//                     }
-//                 }//if
-
-
-
-//             });//data.message
-//         })//data
-//         .catch(error => {
-//             console.error('Error fetching data:', error);
-//         });
-// }
-
-
-// // Function to update the center text with custom info
-// function updateDoorText(newText) {
-//     document.getElementById('door-text').textContent = newText;
-// }
-
-// function toggleDoorState(currentState) {
-
-//     updateDoorText(currentState);
-
-// }
-
-// //#####################################################################
-// // BT - air_temperature_humidity
-// //#####################################################################
-
-// function updateTemperatureC(temperature) {
-//     document.getElementById("celsius").textContent = `${temperature}°C`;
-// }
-
-// function updateTemperatureF(celsius) {
-
-//     const temperatureF = ((celsius * 1.8) + 32).toFixed(1);
-//     document.getElementById("fharenheit").textContent = `${temperatureF}°F`;
-
-// }
-
-// function updateHumidity(humidity) {
-//     document.getElementById("humidity").textContent = `${humidity}% Humidity`;
-// }
-
-// // Track last processed timestamp
-// let lastTimestampAir = null;
-
-// function getAirTempHumidityAnimation(filter = '') {
-
-//     let currentPath = window.location.pathname;
-//     let endpoint = (currentPath === '/animations') ? 'messages' : 'default';
-//     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-
-//     console.log('BT - in getAirTempHumidityAnimation - current URL: ', currentURL);
-
-//     fetch(currentURL)
-//         .then(response => {
-//             if (response.status === 404) return {}; // Handle 404 error
-//             if (!response.ok) throw new Error('Network response was not ok, status: ' + response.status);
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('BT - in getEventForDataAnimation - Data received from the python server: ', data.messages);
-
-//             // BT - Process each message
-//             data.messages.forEach(message => {
-//                 // BT - Check to make sure the message has data_decoded['state']
-//                 if (message.data && message.data.data_decoded) {
-//                     // BT - Read the state.
-//                     const temperature = message.data.data_decoded.temperature;
-//                     const humidity = message.data.data_decoded.humidity;
-//                     // BT - Convert time to milli for easy to comparing.
-//                     const timestamp = new Date(message.data.current_time).getTime();
-//                     // BT - Only process if timestamp is new
-//                     if (timestamp >= lastTimestampAir) {
-//                         // BT - Store the last time stamp. This is for comparing with the new
-//                         //      message with a newer time stamp.
-//                         lastTimestampAir = timestamp;
-//                         console.log('BT - temperature: ', temperature);
-//                         console.log("BT - Humidity:", humidity);
-//                         // BT - Update Temperature
-//                         updateTemperatureC(temperature);
-//                         updateTemperatureF(temperature);
-//                         updateHumidity(humidity);
-//                     } else {
-//                         console.log("Old data, skipping toggle.");
-//                     }
-//                 }//if
-
-//             });//data.message
-//         })//data
-//         .catch(error => {
-//             console.error('Error fetching data:', error);
-//         });
-// }
-
-// //#####################################################################
-// // BT - tilt
-// //#####################################################################
-
-// // Function to adjust the angle of the overlay line based on new data
-// function updateAngle(degrees) {
-//     // const angleLine = document.getElementById('angleLine');
-//     const updateText = document.getElementById('tilt-text');
-//     // angleLine.style.transform = `rotate(${degrees}deg)`;
-//     updateText.textContent = `${degrees} °`;
-// }
-
-// // Track last processed timestamp
-// let lastTimestampTilt = null;
-
-// function getTiltAnimation(filter = '') {
-
-//     let currentPath = window.location.pathname;
-//     let endpoint = (currentPath === '/animations') ? 'messages' : 'default';
-//     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-
-//     console.log('BT - in getAirTempHumidityAnimation - current URL: ', currentURL);
-
-//     fetch(currentURL)
-//         .then(response => {
-//             if (response.status === 404) return {}; // Handle 404 error
-//             if (!response.ok) throw new Error('Network response was not ok, status: ' + response.status);
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('BT - in getEventForDataAnimation - Data received from the python server: ', data.messages);
-
-//             // BT - Process each message
-//             data.messages.forEach(message => {
-//                 // BT - Check to make sure the message has data_decoded['state']
-//                 if (message.data && message.data.data_decoded) {
-//                     // BT - Read the state.
-//                     const angle = message.data.data_decoded.tilt_angle;
-
-//                     // BT - Convert time to milli for easy to comparing.
-//                     const timestamp = new Date(message.data.current_time).getTime();
-//                     // BT - Only process if timestamp is new
-//                     if (timestamp >= lastTimestampTilt) {
-//                         // BT - Store the last time stamp. This is for comparing with the new
-//                         //      message with a newer time stamp.
-//                         lastTimestampTilt = timestamp;
-//                         console.log('BT - angle: ', angle);
-
-//                         // BT - Update angle
-//                         updateAngle(angle);
-
-//                     } else {
-//                         console.log("Old data, skipping toggle.");
-//                     }
-//                 }//if
-
-//             });//data.message
-//         })//data
-//         .catch(error => {
-//             console.error('Error fetching data:', error);
-//         });
-// }
-
-// //#####################################################################
-// // BT - Temperature.
-// //#####################################################################
-
-// function updateTempTemperatureC(temperature) {
-//     document.getElementById("celsius").textContent = `${temperature}°C`;
-// }
-
-// function updateTempTemperatureF(celsius) {
-
-//     const temperatureF = ((celsius * 1.8) + 32).toFixed(1);
-//     document.getElementById("fharenheit").textContent = `${temperatureF}°F`;
-
-// }
-
-// // Track last processed timestamp
-// let lastTimestampTemp = null;
-
-// function getTemperatureAnimation(filter = '') {
-
-//     let currentPath = window.location.pathname;
-//     let endpoint = (currentPath === '/animations') ? 'messages' : 'default';
-//     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-
-//     console.log('BT - in getTemperatureAnimation - current URL: ', currentURL);
-
-//     fetch(currentURL)
-//         .then(response => {
-//             if (response.status === 404) return {}; // Handle 404 error
-//             if (!response.ok) throw new Error('Network response was not ok, status: ' + response.status);
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('BT - in getEventForDataAnimation - Data received from the python server: ', data.messages);
-
-//             // BT - Process each message
-//             data.messages.forEach(message => {
-//                 // BT - Check to make sure the message has data_decoded['state']
-//                 if (message.data && message.data.data_decoded) {
-//                     // BT - Read the state.
-//                     const temperature = message.data.data_decoded.temperature;
-//                     // BT - Convert time to milli for easy to comparing.
-//                     const timestamp = new Date(message.data.current_time).getTime();
-//                     // BT - Only process if timestamp is new
-//                     if (timestamp >= lastTimestampTemp) {
-//                         // BT - Store the last time stamp. This is for comparing with the new
-//                         //      message with a newer time stamp.
-//                         lastTimestampTemp = timestamp;
-//                         console.log('BT - temperature: ', temperature);
-//                         // BT - Update Temperature
-//                         updateTempTemperatureC(temperature);
-//                         updateTempTemperatureF(temperature);
-
-//                     } else {
-//                         console.log("Old data, skipping toggle.");
-//                     }
-//                 }//if
-
-//             });//data.message
-//         })//data
-//         .catch(error => {
-//             console.error('Error fetching data:', error);
-//         });
-// }
-
-// //#####################################################################
-// // BT - Wet and Dry.
-// //#####################################################################
-
-// // Function to update the center text with custom info
-// function updateWetAndDryCenterText(newText) {
-//     document.getElementById('center-text').textContent = newText;
-// }
-
-// // Track last processed timestamp
-// let lastTimestampWetDry = null;
-
-// function getWetAndDryAnimation(filter = '') {
-
-//     let currentPath = window.location.pathname;
-//     let endpoint = (currentPath === '/animations') ? 'messages' : 'default';
-//     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-
-//     console.log('BT - in getTemperatureAnimation - current URL: ', currentURL);
-
-//     fetch(currentURL)
-//         .then(response => {
-//             if (response.status === 404) return {}; // Handle 404 error
-//             if (!response.ok) throw new Error('Network response was not ok, status: ' + response.status);
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('BT - in getEventForDataAnimation - Data received from the python server: ', data.messages);
-
-//             // BT - Process each message
-//             data.messages.forEach(message => {
-//                 // BT - Check to make sure the message has data_decoded['state']
-//                 if (message.data && message.data.data_decoded) {
-//                     // BT - Read the state.
-//                     const state = message.data.data_decoded.state;
-//                     // BT - Convert time to milli for easy to comparing.
-//                     const timestamp = new Date(message.data.current_time).getTime();
-//                     // BT - Only process if timestamp is new
-//                     if (timestamp >= lastTimestampWetDry) {
-//                         // BT - Store the last time stamp. This is for comparing with the new
-//                         //      message with a newer time stamp.
-//                         lastTimestampWetDry = timestamp;
-//                         console.log('BT - state: ', state);
-//                         // BT - Update state
-//                         updateWetAndDryCenterText(state);
-
-//                     } else {
-//                         console.log("Old data, skipping toggle.");
-//                     }
-//                 }//if
-
-//             });//data.message
-//         })//data
-//         .catch(error => {
-//             console.error('Error fetching data:', error);
-//         });
-// }
-
-// //#####################################################################
-// // BT - Push Button.
-// //#####################################################################
-
-// // Function to update the center text with custom info
-// function updatePushButtonCenterText(newText) {
-//     document.getElementById('push-button-text').textContent = newText;
-// }
-
-// // Track last processed timestamp
-// let lastTimestampPush = null;
-
-// function getPushButtonAnimation(filter = '') {
-
-//     let currentPath = window.location.pathname;
-//     let endpoint = (currentPath === '/animations') ? 'messages' : 'default';
-//     let currentURL = `${window.location.origin}/${endpoint}?filter=${filter}`;
-
-//     console.log('BT - in getPushButtonAnimation - current URL: ', currentURL);
-
-//     fetch(currentURL)
-//         .then(response => {
-//             if (response.status === 404) return {}; // Handle 404 error
-//             if (!response.ok) throw new Error('Network response was not ok, status: ' + response.status);
-//             return response.json();
-//         })
-//         .then(data => {
-//             console.log('BT - in getEventForDataAnimation - Data received from the python server: ', data.messages);
-
-//             // BT - Process each message
-//             data.messages.forEach(message => {
-//                 // BT - Check to make sure the message has data_decoded['state']
-//                 if (message.data && message.data.data_decoded) {
-//                     // BT - Read the state.
-//                     const state = message.data.data_decoded.button_state;
-//                     // BT - Convert time to milli for easy to comparing.
-//                     const timestamp = new Date(message.data.current_time).getTime();
-//                     // BT - Only process if timestamp is new
-//                     if (timestamp >= lastTimestampWetDry) {
-//                         // BT - Store the last time stamp. This is for comparing with the new
-//                         //      message with a newer time stamp.
-//                         lastTimestampWetDry = timestamp;
-//                         console.log('BT - state: ', state);
-//                         // BT - Update state
-//                         updatePushButtonCenterText(state);
-
-//                     } else {
-//                         console.log("Old data, skipping toggle.");
-//                     }
-//                 }//if
-
-//             });//data.message
-//         })//data
-//         .catch(error => {
-//             console.error('Error fetching data:', error);
-//         });
-// }
 
 
 

@@ -76,7 +76,7 @@ function startFetchingMessages() {
         const sensorLocalStorage = localStorage.getItem('sensorSelected-animations');
         // BT - Using pop() to get the last element
         const partAfterDash = sensorLocalStorage.split('-').pop().trim();
-        console.log('BT - sensorSelected-animations: ', partAfterDash);
+
         if (partAfterDash === 'door_window'){
             setInterval(() => getDoorWindowAnimation(partAfterDash), 5000);
         }
