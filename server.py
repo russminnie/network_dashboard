@@ -54,7 +54,7 @@ def getDevEui():
     # BT - Get all the deveui.
     ###########################
     list_of_deveuis = []
-    excluded_events = {'reset', 'supervisory', 'device_info', 'contact','downlink_ack'}
+    excluded_events = {'reset', 'supervisory', 'device_info', 'contact','downlink_ack','link_quality'}
 
     for _ in range(message_buffer.qsize()):
 
