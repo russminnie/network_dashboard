@@ -210,9 +210,15 @@ function updateDownlinkTopic() {
     // Get the selected option value
     const selectedSensor = document.getElementById('sensorSelect').value;
 
+    // BT - We need to extract the DevEUI from the selected sensor value.
+
+    const onlyDeveui = selectedSensor.match(/^([a-fA-F0-9]{2}-){7}[a-fA-F0-9]{2}/);
+
+    console.log("In updateDownlinkTopic - Selected sensor:", onlyDeveui[0]);
+
     // Update the input field with the selected sensor's downlink topic
     const downlinkInput = document.getElementById('downlink_topic');
-    downlinkInput.value = `lora/${selectedSensor}/down`;
+    downlinkInput.value = `lora/${onlyDeveui[0]}/down`;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
