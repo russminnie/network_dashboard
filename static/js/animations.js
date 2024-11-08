@@ -192,12 +192,12 @@ function updateTemperatureC(temp) {
     // Change border color based on temperature
     if (temp > highTempThreshold) {
         // BT - Red
-        circle.style.borderColor = '#f76262'; // High temperature
+        circle.style.borderColor = '#f63b3b'; // High temperature
     } else if (temp < lowTempThreshold) {
         // BT - Blue
         circle.style.borderColor = '#3a3afa'; // Low temperature
     } else {
-        // BT - Green
+        // BT - Gray
         circle.style.borderColor = '#e0e0e0'; // Default temperature
     }
 }
@@ -239,7 +239,7 @@ function updateAngle(degrees) {
     
     // Change border color based on angle
     if (degrees > highAngleThreshold) {
-        circle.style.borderColor = 'orange'; // High angle
+        circle.style.borderColor = '#f3ca58'; // High angle
     } else {
         circle.style.borderColor = '#e0e0e0'; // Default angle
     }
@@ -279,12 +279,12 @@ function updateTempTemperatureC(temp) {
         // Change border color based on temperature
         if (temp > highTempThreshold) {
             // BT - Red
-            circle.style.borderColor = '#f76262'; // High temperature
+            circle.style.borderColor = '#f63b3b'; // High temperature
         } else if (temp < lowTempThreshold) {
             // BT - Blue
             circle.style.borderColor = '#3a3afa'; // Low temperature
         } else {
-            // BT - Green
+            // BT - Gray
             circle.style.borderColor = '#e0e0e0'; // Default temperature
         }
 }
