@@ -36,3 +36,22 @@
 #air-temp-humidity-fharenheit{
     margin-bottom: 10px;
 }
+
+/* Colors for various states */
+/* BT - Grey for normal */
+.circle-state-normal {
+    border: 20px solid #e0e0e0;
+}
+/* BT - orange for active */
+.circle-state-active {
+    border: 20px solid #f3ca58; /* Light blue for active states */
+}
+
+.circle-state-standby {
+    border: 20px solid #8bf794; 
+}
+/* BT - Red for alert */
+.circle-state-alert {
+    border: 20px solid#f76262;
+}
+

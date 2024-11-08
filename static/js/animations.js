@@ -148,6 +148,7 @@ function getDoorWindowAnimation(filter = '') {
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampDoor, decodedData => {
             toggleDoorState(decodedData.state);
+            changeCircleColor(decodedData.state);
         });
     });
 }
@@ -170,12 +171,35 @@ function getAirTempHumidityAnimation(filter = '') {
             updateTemperatureC(decodedData.temperature);
             updateTemperatureF(decodedData.temperature);
             updateHumidity(decodedData.humidity);
+            changeCircleColor('standby');
         });
     });
 }
 
 function updateTemperatureC(temp) {
     document.getElementById("air-temp-humidity-celsius").textContent = `${temp}°C`;
+
+    // Get the current temperature element
+    const tempElement = document.querySelector('.data');
+
+    // Get the circle element
+    const circle = tempElement.closest('.circle');
+
+    // Define temperature thresholds for color changes
+    const highTempThreshold = 30; // Adjust this value as needed
+    const lowTempThreshold = 10; // Adjust this value as needed
+    
+    // Change border color based on temperature
+    if (temp > highTempThreshold) {
+        // BT - Red
+        circle.style.borderColor = '#f76262'; // High temperature
+    } else if (temp < lowTempThreshold) {
+        // BT - Blue
+        circle.style.borderColor = '#3a3afa'; // Low temperature
+    } else {
+        // BT - Green
+        circle.style.borderColor = '#e0e0e0'; // Default temperature
+    }
 }
 
 function updateTemperatureF(celsius) {
@@ -199,12 +223,27 @@ function getTiltAnimation(filter = '') {
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampTilt, decodedData => {
             updateAngle(decodedData.tilt_angle);
+            // changeCircleColor('standby');
         });
     });
 }
 
 function updateAngle(degrees) {
     document.getElementById('tilt-text').textContent = `Angle tilted: ${degrees} °`;
+
+    // Define angle threshold for color change
+    const highAngleThreshold = 10; // Adjust this value as needed
+
+    // Get the circle element
+    const circle = document.querySelector('.circle');
+    
+    // Change border color based on angle
+    if (degrees > highAngleThreshold) {
+        circle.style.borderColor = 'orange'; // High angle
+    } else {
+        circle.style.borderColor = '#e0e0e0'; // Default angle
+    }
+    
 }
 
 //#####################################################################
@@ -220,12 +259,34 @@ function getTemperatureAnimation(filter = '') {
         processMessageData(data.messages, lastTimestampTemp, decodedData => {
             updateTempTemperatureC(decodedData.temperature);
             updateTempTemperatureF(decodedData.temperature);
+            // changeCircleColor('standby');
         });
     });
 }
 
 function updateTempTemperatureC(temp) {
     document.getElementById("temp-celsius").textContent = `${temp}°C`;
+        // Get the current temperature element
+        const tempElement = document.querySelector('.data');
+    
+        // Get the circle element
+        const circle = tempElement.closest('.circle');
+        
+        // Define temperature thresholds for color changes
+        const highTempThreshold = 30; // Adjust this value as needed
+        const lowTempThreshold = 10; // Adjust this value as needed
+        
+        // Change border color based on temperature
+        if (temp > highTempThreshold) {
+            // BT - Red
+            circle.style.borderColor = '#f76262'; // High temperature
+        } else if (temp < lowTempThreshold) {
+            // BT - Blue
+            circle.style.borderColor = '#3a3afa'; // Low temperature
+        } else {
+            // BT - Green
+            circle.style.borderColor = '#e0e0e0'; // Default temperature
+        }
 }
 
 function updateTempTemperatureF(celsius) {
@@ -245,6 +306,7 @@ function getWetAndDryAnimation(filter = '') {
     fetchData(url, data => {
         processMessageData(data.messages, lastTimestampWetDry, decodedData => {
             updateWetAndDryCenterText(decodedData.state);
+            changeCircleColor(decodedData.state);
         });
     });
 }
@@ -271,6 +333,41 @@ function getPushButtonAnimation(filter = '') {
 
 function updatePushButtonCenterText(state) {
     document.getElementById('push-button-text').textContent = state;
+    changeCircleColor(state);
+}
+
+// Function to change background color based on state
+function changeCircleColor(state) {
+    const circle = document.querySelector('.circle');
+    
+    // Clear previous state classes
+    circle.classList.remove('circle-state-normal', 'circle-state-alert', 'circle-state-active', 'circle-state-standby');
+    
+    // Set background color based on state
+    switch(state) {
+        case 'open':
+        case 'pressed':
+            circle.classList.add('circle-state-active');
+            break;
+        case 'closed':
+        case 'released':
+            circle.classList.add('circle-state-normal');
+            break;
+        case 'held':
+            circle.classList.add('circle-state-alert');
+            break;
+        case 'wet':
+        case 'alert':
+            circle.classList.add('circle-state-alert');
+            break;
+        case 'dry':
+        case 'standby':
+            circle.classList.add('circle-state-normal');
+            break;
+        default:
+            circle.classList.add('circle-state-normal');
+            break;
+    }
 }
 
 
