@@ -44,7 +44,7 @@
 }
 /* BT - orange for active */
 .circle-state-active {
-    border: 20px solid #f3ca58; /* Light blue for active states */
+    border: 20px solid #dda610; /* Light blue for active states */
 }
 
 .circle-state-standby {
@@ -52,6 +52,6 @@
 }
 /* BT - Red for alert */
 .circle-state-alert {
-    border: 20px solid#f63b3b;
+    border: 20px solid #d81717;
 }
 

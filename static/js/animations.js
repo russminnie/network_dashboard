@@ -192,7 +192,7 @@ function updateTemperatureC(temp) {
     // Change border color based on temperature
     if (temp > highTempThreshold) {
         // BT - Red
-        circle.style.borderColor = '#f63b3b'; // High temperature
+        circle.style.borderColor = '#d81717'; // High temperature
     } else if (temp < lowTempThreshold) {
         // BT - Blue
         circle.style.borderColor = '#3a3afa'; // Low temperature
@@ -239,7 +239,7 @@ function updateAngle(degrees) {
     
     // Change border color based on angle
     if (degrees > highAngleThreshold) {
-        circle.style.borderColor = '#f3ca58'; // High angle
+        circle.style.borderColor = '#dda610'; // High angle
     } else {
         circle.style.borderColor = '#e0e0e0'; // Default angle
     }
@@ -279,7 +279,7 @@ function updateTempTemperatureC(temp) {
         // Change border color based on temperature
         if (temp > highTempThreshold) {
             // BT - Red
-            circle.style.borderColor = '#f63b3b'; // High temperature
+            circle.style.borderColor = '#d81717'; // High temperature
         } else if (temp < lowTempThreshold) {
             // BT - Blue
             circle.style.borderColor = '#3a3afa'; // Low temperature
