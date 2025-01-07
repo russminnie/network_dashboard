@@ -42,7 +42,6 @@ function install_packages {
         fi
         logger -t Install "Command [$PKGCMD] succeeded"
     done
-
     
 }
 
@@ -61,7 +60,7 @@ function post_install {
                 "dstAddr": "ANY",
                 "dstInterface": "ANY",
                 "dstMask": "",
-                "dstPort": "5000:5000",
+                "dstPort": "5000",
                 "dstSpecInterface": "",
                 "enabled": true,
                 "name": "multitech_http_5000",
@@ -168,8 +167,16 @@ case "$1" in
   install)
       echo -n "Installing dependencies: "
       logger -t Install "Installing Dependencies: "
-      install_packages
-      echo "$NAME."
+      # Check the OS version
+      OS_VERSION=$(cat /etc/issue | grep -o 'mLinux 7.0.1')
+      if [ "$OS_VERSION" != "mLinux 7.0.1" ]; then
+        logger -t Install "installing packages for mpower-6.x.x"
+        install_packages
+        echo "$NAME."
+      else
+        logger -t Install "Skip installing packages for mpower-7.x.x"
+      fi
+      
       ;;
   remove)
       echo -n "Removing Dependencies: "
