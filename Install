@@ -1,49 +1,10 @@
 #!/bin/bash
 
-OPKG_CMD_PREFIX="opkg install --force-depends ./provisioning/"
+OPKG_CMD_PREFIX="opkg install --force-depends "
 OPKG_CMD_PREFIX_R="opkg remove --force-depends "
 MANIFEST="./provisioning/p_manifest.json"
 NAME="Install"
 
-#
-# This function is called via the install argument.  It is invoked by the
-# app-manager process during the install of a custom app.  It reads the
-# p_manifest.json file in the provisioning directory of the application,
-# and executes an "opkg install" on each package file listed in the p_manifest.
-#
-function install_packages {
-    if [ ! -f "$MANIFEST" ]; then
-        return
-    fi
-    JSONTXT=$(<./provisioning/p_manifest.json)
-    PKGCNT=$(echo $JSONTXT | jsparser --count -p /pkgs)
-
-    RETURNCODE=$?
-    if [ $RETURNCODE -ne 0 ]; then
-      echo "Failed to parse p_manifest.json as json"
-      exit $RETURNCODE
-    fi
-
-    for ((i=0; i < PKGCNT; i++))
-    do
-        PKG=$(echo $JSONTXT | jsparser --jsobj -p /pkgs/$i)
-        PKGNM=$(echo $PKG | jsparser -p /FileName)
-        PKGTYPE=$(echo $PKG | jsparser -p /type)
-
-        if [ "$PKGTYPE" == "ipk" ]; then
-            PKGCMD=$OPKG_CMD_PREFIX$PKGNM
-            echo "Executing: $PKGCMD"
-            eval $PKGCMD
-            if [ $? != 0 ]; then
-                echo "Command [$PKGCMD] failed with status $?"
-                logger -t Install "Command [$PKGCMD] failed with status $?"
-                exit $?
-            fi
-        fi
-        logger -t Install "Command [$PKGCMD] succeeded"
-    done
-    
-}
 
 #
 # The Install script is invoked with the postinstall argument by the app-manager
@@ -80,7 +41,7 @@ function post_install {
                 "dstAddr": "ANY",
                 "dstInterface": "ANY",
                 "dstMask": "",
-                "dstPort": "1883:1883",
+                "dstPort": "1883",
                 "dstSpecInterface": "",
                 "enabled": true,
                 "name": "multitech_mqtt_1883",
@@ -116,11 +77,14 @@ function post_install {
 # on each package listed in the p_manifest.json.
 #
 function remove_packages {
+    local DIR=$1
+    local MANIFEST="./provisioning/$DIR/p_manifest.json"
+    
     if [ ! -f "$MANIFEST" ]; then
-        echo "provisioning manifest file not found"
         return
     fi
-    JSONTXT=$(<./provisioning/p_manifest.json)
+    # JSONTXT=$(<./provisioning/p_manifest.json)
+    JSONTXT=$(<"$MANIFEST")
     PKGCNT=$(echo $JSONTXT | jsparser --count -p /pkgs)
 
     RETURNCODE=$?
@@ -149,6 +113,43 @@ function remove_packages {
     done
 }
 
+function install_packages {
+    local DIR=$1
+    local MANIFEST="./provisioning/$DIR/p_manifest.json"
+    
+    if [ ! -f "$MANIFEST" ]; then
+        return
+    fi
+    JSONTXT=$(<"$MANIFEST")
+    PKGCNT=$(echo $JSONTXT | jsparser --count -p /pkgs)
+    logger -t Install "PKGCNT: $PKGCNT"
+
+    RETURNCODE=$?
+    if [ $RETURNCODE -ne 0 ]; then
+      echo "Failed to parse p_manifest.json as json"
+      exit $RETURNCODE
+    fi
+
+    for ((i=0; i < PKGCNT; i++))
+    do
+        PKG=$(echo $JSONTXT | jsparser --jsobj -p /pkgs/$i)
+        PKGNM=$(echo $PKG | jsparser -p /FileName)
+        PKGTYPE=$(echo $PKG | jsparser -p /type)
+
+        if [ "$PKGTYPE" == "ipk" ]; then
+            PKGCMD=$OPKG_CMD_PREFIX"./provisioning/$DIR/"$PKGNM
+            echo "Executing: $PKGCMD"
+            eval $PKGCMD
+            if [ $? != 0 ]; then
+                echo "Command [$PKGCMD] failed with status $?"
+                logger -t Install "Command [$PKGCMD] failed with status $?"
+                exit $?
+            fi
+        fi
+        logger -t Install "Command [$PKGCMD] succeeded"
+    done
+}
+
 #
 # The Install script is invoked with the postremove argument by the app-manager
 # process after it has removed an application succesfully. One example of 
@@ -165,23 +166,36 @@ function post_remove {
 
 case "$1" in
   install)
-      echo -n "Installing dependencies: "
-      logger -t Install "Installing Dependencies: "
-      # Check the OS version
-      OS_VERSION=$(cat /etc/issue | grep -o 'mLinux 7.0.1')
-      if [ "$OS_VERSION" != "mLinux 7.0.1" ]; then
-        logger -t Install "installing packages for mpower-6.x.x"
-        install_packages
+
+    echo -n "Installing dependencies: "
+    logger -t Install "Installing Dependencies: "
+    # Check the OS version
+    OS_VERSION=$(cat /etc/issue | grep -o 'mLinux 7')
+    if [ "$OS_VERSION" != "mLinux 7" ]; then
+        logger -t Install "installing packages for mpower-6"
+        install_packages "mpower-6"
         echo "$NAME."
-      else
-        logger -t Install "Skip installing packages for mpower-7.x.x"
-      fi
-      
+    else
+        logger -t Install "installing packages for mpower-7"
+        install_packages "mpower-7"
+        echo "$NAME."
+    fi  
       ;;
   remove)
       echo -n "Removing Dependencies: "
       logger -t Install "Removing Dependencies: "
-      remove_packages
+          # Check the OS version
+    OS_VERSION=$(cat /etc/issue | grep -o 'mLinux 7')
+    if [ "$OS_VERSION" != "mLinux 7" ]; then
+        logger -t Install "removing packages for mpower-6"
+        remove_packages "mpower-6"
+        echo "$NAME."
+    else
+        logger -t Install "removing packages for mpower-7"
+        remove_packages "mpower-7"
+        echo "$NAME."
+    fi
+    #   remove_packages
       echo "$NAME."
       ;;
   postinstall)
